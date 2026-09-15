@@ -13,20 +13,12 @@ export default function VirtualOfficeConfigurator() {
   return (
     <section className="section vo-platform-section" id="voConfigurator">
       <div className="container">
-        <div className="section__header section__header--center reveal">
-          <span className="section__eyebrow" style={{ color: 'var(--vd-teal-primary)' }}>
-            <i className="ph-bold ph-sliders" />
-            Modular Business Infrastructure
-          </span>
-          <h2 className="section__title">
-            CONFIGURE YOUR
-            <br />
-            <span className="highlight-gold">VIRTUAL OFFICE SETUP</span>
+        <div className="ui-section-head ui-section-head--center">
+          <span className="ui-kicker">Custom plan</span>
+          <h2 className="ui-title">
+            Build your own <em>virtual office plan</em>
           </h2>
-          <p className="section__desc">
-            Select your business purpose, grade-A location, and customized add-on services. Real-time dynamic pricing
-            with instant KYC onboarding.
-          </p>
+          <p className="ui-lead">Choose a city, what you&apos;ll use the address for and any extras. Your price updates as you go.</p>
         </div>
         <div className="vo-journey-stepper reveal">
           <div className="vo-step-item active">

@@ -1,4 +1,5 @@
 import { GST_RATE } from '@/data/constants.js';
+import { addBooking } from '@/features/bookings/bookingStore.js';
 import { openCheckoutModal } from '@/features/checkout/checkout.js';
 import { closeModal, openActiveModal } from '@/features/modals/modalManager.js';
 import { showToast } from '@/features/ui/toast.js';
@@ -155,6 +156,8 @@ function openConfirmedBookingPass() {
 
   const bookingId = activeRoomBooking.ref || 'BK-' + Date.now().toString(36).toUpperCase();
   activeRoomBooking.state = 'confirmed';
+  const { customer, ...record } = activeRoomBooking;
+  addBooking({ ...record, ref: bookingId, host: customer?.name || 'Authorized Guest' });
 
   const setText = (id, text) => {
     const el = document.getElementById(id);

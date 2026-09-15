@@ -10,20 +10,12 @@ export default function SchedulerSection() {
       ref={rawStyle('padding: 70px 0; background: #05132B !important;')}
     >
       <div className="container">
-        <div className="section__header section__header--center">
-          <span className="hero-badge-pill" style={{ marginBottom: '12px' }}>
-            <i className="ph-bold ph-presentation" />
-            On-Demand Workspaces
-          </span>
-          <h2 className="section__title" ref={rawStyle('color: #FFFFFF !important;')}>
-            SCHEDULE EXECUTIVE SUITES
-            <br />
-            <span className="highlight-gold">IN REAL TIME</span>
+        <div className="ui-section-head ui-section-head--center ui-section-head--dark">
+          <span className="ui-kicker">Book a room</span>
+          <h2 className="ui-title">
+            Check availability and <em>book in a minute</em>
           </h2>
-          <p className="section__desc" ref={rawStyle('color: #CBD5E1 !important;')}>
-            Select location, room calibre, date, and time slot. Instant availability check and state-machine booking
-            confirmation.
-          </p>
+          <p className="ui-lead">Pick a city, room size, date and time. You see the full price before you pay.</p>
         </div>
         <div className="meeting-scheduler-box" style={{ marginTop: '30px' }}>
           <div className="scheduler-form-grid">

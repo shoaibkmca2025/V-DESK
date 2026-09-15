@@ -65,8 +65,8 @@ function PlatformLayer() {
  * Shared page frame: header, drawer, footer and all global dialogs.
  * Overlay stacking follows DOM order, so the homepage keeps its original layer order.
  */
-export default function SiteLayout({ page, children }) {
-  usePageDocument(page);
+export default function SiteLayout({ page, meta, children }) {
+  usePageDocument(page, meta);
   usePageRuntime(page);
 
   const isHome = page === 'home';

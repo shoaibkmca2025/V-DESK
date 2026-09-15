@@ -1,4 +1,5 @@
 import { parseSearchIntent } from './parseSearchIntent.js';
+import { createExplorerFilters, DEFAULT_MAX_PRICE, filterInventory, filtersFromIntent } from './searchEngine.js';
 import { trackSearchEvent } from '@/features/analytics/telemetry.js';
 import { catalog } from '@/features/catalog/catalogStore.js';
 import { openMeetingBookingModal } from '@/features/meetingRooms/roomBooking.js';
@@ -8,19 +9,6 @@ import { asset } from '@/lib/assets.js';
 import { action, escapeHtml } from '@/lib/html.js';
 
 /* Universal search (PRD §9–16): intent parsing + faceted results explorer (#universalSearchResultsModal). */
-
-const DEFAULT_MAX_PRICE = 15000;
-
-function createExplorerFilters() {
-  return {
-    city: 'all',
-    type: 'all',
-    capacity: 'all',
-    maxPrice: DEFAULT_MAX_PRICE,
-    sort: 'recommended',
-    amenities: { gst: true, wifi: false, parking: false, meeting: false, access247: false },
-  };
-}
 
 let activeExplorerFilters = createExplorerFilters();
 
@@ -38,14 +26,6 @@ export function executeSearchQuery(query) {
   openUniversalSearchResults(query, parseSearchIntent(query));
 }
 
-function capacityBucket(capacity) {
-  if (capacity <= 1) return '1';
-  if (capacity <= 5) return '2-5';
-  if (capacity <= 10) return '6-10';
-  if (capacity <= 25) return '11-25';
-  return '25+';
-}
-
 export function openUniversalSearchResults(query, parsed) {
   const modal = document.getElementById('universalSearchResultsModal');
   const title = document.getElementById('searchResultsModalTitle');
@@ -60,23 +40,9 @@ export function openUniversalSearchResults(query, parsed) {
 
   // Auto-apply filters based on the parsed intent
   if (parsed) {
-    if (parsed.location && citySelect) {
-      citySelect.value = parsed.location;
-      activeExplorerFilters.city = parsed.location;
-    } else if (citySelect) {
-      citySelect.value = 'all';
-      activeExplorerFilters.city = 'all';
-    }
-
-    if (parsed.intent && parsed.intent !== 'General Discovery' && typeSelect) {
-      typeSelect.value = parsed.intent;
-      activeExplorerFilters.type = parsed.intent;
-    } else if (typeSelect) {
-      typeSelect.value = 'all';
-      activeExplorerFilters.type = 'all';
-    }
-
-    if (parsed.capacity) activeExplorerFilters.capacity = capacityBucket(parsed.capacity);
+    activeExplorerFilters = filtersFromIntent(parsed, activeExplorerFilters);
+    if (citySelect) citySelect.value = activeExplorerFilters.city;
+    if (typeSelect) typeSelect.value = activeExplorerFilters.type;
   }
 
   renderExplorerResults();
@@ -133,56 +99,6 @@ export function resetExplorerFilters() {
   renderExplorerResults();
 }
 
-/** Virtual office centres + marketplace workspaces as one searchable inventory. */
-function searchableInventory() {
-  const centres = catalog.locations.map((loc) => ({
-    id: loc.id,
-    name: loc.fullName,
-    type: 'Virtual Office',
-    city: loc.city,
-    locality: loc.areaName,
-    address: loc.address,
-    capacity: 10,
-    priceMonth: loc.vo_price,
-    status: loc.status,
-    rating: 4.9,
-    reviews: 160 + (loc.vo_price % 70),
-  }));
-
-  const workspaces = catalog.workspaces.map((ws) => ({
-    id: ws.id,
-    name: ws.name,
-    type: ws.type,
-    city: ws.city,
-    locality: ws.locality,
-    address: ws.address,
-    capacity: ws.capacity,
-    priceMonth: ws.priceMonth,
-    status: ws.status,
-    rating: ws.rating,
-    reviews: ws.reviews,
-  }));
-
-  return [...centres, ...workspaces];
-}
-
-function matchesCapacity(capacityFilter, capacity) {
-  switch (capacityFilter) {
-    case '1':
-      return capacity === 1;
-    case '2-5':
-      return capacity >= 2 && capacity <= 5;
-    case '6-10':
-      return capacity >= 6 && capacity <= 10;
-    case '11-25':
-      return capacity >= 11 && capacity <= 25;
-    case '25+':
-      return capacity >= 25;
-    default:
-      return true;
-  }
-}
-
 export function renderExplorerResults() {
   const grid = document.getElementById('explorerResultsGrid');
   const zeroCard = document.getElementById('zeroResultsCard');
@@ -190,16 +106,7 @@ export function renderExplorerResults() {
   if (!grid) return;
 
   const filters = activeExplorerFilters;
-  const filtered = searchableInventory().filter((item) => {
-    if (filters.city !== 'all' && item.city.toLowerCase() !== filters.city.toLowerCase()) return false;
-    if (filters.type !== 'all' && item.type.toLowerCase() !== filters.type.toLowerCase()) return false;
-    if (!matchesCapacity(filters.capacity, item.capacity)) return false;
-    return item.priceMonth <= filters.maxPrice;
-  });
-
-  if (filters.sort === 'price-asc') filtered.sort((a, b) => a.priceMonth - b.priceMonth);
-  else if (filters.sort === 'price-desc') filtered.sort((a, b) => b.priceMonth - a.priceMonth);
-  else if (filters.sort === 'capacity') filtered.sort((a, b) => b.capacity - a.capacity);
+  const filtered = filterInventory(filters);
 
   if (countEl) {
     countEl.textContent = `Showing ${filtered.length} Available Location${filtered.length === 1 ? '' : 's'}`;

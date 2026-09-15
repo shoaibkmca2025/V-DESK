@@ -6,20 +6,12 @@ export default function MarketplaceSection() {
   return (
     <section className="section cw-marketplace-section" id="marketplace">
       <div className="container">
-        <div className="section__header section__header--center">
-          <span className="section__eyebrow">
-            <i className="ph-bold ph-magnifying-glass" />
-            Live Workspace Inventory
-          </span>
-          <h2 className="section__title">
-            EXPLORE VERIFIED
-            <br />
-            <span className="highlight-gold">GRADE-A WORKSPACES</span>
+        <div className="ui-section-head ui-section-head--center ui-section-head--dark">
+          <span className="ui-kicker">Browse spaces</span>
+          <h2 className="ui-title">
+            Find a workspace <em>near you</em>
           </h2>
-          <p className="section__desc">
-            Select workspace calibre or filter by city. All spaces include biometric security, high-speed dual internet,
-            and receptionist concierge.
-          </p>
+          <p className="ui-lead">Filter by type or city. Every space includes Wi-Fi, reception and security.</p>
         </div>
         <div className="mp-filter-toolbar" style={{ marginTop: '30px' }}>
           <div className="mp-cat-btn-group">

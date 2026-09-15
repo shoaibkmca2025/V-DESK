@@ -1,7 +1,7 @@
 # V-DESK — Business Infrastructure & Workspace Platform
 
-React + Vite frontend for **V-DESK Workspace & Consulting LLP**. The UI/UX is the client-approved design; this
-repository is the same site restructured into a maintainable component codebase (no visual changes).
+React + Vite frontend for **V-DESK Workspace & Consulting LLP**. Uses the client-approved colour palette
+(navy / gold / teal) with a simplified, easy-to-scan page layout built from shared `components/ui` blocks.
 
 ## Quick start
 
@@ -33,10 +33,14 @@ src/
     navigation.js          header, mobile drawer and footer link structure
   layouts/SiteLayout.jsx   header + drawer + page + footer + all global modals
   components/
+    ui/                    simple-UI building blocks: Section, Button, SearchHero, SplitHero, Plans, Steps,
+                           CityGrid, FeatureCards, Testimonials, StatsRow, CtaBand, DocumentChecklist
     layout/                SiteHeader, MobileDrawer, SiteFooter, docks, banners
     modals/                one component per dialog (quote, booking, KYC, checkout, …)
     sections/              sections shared by several pages (VO configurator, solution finder, KYC docs)
   pages/<page>/            one folder per route: <Page>.jsx + sections/*.jsx
+  components/page/         building blocks for the extended pages (PageHero, SectionHeader, FaqAccordion, LeadCard, …)
+  components/cards/        CentreCard, WorkspaceCard (React versions of the approved cards)
   features/<feature>/      behaviour (plain JS, one folder per feature)
     pageRuntime.js         initialises every widget after a page renders
     templateActions.js     actions reachable from HTML-string widgets (data-action)
@@ -48,6 +52,23 @@ src/
 docs/                      PRD & blueprint
 _archive/                  original static site, backups, one-off scripts, screenshots (reference only)
 ```
+
+## Routes
+
+| Route | Page |
+|---|---|
+| `/` | Home |
+| `/virtual-office`, `/coworking-spaces`, `/meeting-rooms`, `/pricing`, `/company-registration`, `/contact` | Product pages (approved design) |
+| `/services`, `/services/:slug` | Services index + virtual-office / gst-registration / company-registration landing pages |
+| `/locations`, `/locations/:city`, `/locations/:city/:product` | Directory, city hub, city × product (e.g. `/locations/mumbai/virtual-office`) |
+| `/workspaces/:city` | Filterable workspace marketplace per city |
+| `/search?q=` | Universal search results with intent, filters, zero-result recovery |
+| `/resources`, `/resources/:slug`, `/faqs` | Knowledge centre, guide, FAQs |
+| `/legal/privacy`, `/legal/terms`, `/legal/refund-policy`, `/legal/compliance` | Legal documents |
+| `/login`, `/register`, `/kyc`, `/checkout`, `/bookings`, `/quote/:ref` | Account & transaction flows |
+| `/portal`, `/admin` | Client portal, admin console |
+
+Content for the data-driven pages lives in `src/data/` (`services.js`, `cities.js`, `guides.js`, `faqs.js`).
 
 ## How pages work
 
@@ -63,6 +84,9 @@ use `data-action="…"` attributes (see `lib/html.js` → `action()`), dispatche
 
 - **Styles:** `src/styles/*.css`. The partials are imported in cascade order by `src/styles/index.css`;
   add new rules in a new partial at the end or in the relevant existing one — do not reorder imports.
+  `37-simple-ui.css` holds the `.ui-*` component styles and colour tokens (`--ui-navy`, `--ui-gold`, `--ui-teal`, …).
+- **Page layout pattern:** hero with one message → plans/options → what's included → steps → cities → FAQ → CTA.
+  Compose new pages from `src/components/ui` rather than one-off inline styles.
 - **Markup:** `src/pages/<page>/sections/*.jsx` for page content, `src/components/` for shared chrome/modals.
 - **Navigation:** `src/config/navigation.js`.
 - **Data / pricing:** `src/data/*.js`.

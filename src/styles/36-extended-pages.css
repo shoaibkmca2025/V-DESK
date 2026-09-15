@@ -1,0 +1,154 @@
+/* ==========================================================================
+   EXTENDED PAGES (services, city hubs, search, resources, account flows)
+   Responsive rules only — all visual styling reuses the existing design system.
+   ========================================================================== */
+
+.site-hero-split .hero-content-col:only-child {
+  max-width: 860px;
+}
+
+.search-hero-form {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 10px;
+}
+
+.search-hero-form .form-control {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .search-hero-form {
+    flex-direction: column !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .search-layout,
+  .kyc-layout,
+  .checkout-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .search-layout aside,
+  .kyc-layout aside,
+  .checkout-layout aside {
+    position: static !important;
+  }
+
+  .booking-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .booking-row > div:last-child {
+    text-align: left !important;
+  }
+
+  .booking-row > div:last-child > div {
+    justify-content: flex-start !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .subpage--legal .container[style*='grid'] {
+    grid-template-columns: 1fr !important;
+  }
+
+  .subpage--legal nav[aria-label='Legal documents'] {
+    position: static !important;
+  }
+}
+
+@media print {
+  .subpage--quote .site-header,
+  .subpage--quote .top-utility-bar,
+  .subpage--quote .site-footer,
+  .subpage--quote .cw-breadcrumbs-bar,
+  .subpage--quote .floating-contact-widget,
+  .subpage--quote .mobile-sticky-dock,
+  .subpage--quote .mobile-app-bottom-dock,
+  .subpage--quote .proposal-document .btn {
+    display: none !important;
+  }
+}
+
+/* Standalone checkout page (the checkout dialog keeps its approved look) */
+.subpage--checkout .checkout-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid #E2E8F0;
+  padding-bottom: 14px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.subpage--checkout .pay-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid #E2E8F0;
+  background: #F8FAFC;
+  color: #334155;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.subpage--checkout .pay-tab:hover {
+  border-color: #C59239;
+}
+
+.subpage--checkout .pay-tab.active {
+  background: #081D40;
+  border-color: #081D40;
+  color: #FFFFFF;
+}
+
+.subpage--checkout .upi-qr-box {
+  display: grid;
+  gap: 18px;
+}
+
+.subpage--checkout .qr-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px;
+  border: 1px dashed #C59239;
+  border-radius: 12px;
+  background: #FAF8F3;
+  color: #64748B;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.subpage--checkout .qr-big-icon {
+  font-size: 3.5rem;
+  color: #081D40;
+}
+
+.subpage--checkout .upi-id-row > span {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #081D40;
+  margin-bottom: 8px;
+}
+
+.subpage--checkout .upi-input-flex {
+  display: flex;
+  gap: 10px;
+}
+
+.subpage--checkout .upi-input-flex .form-input {
+  flex: 1;
+}
+
+.subpage--checkout .pay-body .btn--full {
+  margin-top: 6px;
+}

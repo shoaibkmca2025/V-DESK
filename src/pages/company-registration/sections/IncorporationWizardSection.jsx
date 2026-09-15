@@ -6,20 +6,12 @@ export default function IncorporationWizardSection() {
   return (
     <section className="section" id="incorpWizard" style={{ padding: '70px 0', background: '#FFFFFF' }}>
       <div className="container">
-        <div className="section__header section__header--center">
-          <span className="section__eyebrow" style={{ color: '#C59239' }}>
-            <i className="ph-bold ph-sliders" />
-            Cost & Timeline Estimator
-          </span>
-          <h2 className="section__title">
-            5-STEP INTERACTIVE
-            <br />
-            <span className="highlight-gold">INCORPORATION WIZARD</span>
+        <div className="ui-section-head ui-section-head--center">
+          <span className="ui-kicker">Cost calculator</span>
+          <h2 className="ui-title">
+            How much will <em>registration cost?</em>
           </h2>
-          <p className="section__desc">
-            Calculate government MCA filing fees, state stamp duties, professional CA fees, and virtual office bundle
-            discounts.
-          </p>
+          <p className="ui-lead">Choose your company type and state to see government fees, stamp duty and our professional fee.</p>
         </div>
         <div
           style={{

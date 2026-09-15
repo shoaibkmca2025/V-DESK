@@ -5,19 +5,12 @@ export default function SavingsComparisonSection() {
   return (
     <section className="section" style={{ padding: '70px 0', background: '#FFFFFF' }}>
       <div className="container">
-        <div className="section__header section__header--center">
-          <span className="section__eyebrow" style={{ color: '#C59239' }}>
-            <i className="ph-bold ph-trend-up" />
-            Fiscal Intelligence
-          </span>
-          <h2 className="section__title">
-            88% OPERATIONAL SAVINGS
-            <br />
-            <span className="highlight-gold">VS TRADITIONAL COMMERCIAL LEASE</span>
+        <div className="ui-section-head ui-section-head--center">
+          <span className="ui-kicker">Savings</span>
+          <h2 className="ui-title">
+            How much you save vs a <em>traditional office</em>
           </h2>
-          <p className="section__desc">
-            Compare standard 1,000 sq.ft commercial office lock-in against V-DESK Virtual Office & Flexi Infrastructure.
-          </p>
+          <p className="ui-lead">Yearly cost of a 1,000 sq.ft office lease compared with V-DESK.</p>
         </div>
         <div style={{ maxWidth: '820px', margin: '35px auto 0 auto', overflowX: 'auto' }}>
           <table

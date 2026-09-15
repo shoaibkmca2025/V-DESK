@@ -6,20 +6,12 @@ export default function TeamSavingsCalculator() {
   return (
     <section className="section cw-calc-section" id="teamCalc">
       <div className="container">
-        <div className="section__header section__header--center">
-          <span className="section__eyebrow">
-            <i className="ph-bold ph-chart-line-up" />
-            Operational Cost Efficiency
-          </span>
-          <h2 className="section__title">
-            TEAM FLEXI-PASS
-            <br />
-            <span className="highlight-gold">SAVINGS CALCULATOR</span>
+        <div className="ui-section-head ui-section-head--center ui-section-head--dark">
+          <span className="ui-kicker">Team savings</span>
+          <h2 className="ui-title">
+            See what your team saves with <em>flexible desks</em>
           </h2>
-          <p className="section__desc">
-            See how much your organization saves switching from a rigid 3-year commercial lease to V-DESK agile
-            flexi-passes.
-          </p>
+          <p className="ui-lead">Move the slider to your team size.</p>
         </div>
         <div className="cw-calc-container">
           <div className="cw-calc-inputs-grid">
