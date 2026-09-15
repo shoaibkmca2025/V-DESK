@@ -1,0 +1,795 @@
+/* ==========================================================================
+   V-DESK DEFINITIVE MASTER WHITE THEME (ABSOLUTE CASCADE PRIORITY)
+   WHITE: 65-75% | NAVY: 15-20% | CREAM: 5-10% | GOLD: 5-8%
+   ENFORCES 100% READABILITY & ELIMINATES ALL INVISIBLE / LOW-CONTRAST TEXT
+   ========================================================================== */
+
+:root {
+  /* Brand Canonical Variables */
+  --vd-bg-primary: #FFFFFF;     /* Dominant Canvas (65-75%) */
+  --vd-bg-secondary: #F8FAFC;   /* Secondary Background */
+  --vd-cream-soft: #F1F5F9;     /* Subtle Cream Warmth (5-10%) */
+  --vd-navy-deep: #0F3B60;      /* Primary Brand / Authority (15-20%) */
+  --vd-navy-dark: #0A2540;      /* Deepest Navy */
+  --vd-gold-primary: #00A896;   /* Primary Vibrant Teal Accent */
+  --vd-gold-light: #02C39A;     /* Light Radiant Teal */
+  --vd-text-body: #26344A;      /* High-contrast Body Slate */
+  --vd-text-dark: #1A1A1A;      /* Charcoal Body */
+  --vd-text-muted: #5A6270;     /* Muted Grey Text */
+  --vd-border-soft: #E2E8F0;    /* Borders & Dividers */
+  --border-subtle: #E2E8F0;
+  --border-light: #E2E8F0;
+  --border-medium: #CBD5E0;
+  --border-accent: rgba(0, 168, 150, 0.4);
+
+  /* Legacy Token Re-mappings */
+  --vd-black: #FFFFFF;
+  --vd-white: #0F3B60;
+  --vd-slate: #F8FAFC;
+  --vd-slate-light: #F1F5F9;
+  --vd-accent: #00A896;
+  --vd-accent-hover: #02C39A;
+  --vd-accent-warm: #02C39A;
+  --vd-accent-dark: #008C7D;
+  --vd-accent-glow: rgba(0, 168, 150, 0.25);
+  --vd-accent-subtle: rgba(0, 168, 150, 0.1);
+  --vd-zinc-50: #0F3B60;
+  --vd-zinc-100: #0F3B60;
+  --vd-zinc-200: #0F3B60;
+  --vd-zinc-300: #1A1A1A;
+  --vd-zinc-400: #26344A;
+  --vd-zinc-500: #5A6270;
+  --vd-zinc-600: #718096;
+  --vd-zinc-700: #A0AEC0;
+  --vd-zinc-800: #E2E8F0;
+  --vd-zinc-900: #F8FAFC;
+}
+
+/* 1. Universal Document Foundation */
+html, body {
+  background-color: var(--vd-bg-primary) !important;
+  color: #26344A !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+/* 2. Section Background Palette Hierarchy */
+/* Pure White Dominant Canvas (65-75%) */
+.section--white,
+.hero-white,
+.services,
+.locations,
+.pricing,
+.wizard,
+.contact {
+  background-color: #FFFFFF;
+  color: #26344A;
+}
+
+/* Explicit Dark Executive Canvas & Sections (PRD v2.0) */
+.admin-page-wrap,
+.room-specs,
+.section--dark {
+  background-color: #05132B !important;
+  color: #FFFFFF !important;
+}
+
+.admin-page-wrap h1,
+.admin-page-wrap h2,
+.admin-page-wrap h3,
+.admin-page-wrap h4,
+.room-specs h1,
+.room-specs h2,
+.room-specs h3,
+.room-specs h4,
+.portal-header-dark h1,
+.portal-header-dark h2,
+.portal-header-dark h3,
+[style*="background: #081D40"] h1,
+[style*="background: #081D40"] h2,
+[style*="background: #081D40"] h3,
+[style*="background: #081D40"] h4,
+[style*="background: #05132B"] h1,
+[style*="background: #05132B"] h2,
+[style*="background: #05132B"] h3,
+[style*="background: #05132B"] h4 {
+  color: #FFFFFF !important;
+}
+
+
+/* Subtle Cream & Warm Neutral Supporting Sections (5-10%) */
+.trust-strip,
+.ecosystem,
+#ecosystem,
+.solution-finder,
+#solutionFinder,
+.testimonials,
+#testimonials,
+.knowledge,
+#knowledge,
+.journey,
+#journey,
+.section--cream,
+.faq-section {
+  background-color: #F8FAFC !important;
+  color: #26344A !important;
+}
+
+/* Deep Navy Authority Sections (15-20%) */
+.final-cta {
+  background-color: #0F3B60 !important;
+  color: #F1F5F9 !important;
+}
+
+/* 3. Typography & Text Contrast Engine */
+/* Headings & Authority Titles -> Deep Navy with ORIGINAL Brand Font */
+h1, h2, h3, h4, h5, h6,
+.section__title,
+.service-card__name,
+.card-title,
+.finder__card-title,
+.ecosystem__stage-title,
+.location-card__city,
+.location-card__name,
+.pricing__bar-value,
+.wizard__pane-title,
+.wizard__choice strong,
+.knowledge__card-title,
+.contact__form-title,
+.contact__channel-title,
+.modal__title,
+.modal-card h3,
+.hero-white__headline,
+.testimonial-display__name,
+.spotlight-val,
+.floating-badge .badge-title {
+  color: #0B1B33 !important;
+  font-family: 'Outfit', 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+/* Standard Body & Descriptions -> #26344A Crisp Slate */
+p,
+.section__desc,
+.service-card__desc,
+.body-text,
+.finder__card-desc,
+.ecosystem__stage-desc,
+.location-card__address,
+.pricing__bar-title,
+.pricing__disclaimer,
+.wizard__pane-desc,
+.wizard__choice span,
+.knowledge__card-excerpt,
+.testimonial-display__quote,
+.contact__form-desc,
+.contact__channel-desc,
+.service-card__feature,
+.pricing__checkbox-label,
+.wizard__multi-option,
+.faq-item__answer p,
+.hero-white__subtitle {
+  color: #26344A !important;
+}
+
+/* Secondary & Muted Meta Information -> #5A6270 Muted Grey */
+.trust-strip__label,
+.trust-strip__sub,
+.knowledge__card-time,
+.testimonial-display__role,
+.testimonial-display__location,
+.pricing__breakdown-row span:first-child,
+.form-footer,
+.hero-trust-item span,
+.floating-badge .badge-sub,
+.spotlight-lbl,
+.scrub-instruction {
+  color: #5A6270 !important;
+}
+
+/* Big Stage & Milestone Numbers (Previously Invisible #EDF2F7 -> Bold Gold) */
+.ecosystem__stage-num,
+.journey__milestone-num {
+  color: #00A896 !important;
+  font-family: 'Cinzel', 'Playfair Display', Georgia, serif !important;
+  font-weight: 800 !important;
+  opacity: 0.9 !important;
+  line-height: 1 !important;
+}
+
+/* Gold Accents & Highlights -> #00A896 (NO white gradients, NO transparent text) */
+.text-gold,
+.highlight-gold,
+.accent,
+.pricing__savings-value,
+.pricing__bar-value--accent,
+.service-card__price,
+.location-card__price,
+.finder__card-label,
+.knowledge__card-category {
+  color: #00A896 !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #00A896 !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+/* 4. Interactive Cards & Elevated Containers */
+.card,
+.service-card,
+.service-card--featured,
+.service-card--standard,
+.service-card--compact,
+.finder__card,
+.location-card,
+.knowledge__card,
+.contact__form-card,
+.pricing__summary,
+.ecosystem__stage,
+.journey__milestone-content,
+.contact__channel,
+.trust-strip__item {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(11, 35, 72, 0.05) !important;
+  color: #26344A !important;
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), border-color 300ms ease, box-shadow 300ms ease !important;
+}
+
+.card:hover,
+.service-card:hover,
+.finder__card:hover,
+.location-card:hover,
+.knowledge__card:hover,
+.ecosystem__stage:hover,
+.journey__milestone-content:hover,
+.contact__channel:hover {
+  transform: translateY(-4px) !important;
+  border-color: #00A896 !important;
+  box-shadow: 0 12px 32px rgba(11, 35, 72, 0.1) !important;
+}
+
+/* 5. Button System (High Contrast & Fluid Interactions) */
+/* Primary: Deep Navy background + Crisp White text */
+.btn--primary,
+button.btn--primary,
+.hero-white__ctas .btn--primary {
+  background-color: var(--vd-navy-deep, #0B1B33) !important;
+  color: #FFFFFF !important;
+  border: 1.5px solid var(--vd-navy-deep, #0B1B33) !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 4px 14px rgba(11, 27, 51, 0.15) !important;
+}
+
+.btn--primary:hover,
+button.btn--primary:hover,
+.hero-white__ctas .btn--primary:hover {
+  background-color: #00A896 !important;
+  color: #FFFFFF !important;
+  border-color: #00A896 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(0, 168, 150, 0.3) !important;
+}
+
+/* Secondary: White background + Deep Navy border + Navy text */
+.btn--secondary,
+.btn--outline,
+button.btn--secondary,
+button.btn--outline,
+.hero-white__ctas .btn--secondary {
+  background-color: #FFFFFF !important;
+  color: var(--vd-navy-deep, #0B1B33) !important;
+  border: 1.5px solid var(--vd-navy-deep, #0B1B33) !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn--secondary:hover,
+.btn--outline:hover,
+button.btn--secondary:hover,
+button.btn--outline:hover,
+.hero-white__ctas .btn--secondary:hover {
+  background-color: var(--vd-navy-deep, #0B1B33) !important;
+  color: #FFFFFF !important;
+  border-color: var(--vd-navy-deep, #0B1B33) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Gold CTA Buttons */
+.btn--gold,
+button.btn--gold {
+  background-color: #00A896 !important;
+  color: #FFFFFF !important;
+  border: 1.5px solid #00A896 !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 4px 16px rgba(0, 168, 150, 0.25) !important;
+}
+
+.btn--gold:hover,
+button.btn--gold:hover {
+  background-color: #02C39A !important;
+  color: #FFFFFF !important;
+  border-color: #02C39A !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(0, 168, 150, 0.4) !important;
+}
+
+.btn:focus-visible,
+button.btn:focus-visible {
+  outline: none !important;
+  box-shadow: var(--focus-ring, 0 0 0 3px rgba(0, 168, 150, 0.35)) !important;
+}
+
+/* 6. Badges, Chips, Pills & Tags */
+.service-card__badge,
+.locations__filter-btn.active,
+.mobile-cta-quote {
+  background-color: #00A896 !important;
+  color: #0B2348 !important;
+  border-color: #00A896 !important;
+  font-weight: 700 !important;
+}
+
+.utility-badge {
+  background-color: rgba(0, 168, 150, 0.12) !important;
+  color: #0B2348 !important;
+  border: 1px solid rgba(0, 168, 150, 0.35) !important;
+  font-weight: 700 !important;
+}
+
+.locations__filter-btn {
+  background-color: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  color: #0B2348 !important;
+  font-weight: 600 !important;
+  border-radius: 9999px !important;
+  transition: all 200ms ease !important;
+}
+
+.locations__filter-btn:hover:not(.active) {
+  border-color: #00A896 !important;
+  color: #00A896 !important;
+  background-color: #F8FAFC !important;
+}
+
+.ecosystem__service-tag,
+.location-card__service-tag {
+  background-color: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #0B2348 !important;
+  font-weight: 500 !important;
+}
+
+.service-card__feature .check {
+  color: #059669 !important;
+}
+
+/* 7. Forms, Inputs & Select Elements */
+input, select, textarea,
+.form-input,
+.form-select,
+.form-textarea,
+.locations__search-input,
+.pricing__select {
+  background-color: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  color: #0B2348 !important;
+  border-radius: 8px !important;
+  font-family: inherit !important;
+}
+
+input:focus, select:focus, textarea:focus,
+.form-input:focus, .form-select:focus, .form-textarea:focus,
+.locations__search-input:focus, .pricing__select:focus {
+  border-color: #0B2348 !important;
+  box-shadow: 0 0 0 3px rgba(11, 35, 72, 0.08) !important;
+  outline: none !important;
+}
+
+input::placeholder, textarea::placeholder,
+.locations__search-input::placeholder {
+  color: #8A94A6 !important;
+}
+
+option, select option {
+  background-color: #FFFFFF !important;
+  color: #0B2348 !important;
+}
+
+.form-label, .pricing__checkbox-label {
+  color: #0B2348 !important;
+  font-weight: 600 !important;
+}
+
+/* Checkbox Checkmarks (Bold Navy Checkmark on Gold Background) */
+input[type="checkbox"]:checked,
+.pricing__checkbox-label input[type="checkbox"]:checked,
+.wizard__multi-option input[type="checkbox"]:checked {
+  background-color: #00A896 !important;
+  border-color: #00A896 !important;
+}
+
+input[type="checkbox"]:checked::after,
+.pricing__checkbox-label input[type="checkbox"]:checked::after,
+.wizard__multi-option input[type="checkbox"]:checked::after {
+  content: '✓' !important;
+  color: #0B2348 !important;
+  font-weight: 900 !important;
+}
+
+/* 8. Pricing Configurator Polish */
+.pricing__summary {
+  background-color: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+.pricing__summary-kicker {
+  color: #00A896 !important;
+  font-weight: 700 !important;
+}
+
+.pricing__bar-track {
+  background-color: #E2E8F0 !important;
+}
+
+.pricing__bar-fill--trad {
+  background-color: #8A94A6 !important;
+}
+
+.pricing__bar-fill--vdesk {
+  background: linear-gradient(90deg, #0B2348, #00A896) !important;
+}
+
+.pricing__savings {
+  background-color: #FFFFFF !important;
+  border: 1.5px solid #00A896 !important;
+  border-radius: 12px !important;
+}
+
+.pricing__savings-value {
+  color: #00A896 !important;
+}
+
+.pricing__savings-label {
+  color: #0B2348 !important;
+}
+
+.pricing__breakdown {
+  border-top: 1px solid #E2E8F0 !important;
+}
+
+.pricing__breakdown-row strong {
+  color: #0B2348 !important;
+}
+
+.pricing__range {
+  background-color: #E2E8F0 !important;
+}
+
+.pricing__range::-webkit-slider-thumb {
+  background-color: #00A896 !important;
+  border: 3px solid #0B2348 !important;
+}
+
+.pricing__range::-moz-range-thumb {
+  background-color: #00A896 !important;
+  border: 3px solid #0B2348 !important;
+}
+
+/* 9. Setup Wizard Polish */
+.wizard__container {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 40px rgba(11, 35, 72, 0.06) !important;
+}
+
+.wizard__step-node {
+  background-color: #F8FAFC !important;
+  border: 2px solid #E2E8F0 !important;
+  color: #0B2348 !important;
+  font-weight: 700 !important;
+}
+
+.wizard__step-node.active,
+.wizard__step-node.completed {
+  background-color: #00A896 !important;
+  border-color: #00A896 !important;
+  color: #0B2348 !important;
+  font-weight: 800 !important;
+}
+
+.wizard__step-line {
+  background-color: #E2E8F0 !important;
+}
+
+.wizard__step-line.completed {
+  background-color: #00A896 !important;
+}
+
+.wizard__choice {
+  background-color: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
+  color: #26344A !important;
+  border-radius: 10px !important;
+}
+
+.wizard__choice:hover {
+  border-color: #00A896 !important;
+  background-color: #FFFFFF !important;
+}
+
+.wizard__choice.selected {
+  border-color: #00A896 !important;
+  background-color: #F1F5F9 !important;
+  box-shadow: 0 0 0 2px rgba(0, 168, 150, 0.3) !important;
+}
+
+.wizard__choice strong {
+  color: #0B2348 !important;
+}
+
+.wizard__choice span {
+  color: #5A6270 !important;
+}
+
+.wizard__multi-option {
+  background-color: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
+  color: #0B2348 !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+
+.wizard__multi-option:hover {
+  border-color: #00A896 !important;
+}
+
+.wizard__multi-option:has(input:checked) {
+  border-color: #00A896 !important;
+  background-color: #F1F5F9 !important;
+}
+
+/* 10. Header, Navigation & Top Utility Bar */
+.site-header {
+  background-color: #FFFFFF !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  width: 100% !important;
+  transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.header-container {
+  transition: padding 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.site-header.is-scrolled {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  box-shadow: 0 4px 20px rgba(15, 59, 96, 0.06) !important;
+  border-bottom: 1px solid rgba(0, 168, 150, 0.3) !important;
+}
+
+.site-header.is-scrolled .header-container {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+.header-nav__link {
+  color: #0B2348 !important;
+  font-weight: 600 !important;
+}
+
+.header-nav__link:hover,
+.header-nav__link.active {
+  color: #00A896 !important;
+}
+
+.header-nav__link.active::after {
+  background-color: #00A896 !important;
+}
+
+.header-nav__dropdown {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 12px 36px rgba(11, 35, 72, 0.1) !important;
+}
+
+.dropdown-item {
+  color: #26344A !important;
+}
+
+.dropdown-item:hover {
+  background-color: #F8FAFC !important;
+}
+
+.dropdown-item strong {
+  color: #0B2348 !important;
+}
+
+.dropdown-item span {
+  color: #5A6270 !important;
+}
+
+.top-utility-bar {
+  background-color: #F8FAFC !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  color: #5A6270 !important;
+}
+
+.top-utility-link {
+  color: #0B2348 !important;
+}
+
+.top-utility-link:hover {
+  color: #00A896 !important;
+}
+
+.top-utility-btn {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #0B2348 !important;
+}
+
+.top-utility-btn:hover {
+  border-color: #00A896 !important;
+  color: #00A896 !important;
+}
+
+/* 11. FAQ Accordion */
+.faq-item {
+  background-color: #FFFFFF !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.faq-item.open {
+  border-color: #00A896 !important;
+  background-color: #F8FAFC !important;
+}
+
+.faq-item__question {
+  color: var(--vd-navy-deep, #0B1B33) !important;
+  font-weight: 700 !important;
+}
+
+.faq-item__arrow {
+  color: #00A896 !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.faq-item.open .faq-item__arrow {
+  transform: rotate(180deg) !important;
+}
+
+.faq-item__answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease !important;
+  opacity: 0;
+}
+
+.faq-item.open .faq-item__answer {
+  max-height: 600px !important;
+  opacity: 1 !important;
+}
+
+/* 12. Deep Navy Sections (Final CTA & Site Footer - 15-20% Authority) */
+.final-cta {
+  background-color: var(--vd-navy-deep, #0B1B33) !important;
+  color: #FFFFFF !important;
+}
+
+.final-cta__title {
+  color: #FFFFFF !important;
+  font-family: 'Outfit', 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+.final-cta__desc {
+  color: #F1F5F9 !important;
+}
+
+.final-cta .btn--primary {
+  background-color: #00A896 !important;
+  color: #0B2348 !important;
+  border: 1.5px solid #00A896 !important;
+}
+
+.final-cta .btn--primary:hover {
+  background-color: #02C39A !important;
+  color: #0B2348 !important;
+}
+
+.final-cta .btn--secondary {
+  background-color: transparent !important;
+  color: #FFFFFF !important;
+  border: 1.5px solid #FFFFFF !important;
+}
+
+.final-cta .btn--secondary:hover {
+  background-color: #FFFFFF !important;
+  color: #0B2348 !important;
+}
+
+/* Section 12 Site Footer overrides consolidated into Master Executive Footer System */
+
+
+/* 13. Modals & Overlays */
+.modal-overlay,
+.modal {
+  background-color: rgba(7, 26, 54, 0.65) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.modal__dialog,
+.modal-content,
+.modal-card {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 24px 60px rgba(7, 26, 54, 0.25) !important;
+  color: #26344A !important;
+  border-radius: 16px !important;
+}
+
+.modal__title,
+.modal-card h3 {
+  color: #0B2348 !important;
+  font-family: 'Cinzel', serif !important;
+}
+
+.modal-close {
+  background-color: #F8FAFC !important;
+  color: #0B2348 !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+.modal-close:hover {
+  background-color: #00A896 !important;
+  color: #0B2348 !important;
+}
+
+/* 14. Floating Action Buttons & Mobile Navigation */
+.scroll-top-btn {
+  background-color: #FFFFFF !important;
+  color: #0B2348 !important;
+  border: 1.5px solid #E2E8F0 !important;
+}
+
+.scroll-top-btn:hover {
+  background-color: #0B2348 !important;
+  color: #00A896 !important;
+  border-color: #00A896 !important;
+}
+
+.fab-btn {
+  background-color: #0B2348 !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(0, 168, 150, 0.4) !important;
+}
+
+.fab-btn:hover {
+  background-color: #00A896 !important;
+  color: #0B2348 !important;
+}
+
+.mobile-sticky-bar {
+  background-color: #FFFFFF !important;
+  border-top: 1px solid #E2E8F0 !important;
+}
+
+.mobile-cta-call {
+  background-color: #F8FAFC !important;
+  color: #0B2348 !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+

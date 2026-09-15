@@ -1,0 +1,273 @@
+/* ==========================================================================
+   V-DESK LUXURY SCROLL-BASED ANIMATION SYSTEM
+   ========================================================================== */
+
+/* 1. Global Reading Scroll Progress Bar (Enhanced Gold/Teal Gradient with Native Scroll Timeline) */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3.5px;
+  background: linear-gradient(90deg, #00A896 0%, #C59239 50%, #F59E0B 100%);
+  box-shadow: 0 0 12px rgba(197, 146, 57, 0.7);
+  z-index: 10001;
+  pointer-events: none;
+  transform-origin: 0% 50%;
+  transition: width 0.08s ease-out;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
+    .scroll-progress-bar {
+      width: 100% !important;
+      transform-origin: 0% 50% !important;
+      transform: scaleX(0) !important;
+      animation: vdeskScrollProgressFill auto linear both !important;
+      animation-timeline: scroll(block root) !important;
+      animation-range: 0% 100% !important;
+      transition: none !important;
+    }
+    @keyframes vdeskScrollProgressFill {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+  }
+}
+
+/* 2. Scroll-To-Top Floating Circular Button (Positioned safely above WhatsApp launcher to prevent collision) */
+.scroll-top-btn {
+  position: fixed;
+  bottom: 116px;
+  right: 28px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid #C59239;
+  color: #05132B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  box-shadow: 0 8px 24px rgba(5, 19, 43, 0.16);
+  cursor: pointer;
+  z-index: 998;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px) scale(0.9);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-top-btn.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.scroll-top-btn:hover {
+  background-color: #05132B;
+  color: #C59239;
+  border-color: #00A896;
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 12px 28px rgba(0, 168, 150, 0.3);
+}
+
+@media (max-width: 640px) {
+  .scroll-top-btn {
+    bottom: 92px;
+    right: 18px;
+    width: 42px;
+    height: 42px;
+    font-size: 1.1rem;
+  }
+}
+
+/* 3. Universal Smooth Scroll Reveal Primitives (Apple/Stripe Spring Easing) */
+.reveal,
+.reveal-on-scroll,
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.is-revealed,
+.reveal.visible,
+.reveal-on-scroll.is-revealed,
+.scroll-reveal.is-revealed,
+.scroll-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Reveal from Left */
+.reveal-left,
+.scroll-reveal--left {
+  opacity: 0;
+  transform: translateX(-32px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal-left.is-revealed,
+.reveal-left.visible,
+.scroll-reveal--left.is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Reveal from Right */
+.reveal-right,
+.scroll-reveal--right {
+  opacity: 0;
+  transform: translateX(32px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal-right.is-revealed,
+.reveal-right.visible,
+.scroll-reveal--right.is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Reveal Scale (for Showcase, Images & CTAs) */
+.reveal-scale,
+.scroll-reveal--scale {
+  opacity: 0;
+  transform: scale(0.93);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal-scale.is-revealed,
+.reveal-scale.visible,
+.scroll-reveal--scale.is-revealed {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Staggered Children Grid Animations */
+.reveal-stagger > *,
+.scroll-reveal-group > * {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+  will-change: opacity, transform;
+}
+
+.reveal-stagger.is-revealed > *,
+.reveal-stagger.visible > *,
+.scroll-reveal-group.is-revealed > *,
+.scroll-reveal-group.visible > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger Delays (1 through 12) */
+.reveal-stagger.is-revealed > *:nth-child(1), .reveal-stagger.visible > *:nth-child(1), .scroll-reveal-group.is-revealed > *:nth-child(1) { transition-delay: 0.04s; }
+.reveal-stagger.is-revealed > *:nth-child(2), .reveal-stagger.visible > *:nth-child(2), .scroll-reveal-group.is-revealed > *:nth-child(2) { transition-delay: 0.10s; }
+.reveal-stagger.is-revealed > *:nth-child(3), .reveal-stagger.visible > *:nth-child(3), .scroll-reveal-group.is-revealed > *:nth-child(3) { transition-delay: 0.16s; }
+.reveal-stagger.is-revealed > *:nth-child(4), .reveal-stagger.visible > *:nth-child(4), .scroll-reveal-group.is-revealed > *:nth-child(4) { transition-delay: 0.22s; }
+.reveal-stagger.is-revealed > *:nth-child(5), .reveal-stagger.visible > *:nth-child(5), .scroll-reveal-group.is-revealed > *:nth-child(5) { transition-delay: 0.28s; }
+.reveal-stagger.is-revealed > *:nth-child(6), .reveal-stagger.visible > *:nth-child(6), .scroll-reveal-group.is-revealed > *:nth-child(6) { transition-delay: 0.34s; }
+.reveal-stagger.is-revealed > *:nth-child(7), .reveal-stagger.visible > *:nth-child(7), .scroll-reveal-group.is-revealed > *:nth-child(7) { transition-delay: 0.40s; }
+.reveal-stagger.is-revealed > *:nth-child(8), .reveal-stagger.visible > *:nth-child(8), .scroll-reveal-group.is-revealed > *:nth-child(8) { transition-delay: 0.46s; }
+.reveal-stagger.is-revealed > *:nth-child(9), .reveal-stagger.visible > *:nth-child(9), .scroll-reveal-group.is-revealed > *:nth-child(9) { transition-delay: 0.52s; }
+.reveal-stagger.is-revealed > *:nth-child(10), .reveal-stagger.visible > *:nth-child(10), .scroll-reveal-group.is-revealed > *:nth-child(10) { transition-delay: 0.58s; }
+.reveal-stagger.is-revealed > *:nth-child(11), .reveal-stagger.visible > *:nth-child(11), .scroll-reveal-group.is-revealed > *:nth-child(11) { transition-delay: 0.64s; }
+.reveal-stagger.is-revealed > *:nth-child(12), .reveal-stagger.visible > *:nth-child(12), .scroll-reveal-group.is-revealed > *:nth-child(12) { transition-delay: 0.70s; }
+
+/* Responsive Scroll Animation Tuning */
+@media (max-width: 768px) {
+  .reveal,
+  .reveal-on-scroll,
+  .scroll-reveal,
+  .reveal-stagger > *,
+  .scroll-reveal-group > * {
+    transform: translateY(16px);
+    transition-duration: 0.5s;
+  }
+}
+
+/* Reduced Motion Respect */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-progress-bar,
+  .scroll-top-btn,
+  .reveal,
+  .reveal-on-scroll,
+  .scroll-reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale,
+  .reveal-stagger > *,
+  .scroll-reveal-group > * {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* 4. Gold Line Drawing Animation on Scroll */
+.gold-line-draw {
+  position: relative;
+}
+.gold-line-draw::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #00A896, #D9B56A);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.gold-line-draw.is-revealed::after {
+  transform: scaleX(1);
+}
+
+/* 5. Interactive Scroll-Driven Showcase Video Controls */
+.showcase-card__controls {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 8;
+  background: rgba(11, 35, 72, 0.8);
+  backdrop-filter: blur(8px);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 168, 150, 0.4);
+  color: #FFFFFF;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.showcase-card__controls:hover {
+  background: #0B2348;
+  border-color: #00A896;
+  color: #00A896;
+}
+
+.showcase-card__controls i {
+  color: #00A896;
+  font-size: 0.9rem;
+}
+
+

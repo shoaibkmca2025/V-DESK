@@ -1,0 +1,2175 @@
+﻿/* ==========================================================================
+   V-DESK — PREMIUM INTERACTION ENGINE
+   Business Logic + Motion + Lead Management
+
+   PRESERVES: LOCATIONS_DB, MEETING_ROOMS_DB, Lead management, CRM, CSV export
+   NEW: Hero parallax, scroll animations, counter animations, ecosystem interactions,
+        location explorer, pricing configurator, wizard, testimonials, header state,
+        mobile drawer, FAQ accordion, toast notifications
+   ========================================================================== */
+
+'use strict';
+
+/* --------------------------------------------------------------------------
+   1. LOCATIONS DATABASE (Preserved & Extended)
+   -------------------------------------------------------------------------- */
+const LOCATIONS_DB = [
+  // ━━━ NASHIK (Flagship) ━━━
+  { id:'NSK-001', city:'Nashik', areaName:'College Road',  fullName:'V-DESK Headquarters — College Road',
+    address:'Landmark Trade Centre, 3rd Floor, College Road, Nashik – 422005',
+    services:['Virtual Office','Coworking','Meeting Rooms','Private Office','GST Registration','Company Registration'],
+    vo_price:1249, cw_price:399, meetingCapacity:'4–20 pax', status:'available', flagship:true },
+  { id:'NSK-002', city:'Nashik', areaName:'Gangapur Road', fullName:'V-DESK Premium — Gangapur Road',
+    address:'Phoenix Business Park, Near Sula Vineyards Road, Gangapur Road, Nashik – 422013',
+    services:['Virtual Office','Coworking','Meeting Rooms','GST Registration'],
+    vo_price:1349, cw_price:449, meetingCapacity:'4–12 pax', status:'available', flagship:true },
+  // ━━━ MUMBAI ━━━
+  { id:'MUM-001', city:'Mumbai', areaName:'Andheri East', fullName:'V-DESK Mumbai — Andheri East',
+    address:'Peninsula Business Hub, Andheri–Kurla Road, Andheri East, Mumbai – 400059',
+    services:['Virtual Office','Coworking','Meeting Rooms','GST Registration'],
+    vo_price:1999, cw_price:699, meetingCapacity:'6–20 pax', status:'available', flagship:false },
+  { id:'MUM-002', city:'Mumbai', areaName:'BKC',           fullName:'V-DESK Mumbai — BKC',
+    address:'BKC Business Center, G Block, Bandra Kurla Complex, Mumbai – 400051',
+    services:['Virtual Office','Private Office','Meeting Rooms','Company Registration'],
+    vo_price:2499, cw_price:899, meetingCapacity:'4–16 pax', status:'limited', flagship:false },
+  { id:'MUM-003', city:'Mumbai', areaName:'Lower Parel',   fullName:'V-DESK Mumbai — Lower Parel',
+    address:'Tower 5, High Street Phoenix, Lower Parel, Mumbai – 400013',
+    services:['Virtual Office','Coworking','GST Registration'],
+    vo_price:2199, cw_price:799, meetingCapacity:'4–12 pax', status:'available', flagship:false },
+  // ━━━ DELHI ━━━
+  { id:'DEL-001', city:'Delhi', areaName:'Connaught Place', fullName:'V-DESK Delhi — Connaught Place',
+    address:'Statesman House, Barakhamba Road, Connaught Place, New Delhi – 110001',
+    services:['Virtual Office','Coworking','Meeting Rooms','GST Registration','Company Registration'],
+    vo_price:2199, cw_price:799, meetingCapacity:'6–20 pax', status:'available', flagship:false },
+  { id:'DEL-002', city:'Delhi', areaName:'Nehru Place',     fullName:'V-DESK Delhi — Nehru Place',
+    address:'Hemkunt Chambers, Nehru Place, New Delhi – 110019',
+    services:['Virtual Office','GST Registration'],
+    vo_price:1799, cw_price:599, meetingCapacity:'4–8 pax', status:'available', flagship:false },
+  // ━━━ BANGALORE ━━━
+  { id:'BLR-001', city:'Bangalore', areaName:'Koramangala', fullName:'V-DESK Bangalore — Koramangala',
+    address:'Omega Tech Park, 5th Block, Koramangala, Bengaluru – 560034',
+    services:['Virtual Office','Coworking','Meeting Rooms','Private Office','GST Registration'],
+    vo_price:1999, cw_price:699, meetingCapacity:'6–20 pax', status:'available', flagship:false },
+  { id:'BLR-002', city:'Bangalore', areaName:'HSR Layout',  fullName:'V-DESK Bangalore — HSR Layout',
+    address:'Bridge+ Workspaces, Sector 7, HSR Layout, Bengaluru – 560102',
+    services:['Virtual Office','Coworking','GST Registration'],
+    vo_price:1799, cw_price:649, meetingCapacity:'4–12 pax', status:'available', flagship:false },
+  // ━━━ PUNE ━━━
+  { id:'PNE-001', city:'Pune', areaName:'Baner',       fullName:'V-DESK Pune — Baner',
+    address:'Embassy Business Park, Baner Road, Pune – 411045',
+    services:['Virtual Office','Coworking','Meeting Rooms','GST Registration','Company Registration'],
+    vo_price:1599, cw_price:549, meetingCapacity:'6–16 pax', status:'available', flagship:false },
+  { id:'PNE-002', city:'Pune', areaName:'Viman Nagar', fullName:'V-DESK Pune — Viman Nagar',
+    address:'Nyati Emporius, Viman Nagar Road, Pune – 411014',
+    services:['Virtual Office','GST Registration'],
+    vo_price:1449, cw_price:499, meetingCapacity:'4–8 pax', status:'available', flagship:false },
+  // ━━━ HYDERABAD ━━━
+  { id:'HYD-001', city:'Hyderabad', areaName:'HITEC City',  fullName:'V-DESK Hyderabad — HITEC City',
+    address:'Laxmi Cyber City, Whitefields, HITEC City, Hyderabad – 500081',
+    services:['Virtual Office','Coworking','Meeting Rooms','Private Office','GST Registration'],
+    vo_price:1799, cw_price:649, meetingCapacity:'6–20 pax', status:'available', flagship:false },
+  // ━━━ NOIDA ━━━
+  { id:'NOI-001', city:'Noida', areaName:'Sector 62',  fullName:'V-DESK Noida — Sector 62',
+    address:'Express Trade Tower, Sector 62, Noida – 201301',
+    services:['Virtual Office','Coworking','GST Registration'],
+    vo_price:1599, cw_price:549, meetingCapacity:'4–12 pax', status:'available', flagship:false },
+  // ━━━ GURGAON ━━━
+  { id:'GUR-001', city:'Gurgaon', areaName:'Cyber City', fullName:'V-DESK Gurgaon — DLF Cyber City',
+    address:'DLF Cyber City, Building 10, Tower C, Gurgaon – 122002',
+    services:['Virtual Office','Coworking','Meeting Rooms','Private Office','GST Registration','Company Registration'],
+    vo_price:2299, cw_price:799, meetingCapacity:'6–20 pax', status:'limited', flagship:false },
+  // ━━━ CHENNAI ━━━
+  { id:'CHN-001', city:'Chennai', areaName:'Nungambakkam', fullName:'V-DESK Chennai — Nungambakkam',
+    address:'Presidium Business Hub, Nungambakkam High Road, Chennai – 600034',
+    services:['Virtual Office','Coworking','Meeting Rooms','GST Registration'],
+    vo_price:1699, cw_price:599, meetingCapacity:'4–16 pax', status:'available', flagship:false }
+];
+
+const MEETING_ROOMS_DB = [
+  { name:'Huddle Room',     capacity:'4 Pax',  priceHour:499,  tech:'65" 4K Display, Wireless Share',  icon:'👥' },
+  { name:'Conference Room', capacity:'8 Pax',  priceHour:799,  tech:'75" Display, PTZ Camera, Soundbar', icon:'🏢' },
+  { name:'Boardroom',       capacity:'12 Pax', priceHour:1199, tech:'86" Display, Poly Studio X50 Bar', icon:'🏛️' },
+  { name:'Training Hall',   capacity:'20 Pax', priceHour:1999, tech:'Dual Displays, PA System, Lectern', icon:'🎓' }
+];
+
+/* --------------------------------------------------------------------------
+   2. TESTIMONIALS DATA
+   -------------------------------------------------------------------------- */
+const TESTIMONIALS = [
+  {
+    quote: "Getting our GST registration in Maharashtra was seamless with V-DESK. The registered rent agreement and electricity bill were delivered in less than 24 hours. Their team even assisted when the tax officer conducted a physical verification.",
+    name: "Priya Kulkarni",
+    role: "Founder & Director, Zenith D2C Brands",
+    location: "Nashik & Mumbai Hub"
+  },
+  {
+    quote: "We operate from Nashik but our clients are in Mumbai and Delhi. V-DESK gave us verified business addresses in all three cities within a week. The cost savings compared to traditional leases are transformative for our bottom line.",
+    name: "Rajesh Patel",
+    role: "Managing Partner, Patel & Associates CA Firm",
+    location: "Multi-City — Nashik, Mumbai, Delhi"
+  },
+  {
+    quote: "As an Amazon FBA seller, I needed APOB addresses in 4 states within a tight deadline. V-DESK activated all four locations in 48 hours with complete documentation. Their operational efficiency is unmatched.",
+    name: "Suhani Agarwal",
+    role: "E-Commerce Director, Artisan Commerce Pvt Ltd",
+    location: "Pune, Hyderabad, Chennai, Bangalore"
+  }
+];
+
+/* --------------------------------------------------------------------------
+   3. LEAD MANAGEMENT SYSTEM (Preserved)
+   -------------------------------------------------------------------------- */
+const CRM_KEY = 'VDESK_LEADS';
+
+function getLeads() {
+  try { return JSON.parse(localStorage.getItem(CRM_KEY)) || []; }
+  catch { return []; }
+}
+
+function saveLeads(leads) {
+  localStorage.setItem(CRM_KEY, JSON.stringify(leads));
+}
+
+function addLead(data) {
+  const leads = getLeads();
+  const lead = {
+    id: 'VD-' + Date.now().toString(36).toUpperCase(),
+    ...data,
+    status: 'NEW',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  leads.unshift(lead);
+  saveLeads(leads);
+  return lead;
+}
+
+function updateLeadStatus(id, status) {
+  const leads = getLeads();
+  const lead = leads.find(l => l.id === id);
+  if (lead) {
+    lead.status = status;
+    lead.updatedAt = new Date().toISOString();
+    saveLeads(leads);
+    renderAdminLeads();
+  }
+}
+
+function exportLeadsToCSV() {
+  const leads = getLeads();
+  if (!leads.length) { showToast('No leads to export.'); return; }
+  const headers = ['ID','Name','Mobile','Email','City','Service','Company','Source','Status','Date'];
+  const rows = leads.map(l => [l.id, l.name, l.mobile, l.email, l.city, l.service, l.company||'', l.source||'', l.status, l.createdAt]);
+  const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `vdesk-leads-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('CSV exported successfully.');
+}
+
+function seedSampleLeads() {
+  const names = ['Vikram Desai','Ananya Shah','Arjun Mehta','Kavita Nair','Nikhil Kumar'];
+  const cities = ['Mumbai','Nashik','Delhi','Bangalore','Pune'];
+  const services = ['Virtual Office','GST Registration','Company Registration','Coworking','Private Office'];
+  const statuses = ['NEW','CONTACTED','QUALIFIED','PROPOSAL_SENT','CONVERTED'];
+  const name = names[Math.floor(Math.random()*names.length)];
+  const lead = addLead({
+    name, mobile:'98' + Math.floor(10000000 + Math.random()*90000000),
+    email: name.toLowerCase().replace(/\s/g,'.') + '@gmail.com',
+    city: cities[Math.floor(Math.random()*cities.length)],
+    service: services[Math.floor(Math.random()*services.length)],
+    company: 'Demo Corp', source:'Admin — Seeded Sample'
+  });
+  lead.status = statuses[Math.floor(Math.random()*statuses.length)];
+  saveLeads(getLeads());
+  renderAdminLeads();
+  showToast(`Sample lead "${name}" added.`);
+}
+
+/* --------------------------------------------------------------------------
+   4. INITIALIZATION
+   -------------------------------------------------------------------------- */
+document.addEventListener('DOMContentLoaded', () => {
+  initHeader();
+  initScrollAnimations();
+  initNavigation();
+  initScrollProgressAndFab();
+  initCardSpotlight();
+  initAccessibility();
+  initHeroParallax();
+  renderLocations(LOCATIONS_DB);
+  filterDiscoveryEngine();
+  runCostCalculation();
+  initJourneyTimeline();
+  initTestimonials();
+  initMobileDrawer();
+});
+
+/* --------------------------------------------------------------------------
+   5. HEADER — Transparent → Solid Scroll State
+   -------------------------------------------------------------------------- */
+function initHeader() {
+  const header = document.getElementById('siteHeader');
+  if (!header) return;
+
+  function updateHeaderOnScroll() {
+    if (window.scrollY > 20) {
+      header.classList.add('is-scrolled');
+      header.classList.remove('site-header--transparent');
+      header.classList.add('site-header--solid');
+    } else {
+      header.classList.remove('is-scrolled');
+      header.classList.remove('site-header--transparent');
+      header.classList.remove('site-header--solid');
+    }
+  }
+
+  window.addEventListener('scroll', updateHeaderOnScroll, { passive: true });
+  updateHeaderOnScroll();
+}
+
+/* --------------------------------------------------------------------------
+   6. SCROLL-TRIGGERED ANIMATIONS (IntersectionObserver)
+   -------------------------------------------------------------------------- */
+function initScrollAnimations() {
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) {
+    // Instantly reveal everything
+    document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => el.classList.add('visible'));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+
+        // Trigger counter animations
+        entry.target.querySelectorAll('.counter').forEach(counter => {
+          if (!counter.dataset.animated) {
+            animateCounter(counter);
+            counter.dataset.animated = '1';
+          }
+        });
+
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => observer.observe(el));
+}
+
+/* --------------------------------------------------------------------------
+   7. COUNTER ANIMATION
+   -------------------------------------------------------------------------- */
+function animateCounter(el) {
+  const target = parseInt(el.dataset.target, 10);
+  if (isNaN(target)) return;
+  const duration = 1800;
+  const start = performance.now();
+
+  function tick(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    // easeOutCubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(eased * target);
+    el.textContent = current.toLocaleString('en-IN');
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+/* --------------------------------------------------------------------------
+   8. HERO — Floating Ecosystem Parallax
+   -------------------------------------------------------------------------- */
+function initHeroParallax() {
+  const eco = document.getElementById('floatingEcosystem');
+  if (!eco) return;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) return;
+
+  const cards = eco.querySelectorAll('.float-card');
+
+  document.querySelector('.hero').addEventListener('mousemove', (e) => {
+    const rect = eco.getBoundingClientRect();
+    const cx = (e.clientX - rect.left) / rect.width - 0.5;
+    const cy = (e.clientY - rect.top) / rect.height - 0.5;
+
+    cards.forEach(card => {
+      const speed = parseFloat(card.dataset.speed) || 0.02;
+      const x = cx * speed * 800;
+      const y = cy * speed * 800;
+      card.style.transform = `translate(${x}px, ${y}px)`;
+    });
+  });
+
+  // Reset on leave
+  document.querySelector('.hero').addEventListener('mouseleave', () => {
+    cards.forEach(card => {
+      card.style.transform = 'translate(0, 0)';
+    });
+  });
+}
+
+/* --------------------------------------------------------------------------
+   8. WORKSPACE DISCOVERY ENGINE (Master Item 8)
+   -------------------------------------------------------------------------- */
+const DISCOVERY_SPACES = [
+  {
+    id: 'DISC-VO-01',
+    title: 'Premium Virtual Office (GST & MCA)',
+    type: 'Virtual Office',
+    city: 'Nashik',
+    area: 'College Road (HQ Flagship)',
+    capacity: 'All Team Sizes',
+    capacityCategory: 'all',
+    price: '₹1,249',
+    priceUnit: '/mo',
+    durationMatch: ['monthly', 'annual'],
+    status: 'Available',
+    image: 'assets/vdesk-reception.jpg',
+    amenities: ['Registered Rent Deed', 'Landlord NOC', 'Name Board Display', 'Courier WhatsApp Alert'],
+    quoteLabel: 'Virtual Office — Nashik HQ'
+  },
+  {
+    id: 'DISC-VO-02',
+    title: 'Commercial Virtual Office BKC',
+    type: 'Virtual Office',
+    city: 'Mumbai',
+    area: 'Bandra Kurla Complex (BKC)',
+    capacity: 'All Team Sizes',
+    capacityCategory: 'all',
+    price: '₹2,499',
+    priceUnit: '/mo',
+    durationMatch: ['monthly', 'annual'],
+    status: 'Limited',
+    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80',
+    amenities: ['BKC Corporate Address', 'GST Inspection Support', 'MCA SPICe+ Compliant', 'Courier Handling'],
+    quoteLabel: 'Virtual Office — Mumbai BKC'
+  },
+  {
+    id: 'DISC-CW-01',
+    title: 'Dedicated Coworking Workstation',
+    type: 'Coworking',
+    city: 'Bangalore',
+    area: 'Koramangala 5th Block',
+    capacity: '1–8 Members',
+    capacityCategory: 'solo,growth',
+    price: '₹6,499',
+    priceUnit: '/desk/mo',
+    durationMatch: ['daily', 'monthly', 'annual'],
+    status: 'Available',
+    image: 'assets/vdesk-coworking.jpg',
+    amenities: ['Ergonomic Chair', '500 Mbps Wi-Fi', 'Meeting Room Credits', 'Barista Coffee'],
+    quoteLabel: 'Coworking Desk — Bangalore Koramangala'
+  },
+  {
+    id: 'DISC-CW-02',
+    title: 'Flex Day Pass & Hot Desk',
+    type: 'Coworking',
+    city: 'Pune',
+    area: 'Baner Business Park',
+    capacity: '1–2 Solo',
+    capacityCategory: 'solo',
+    price: '₹399',
+    priceUnit: '/day',
+    durationMatch: ['daily'],
+    status: 'Available',
+    image: 'assets/vdesk-coworking.jpg',
+    amenities: ['High-Speed Internet', 'Power Backup', 'Cafeteria Access', 'Community Events'],
+    quoteLabel: 'Flex Day Pass — Pune Baner'
+  },
+  {
+    id: 'DISC-PO-01',
+    title: 'Executive Private Cabin (4-Pax)',
+    type: 'Private Office',
+    city: 'Delhi',
+    area: 'Connaught Place (CP)',
+    capacity: '3–8 Growth Team',
+    capacityCategory: 'growth',
+    price: '₹24,999',
+    priceUnit: '/mo',
+    durationMatch: ['monthly', 'annual'],
+    status: 'Available',
+    image: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=600&q=80',
+    amenities: ['24/7 RFID Access', 'Private Subnet LAN', 'Acoustic Soundproofing', 'Company Branding'],
+    quoteLabel: 'Private Cabin 4-Pax — Delhi CP'
+  },
+  {
+    id: 'DISC-PO-02',
+    title: 'Enterprise Team Suite (12-Pax)',
+    type: 'Private Office',
+    city: 'Hyderabad',
+    area: 'HITEC City Cyber Hub',
+    capacity: '9–20 Enterprise',
+    capacityCategory: 'team',
+    price: '₹68,999',
+    priceUnit: '/mo',
+    durationMatch: ['monthly', 'annual'],
+    status: 'Available',
+    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80',
+    amenities: ['Manager Cabin Inside', 'Dedicated Leased Line', 'Daily Concierge', 'Executive Lounge Access'],
+    quoteLabel: 'Enterprise Suite 12-Pax — Hyderabad HITEC City'
+  },
+  {
+    id: 'DISC-MR-01',
+    title: 'Executive 4K Video Boardroom',
+    type: 'Meeting Rooms',
+    city: 'Mumbai',
+    area: 'Andheri–Kurla Business Hub',
+    capacity: '8–16 Pax',
+    capacityCategory: 'growth,team',
+    price: '₹1,199',
+    priceUnit: '/hr',
+    durationMatch: ['daily'],
+    status: 'Available',
+    image: 'assets/vdesk-boardroom.jpg',
+    amenities: ['86" 4K Smart Display', 'Polycom Video Bar', 'Reception Greeting', 'Beverage Service'],
+    quoteLabel: 'Boardroom — Mumbai Andheri'
+  },
+  {
+    id: 'DISC-MR-02',
+    title: 'Strategy Huddle Suite',
+    type: 'Meeting Rooms',
+    city: 'Nashik',
+    area: 'Gangapur Road Landmark',
+    capacity: '4–6 Pax',
+    capacityCategory: 'solo,growth',
+    price: '₹499',
+    priceUnit: '/hr',
+    durationMatch: ['daily'],
+    status: 'Available',
+    image: 'assets/vdesk-boardroom.jpg',
+    amenities: ['65" Wireless Display', 'Whiteboard Wall', 'High-Speed Wi-Fi', 'Tea/Coffee Service'],
+    quoteLabel: 'Huddle Suite — Nashik Gangapur'
+  }
+];
+
+function filterDiscoveryEngine() {
+  const container = document.getElementById('discoveryResultsContainer');
+  if (!container) return;
+
+  const cityVal = document.getElementById('discCity')?.value || 'all';
+  const typeVal = document.getElementById('discType')?.value || 'all';
+  const teamVal = document.getElementById('discTeam')?.value || 'all';
+  const durationVal = document.getElementById('discDuration')?.value || 'all';
+
+  const filtered = DISCOVERY_SPACES.filter(w => {
+    if (cityVal !== 'all' && w.city !== cityVal) return false;
+    if (typeVal !== 'all' && w.type !== typeVal) return false;
+    if (teamVal !== 'all') {
+      if (w.capacityCategory !== 'all' && !w.capacityCategory.includes(teamVal)) return false;
+    }
+    if (durationVal !== 'all') {
+      if (!w.durationMatch.includes(durationVal)) return false;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="discovery-empty-state">
+        <div class="empty-icon"><i class="ph-bold ph-buildings"></i></div>
+        <h4>No workspaces match these specific criteria</h4>
+        <p>Try broadening your filters or speak directly with our infrastructure consultant for custom team requirements.</p>
+        <button class="btn btn--primary btn--sm" onclick="resetDiscoveryFilters()">Reset Filters</button>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(item => `
+    <div class="discovery-card">
+      <div class="discovery-card__media">
+        <img src="${item.image}" alt="${item.title}" loading="lazy">
+        <span class="discovery-card__status ${item.status === 'Limited' ? 'status--limited' : 'status--avail'}">
+          <span class="status-dot"></span> ${item.status}
+        </span>
+        <span class="discovery-card__type-tag">${item.type}</span>
+      </div>
+      <div class="discovery-card__body">
+        <div class="discovery-card__location">
+          <i class="ph-bold ph-map-pin"></i> <strong>${item.city}</strong> &bull; <span>${item.area}</span>
+        </div>
+        <h4 class="discovery-card__title">${item.title}</h4>
+        <div class="discovery-card__capacity">
+          <i class="ph-bold ph-users"></i> Capacity: <strong>${item.capacity}</strong>
+        </div>
+        <div class="discovery-card__amenities">
+          ${item.amenities.map(a => `<span class="amenity-pill"><i class="ph-bold ph-check"></i> ${a}</span>`).join('')}
+        </div>
+      </div>
+      <div class="discovery-card__footer">
+        <div class="discovery-card__price-wrap">
+          <span class="price-from">Starting at</span>
+          <span class="price-amount">${item.price}<small>${item.priceUnit}</small></span>
+        </div>
+        <button class="btn btn--primary btn--sm" onclick="openQuoteModal('Discovery: ${item.quoteLabel}')">
+          Get Quote <i class="ph-bold ph-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function resetDiscoveryFilters() {
+  if (document.getElementById('discCity')) document.getElementById('discCity').value = 'all';
+  if (document.getElementById('discType')) document.getElementById('discType').value = 'all';
+  if (document.getElementById('discTeam')) document.getElementById('discTeam').value = 'all';
+  if (document.getElementById('discDuration')) document.getElementById('discDuration').value = 'all';
+  filterDiscoveryEngine();
+}
+
+window.filterDiscoveryEngine = filterDiscoveryEngine;
+window.resetDiscoveryFilters = resetDiscoveryFilters;
+
+const CITY_IMAGES = {
+  'Nashik': 'assets/vdesk-reception.jpg',
+  'Mumbai': 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80',
+  'Delhi': 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80',
+  'Bangalore': 'assets/vdesk-coworking.jpg',
+  'Pune': 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=600&q=80',
+  'Hyderabad': 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80',
+  'Noida': 'https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=600&q=80',
+  'Gurgaon': 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80',
+  'Chennai': 'assets/vdesk-boardroom.jpg'
+};
+
+/* --------------------------------------------------------------------------
+   9. LOCATION EXPLORER (Master Item 9)
+   -------------------------------------------------------------------------- */
+function renderLocations(locations) {
+  const container = document.getElementById('locationsContainer');
+  if (!container) return;
+
+  if (locations.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:3.5rem 1.5rem;background:var(--vd-bg-secondary, #FAF8F3);border-radius:12px;border:1px dashed var(--vd-border-soft, #E8E2D8);">
+        <div style="font-size:2.2rem;margin-bottom:0.75rem;">📍</div>
+        <h4 style="color:var(--vd-navy-deep, #0B1B33);margin-bottom:0.35rem;font-size:1.1rem;">No locations found matching your search</h4>
+        <p style="color:var(--vd-text-muted, #687386);font-size:0.875rem;margin-bottom:1.25rem;">Try searching for a different city, neighborhood, or service.</p>
+        <button class="btn btn--secondary btn--sm" onclick="clearLocationSearch()">Show All Locations</button>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = locations.map(loc => {
+    const cityImg = CITY_IMAGES[loc.city] || 'assets/vdesk-reception.jpg';
+    return `
+    <div class="location-card">
+      <div class="location-card__img-wrap">
+        <img src="${cityImg}" alt="${loc.fullName}" loading="lazy" class="location-card__thumb">
+        <span class="location-card__status location-card__status--${loc.status}">${loc.status === 'limited' ? 'Limited' : 'Available'}</span>
+        ${loc.flagship ? '<span class="location-card__flagship-badge">★ Flagship</span>' : ''}
+      </div>
+      <div class="location-card__content">
+        <div class="location-card__header">
+          <div>
+            <div class="location-card__city">${loc.city}</div>
+            <h4 class="location-card__name">${loc.areaName}</h4>
+          </div>
+        </div>
+        <div class="location-card__address">${loc.address}</div>
+        <div class="location-card__services">
+          ${loc.services.map(s => `<span class="location-card__service-tag">${s}</span>`).join('')}
+        </div>
+        <div class="location-card__footer">
+          <div class="location-card__price-wrap">
+            <span class="location-price-lbl">Starting from</span>
+            <span class="location-card__price">₹${loc.vo_price.toLocaleString('en-IN')}<small>/mo</small></span>
+          </div>
+          <div style="display:flex; gap:0.4rem; align-items:center;">
+            <button class="btn btn--ghost btn--sm" title="Copy Address" onclick="copyToClipboard('${loc.address.replace(/'/g, "\\'")}', 'Address copied to clipboard!')">
+              <i class="ph-bold ph-copy"></i>
+            </button>
+            <button class="btn btn--primary btn--sm" onclick="openQuoteModal('Location: ${loc.fullName}')">Get Quote</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `}).join('');
+}
+
+function handleLocationSearch(query) {
+  const clearBtn = document.getElementById('clearSearchBtn');
+  clearBtn.style.display = query ? 'block' : 'none';
+
+  // Deactivate city filter buttons
+  document.querySelectorAll('.locations__filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.locations__filter-btn').classList.add('active');
+
+  if (!query.trim()) {
+    renderLocations(LOCATIONS_DB);
+    return;
+  }
+
+  const q = query.toLowerCase();
+  const filtered = LOCATIONS_DB.filter(loc =>
+    loc.city.toLowerCase().includes(q) ||
+    loc.areaName.toLowerCase().includes(q) ||
+    loc.address.toLowerCase().includes(q) ||
+    loc.services.some(s => s.toLowerCase().includes(q))
+  );
+  renderLocations(filtered);
+}
+
+function clearLocationSearch() {
+  const input = document.getElementById('citySearchInput');
+  input.value = '';
+  document.getElementById('clearSearchBtn').style.display = 'none';
+  renderLocations(LOCATIONS_DB);
+}
+
+function filterLocationsByCity(city, btn) {
+  // Update active state
+  document.querySelectorAll('.locations__filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  // Clear search
+  const input = document.getElementById('citySearchInput');
+  if (input) input.value = '';
+  document.getElementById('clearSearchBtn').style.display = 'none';
+
+  if (city === 'all') {
+    renderLocations(LOCATIONS_DB);
+  } else {
+    renderLocations(LOCATIONS_DB.filter(l => l.city === city));
+  }
+}
+
+/* --------------------------------------------------------------------------
+   10. PRICING / COST CALCULATOR
+   -------------------------------------------------------------------------- */
+function updateTeamSlider(value) {
+  document.getElementById('calcTeamDisplay').textContent = value + ' Members';
+  runCostCalculation();
+}
+
+function runCostCalculation() {
+  const cityTier = document.getElementById('calcCity').value;
+  const service  = document.getElementById('calcService').value;
+  const team     = parseInt(document.getElementById('calcTeamSlider').value, 10);
+  const duration = parseInt(document.getElementById('calcDuration').value, 10);
+  const addonGST     = document.getElementById('calcAddonGST').checked;
+  const addonMeeting = document.getElementById('calcAddonMeeting').checked;
+
+  // Base costs
+  let baseMonthly;
+  const tierMultiplier = cityTier.includes('Tier-1') ? 1.6 : cityTier.includes('Tier-2') ? 1.0 : 0.75;
+
+  switch (service) {
+    case 'Virtual Office for GST':
+      baseMonthly = 1499 * tierMultiplier;
+      break;
+    case 'Coworking Dedicated Desks':
+      baseMonthly = 5999 * tierMultiplier * Math.max(1, team * 0.4);
+      break;
+    case 'Private Office Cabin':
+      baseMonthly = 11999 * tierMultiplier * Math.max(1, team * 0.25);
+      break;
+    case 'Hybrid Combo':
+      baseMonthly = (1499 + 5999 * Math.max(1, team * 0.3)) * tierMultiplier;
+      break;
+    default:
+      baseMonthly = 1499 * tierMultiplier;
+  }
+
+  // Duration discount
+  const durationDiscount = duration >= 24 ? 0.85 : duration >= 12 ? 0.80 : 1.0;
+  let monthlyFinal = baseMonthly * durationDiscount;
+
+  // Add-ons
+  if (addonGST) monthlyFinal += 299;
+  if (addonMeeting) monthlyFinal += 2999;
+
+  const vdeskAnnual = Math.round(monthlyFinal * 12);
+
+  // Traditional lease estimate
+  let tradAnnual;
+  if (service === 'Virtual Office for GST') {
+    tradAnnual = tierMultiplier > 1 ? 1440000 : 720000;
+  } else if (service === 'Coworking Dedicated Desks') {
+    tradAnnual = Math.round(team * 15000 * tierMultiplier * 12);
+  } else if (service === 'Private Office Cabin') {
+    tradAnnual = Math.round(team * 20000 * tierMultiplier * 12);
+  } else {
+    tradAnnual = Math.round((team * 12000 + 120000) * tierMultiplier);
+  }
+
+  const savingsPercent = Math.max(0, Math.round((1 - vdeskAnnual / tradAnnual) * 100));
+  const vdeskBarWidth = Math.max(5, Math.round((vdeskAnnual / tradAnnual) * 100));
+
+  // Update UI
+  const estValEl = document.getElementById('vdeskEstVal');
+  const savingsEl = document.getElementById('vdeskSavingsPercent');
+  document.getElementById('tradLeaseVal').textContent = '₹' + tradAnnual.toLocaleString('en-IN') + ' / yr';
+  estValEl.textContent = '₹' + vdeskAnnual.toLocaleString('en-IN') + ' / yr';
+  document.getElementById('vdeskFillBar').style.width  = vdeskBarWidth + '%';
+  savingsEl.textContent = savingsPercent + '%';
+
+  // Trigger micro-interaction bump
+  if (estValEl) {
+    estValEl.classList.remove('bump');
+    void estValEl.offsetWidth;
+    estValEl.classList.add('bump');
+  }
+  document.getElementById('calcPlanSummary').textContent     = service;
+  document.getElementById('calcDurationSummary').textContent = duration + ' Months';
+
+  const addons = [];
+  if (addonGST) addons.push('GST Filing');
+  if (addonMeeting) addons.push('Meeting Room Bundle');
+  document.getElementById('calcAddonsSummary').textContent = addons.length ? addons.join(', ') : 'None';
+}
+
+/* --------------------------------------------------------------------------
+   11. BUSINESS SETUP WIZARD
+   -------------------------------------------------------------------------- */
+let wizardState = {
+  entity: 'Private Limited Company',
+  city: 'Nashik (Flagship)',
+  step: 1
+};
+
+function selectWizardChoice(field, value, btn) {
+  wizardState[field] = value;
+  // Update visual selection
+  btn.closest('.wizard__choices').querySelectorAll('.wizard__choice').forEach(c => c.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function navigateWizard(step) {
+  wizardState.step = step;
+
+  // Update panes
+  document.querySelectorAll('.wizard__pane').forEach(p => p.classList.remove('active'));
+  const pane = document.getElementById('wizPane' + step);
+  if (pane) pane.classList.add('active');
+
+  // Update progress nodes
+  for (let i = 1; i <= 5; i++) {
+    const node = document.getElementById('wizNode' + i);
+    const line = document.getElementById('wizLine' + (i-1));
+    if (i < step) {
+      node.classList.add('completed');
+      node.classList.remove('active');
+      node.innerHTML = '✓';
+    } else if (i === step) {
+      node.classList.add('active');
+      node.classList.remove('completed');
+      node.innerHTML = i;
+    } else {
+      node.classList.remove('active', 'completed');
+      node.innerHTML = i;
+    }
+    if (line) {
+      line.classList.toggle('completed', i < step);
+    }
+  }
+}
+
+function generateWizardRecommendation() {
+  // Gather selections
+  const reqVO   = document.getElementById('wizReqVO')?.checked;
+  const reqGST  = document.getElementById('wizReqGST')?.checked;
+  const reqReg  = document.getElementById('wizReqReg')?.checked;
+  const reqTM   = document.getElementById('wizReqTM')?.checked;
+  const reqCW   = document.getElementById('wizReqCW')?.checked;
+  const reqMR   = document.getElementById('wizReqMR')?.checked;
+  const urgency = document.getElementById('wizUrgency')?.value || 'This Week';
+  const team    = document.getElementById('wizTeam')?.value || 'Solo';
+
+  // Build recommendation
+  const services = [];
+  let cost = 0;
+  if (reqVO)  { services.push('Virtual Office'); cost += 14988; }
+  if (reqGST) { services.push('GST Registration'); cost += 1999; }
+  if (reqReg) { services.push('Company Incorporation'); cost += 4999; }
+  if (reqTM)  { services.push('Trademark Registration'); cost += 1999; }
+  if (reqCW)  { services.push('Coworking Access'); cost += 9999; }
+  if (reqMR)  { services.push('Meeting Room Credits'); cost += 4999; }
+
+  if (services.length === 0) services.push('Virtual Office');
+  if (cost === 0) cost = 14988;
+
+  // Discount for bundles
+  if (services.length >= 3) cost = Math.round(cost * 0.85);
+
+  const heading = services.join(' + ');
+  const time = urgency.includes('24') ? '24 Working Hours' : urgency.includes('Week') ? '3 – 5 Working Days' : '7 – 10 Working Days';
+
+  document.getElementById('recBundleHeading').textContent = heading;
+  document.getElementById('recBundleDesc').textContent = `Complete turnkey package including ${services.slice(0, 3).join(', ').toLowerCase()}${services.length > 3 ? ' and more' : ''} — with dedicated CA support and guaranteed activation.`;
+  document.getElementById('recCost').textContent = '₹' + cost.toLocaleString('en-IN') + ' (All-Inclusive)';
+  document.getElementById('recTime').textContent = time;
+  document.getElementById('recCity').textContent = wizardState.city;
+
+  navigateWizard(5);
+}
+
+/* --------------------------------------------------------------------------
+   12. CUSTOMER JOURNEY TIMELINE
+   -------------------------------------------------------------------------- */
+function initJourneyTimeline() {
+  const milestones = document.querySelectorAll('.journey__milestone');
+  if (!milestones.length) return;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+      }
+    });
+  }, { threshold: 0.4 });
+
+  milestones.forEach(m => observer.observe(m));
+}
+
+/* --------------------------------------------------------------------------
+   13. TESTIMONIALS
+   -------------------------------------------------------------------------- */
+let currentTestimonial = 0;
+let testimonialTimer;
+
+function initTestimonials() {
+  showTestimonial(0);
+  testimonialTimer = setInterval(() => {
+    currentTestimonial = (currentTestimonial + 1) % TESTIMONIALS.length;
+    showTestimonial(currentTestimonial);
+  }, 7000);
+}
+
+function showTestimonial(index) {
+  currentTestimonial = index;
+  const t = TESTIMONIALS[index];
+  if (!t) return;
+
+  const quoteEl = document.getElementById('testiQuote');
+  const nameEl  = document.getElementById('testiName');
+  const roleEl  = document.getElementById('testiRole');
+  const locEl   = document.getElementById('testiLocation');
+
+  // Fade transition
+  quoteEl.style.opacity = '0';
+  setTimeout(() => {
+    quoteEl.textContent = t.quote;
+    nameEl.textContent  = t.name;
+    roleEl.textContent  = t.role;
+    locEl.textContent   = t.location;
+    quoteEl.style.opacity = '1';
+  }, 250);
+
+  // Update dots
+  document.querySelectorAll('.testimonial-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === index);
+  });
+
+  // Reset timer
+  clearInterval(testimonialTimer);
+  testimonialTimer = setInterval(() => {
+    currentTestimonial = (currentTestimonial + 1) % TESTIMONIALS.length;
+    showTestimonial(currentTestimonial);
+  }, 7000);
+}
+
+/* --------------------------------------------------------------------------
+   14. FAQ ACCORDION
+   -------------------------------------------------------------------------- */
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  const wasOpen = item.classList.contains('open');
+
+  // Close all
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+
+  if (!wasOpen) item.classList.add('open');
+}
+
+/* --------------------------------------------------------------------------
+   15. MODALS
+   -------------------------------------------------------------------------- */
+let quoteSource = '';
+
+function openQuoteModal(source = '') {
+  quoteSource = source || 'Unknown';
+  const modal = document.getElementById('quoteModal');
+  if (!modal) return;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  const title = document.getElementById('modalQuoteTitle');
+  const citySelect = document.getElementById('mqCity');
+  const serviceSelect = document.getElementById('mqService');
+
+  if (title) {
+    if (source && source.includes('Virtual Office')) title.textContent = 'Virtual Office Quote';
+    else if (source && source.includes('Coworking')) title.textContent = 'Coworking Quote';
+    else if (source && source.includes('Meeting')) title.textContent = 'Meeting Room Quote';
+    else if (source && source.includes('Registration')) title.textContent = 'Registration Quote';
+    else if (source && source.includes('Trademark')) title.textContent = 'Trademark Quote';
+    else if (source && source.includes('Location:')) title.textContent = source.replace('Location: ', '');
+    else title.textContent = 'Get Instant Quote';
+  }
+
+  // Pre-fill City
+  if (citySelect) {
+    const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Pune', 'Nashik', 'Hyderabad', 'Noida', 'Gurgaon', 'Chennai'];
+    const matchedCity = cities.find(c => source.includes(c));
+    if (matchedCity) {
+      citySelect.value = matchedCity;
+    } else if (typeof wizardState !== 'undefined' && wizardState.city) {
+      const wizMatch = cities.find(c => wizardState.city.includes(c));
+      if (wizMatch) citySelect.value = wizMatch;
+    }
+  }
+
+  // Pre-fill Service
+  if (serviceSelect) {
+    if (source && source.includes('Coworking')) serviceSelect.value = 'Coworking';
+    else if (source && source.includes('Meeting')) serviceSelect.value = 'Meeting Rooms';
+    else if (source && source.includes('Private Office')) serviceSelect.value = 'Private Office';
+    else if (source && source.includes('GST')) serviceSelect.value = 'GST Registration';
+    else if (source && source.includes('Company') || source.includes('Incorporation')) serviceSelect.value = 'Company Registration';
+    else if (source && source.includes('Trademark')) serviceSelect.value = 'Trademark';
+    else if (source && source.includes('Calculator')) {
+      const calcPlan = document.getElementById('calcPlanSummary')?.textContent || '';
+      if (calcPlan.includes('Coworking')) serviceSelect.value = 'Coworking';
+      else if (calcPlan.includes('Private Office')) serviceSelect.value = 'Private Office';
+      else serviceSelect.value = 'Virtual Office';
+    } else {
+      serviceSelect.value = 'Virtual Office';
+    }
+  }
+
+  // Focus Name input for smooth UX
+  setTimeout(() => {
+    document.getElementById('mqName')?.focus();
+  }, 80);
+}
+
+function openAdminModal() {
+  document.getElementById('adminModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderAdminLeads();
+}
+
+/* --------------------------------------------------------------------------
+   LEGAL & COMPLIANCE MODAL ENGINE
+   -------------------------------------------------------------------------- */
+const legalData = {
+  privacy: {
+    title: 'Privacy Policy & Data Protection',
+    content: `
+      <h4>1. Information Governance & Privacy Commitment</h4>
+      <p>V-DESK Workspace & Consulting LLP ("V-DESK", LLPIN: AAY-9842) is deeply committed to protecting the privacy, identity, and statutory records of our clients, authorized partners, and platform visitors.</p>
+      
+      <h4>2. Categories of Information Collected</h4>
+      <ul>
+        <li><strong>KYC & Statutory Records:</strong> Identity proof (Aadhaar/Passport/PAN), Certificate of Incorporation, Director Identification Numbers (DIN), and Authorized Signatory declarations for Virtual Office and GST compliance.</li>
+        <li><strong>Transactional Information:</strong> Invoicing details, commercial agreements, desk allocation numbers, and SLA timelines.</li>
+        <li><strong>Digital Usage Data:</strong> IP addresses, browser profiles, UTM parameters, and inquiry records captured during consultation requests.</li>
+      </ul>
+
+      <h4>3. Purpose and Legal Basis for Processing</h4>
+      <p>Data collected is strictly utilized to issue legally compliant Lease Deeds, NOCs, Municipal Tax proofs, and to interface with regulatory agencies (MCA, GSTN) on your behalf. We enforce a zero third-party monetization policy—your business data is never traded or rented.</p>
+
+      <h4>4. Data Security Standards</h4>
+      <p>All sensitive documents uploaded to V-DESK repositories are encrypted with AES-256 at rest and TLS 1.3 in transit. Physical mail received at our commercial centers is scanned only upon express written consent and archived in secure, firewalled servers.</p>
+    `
+  },
+  terms: {
+    title: 'Terms of Service & Workspace SLAs',
+    content: `
+      <h4>1. Agreement of Service</h4>
+      <p>These Terms of Service govern all virtual office registrations, dedicated desk leases, meeting room bookings, and company formation consultancies provided by V-DESK Workspace & Consulting LLP.</p>
+
+      <h4>2. Permitted Business Usage</h4>
+      <ul>
+        <li>Virtual Office addresses are allocated exclusively for lawful business registration, corporate correspondence, and statutory GST jurisdiction.</li>
+        <li>Sub-leasing, illegal commercial operations, fraudulent financial activities, or misrepresentation of center premises will result in immediate termination of the agreement and reportage to regulatory authorities.</li>
+      </ul>
+
+      <h4>3. Service Level Agreements (SLAs)</h4>
+      <ul>
+        <li><strong>Document Issuance:</strong> Standard NOC, Registered Rent Agreement, and Utility Bill proofs are delivered digitally within 24–48 hours following successful KYC approval.</li>
+        <li><strong>Mail Handling:</strong> Inbound physical letters are logged within 4 operating hours, with instant WhatsApp/Email alerts dispatched to the designated representative.</li>
+        <li><strong>Meeting Room Reservations:</strong> Real-time booking confirmations with guaranteed high-speed fiber internet, presentation screens, and front-desk receptionist escort.</li>
+      </ul>
+
+      <h4>4. Client Compliance Obligations</h4>
+      <p>Clients are solely responsible for timely filing of statutory returns (GST, Income Tax, MCA ROC) using the allocated registered address. V-DESK provides continuous document renewal support prior to lease expiry.</p>
+    `
+  },
+  refund: {
+    title: 'Refund, Cancellation & 100% NOC Guarantee',
+    content: `
+      <h4>1. 100% Regulatory Document Approval Guarantee</h4>
+      <p>V-DESK provides a rock-solid, 100% money-back guarantee: If your Virtual Office application for GST Registration or MCA Company Incorporation is formally rejected by statutory authorities solely due to a document defect attributable to V-DESK (such as Landlord NOC or Utility Bill issues), you are entitled to a full 100% refund of fees paid.</p>
+
+      <h4>2. Cancellation & Voluntary Termination</h4>
+      <ul>
+        <li><strong>Pre-NOC Issuance:</strong> Cancellations initiated within 48 hours of booking and prior to the generation of signed lease deeds receive a 100% refund less standard processing gateway charges.</li>
+        <li><strong>Post-NOC Issuance:</strong> Once notarized agreements and jurisdictional electricity bills are legally issued to the client, refunds cannot be processed due to regulatory stamp duty and administrative center reservation commitments.</li>
+      </ul>
+
+      <h4>3. Settlement & Disbursement</h4>
+      <p>All approved refunds are audited and disbursed via NEFT/RTGS directly to the originating corporate bank account within 5 to 7 business banking days.</p>
+    `
+  },
+  compliance: {
+    title: 'Ministry of Corporate Affairs (MCA) & GST Compliance',
+    content: `
+      <h4>1. Corporate Entity Particulars</h4>
+      <p><strong>Entity Name:</strong> V-DESK Workspace & Consulting LLP<br>
+      <strong>LLP Identification Number (LLPIN):</strong> AAY-9842<br>
+      <strong>Incorporation Authority:</strong> Ministry of Corporate Affairs, Government of India<br>
+      <strong>Corporate Headquarters:</strong> V-DESK Corporate Tower, College Road, Nashik, Maharashtra 422005</p>
+
+      <h4>2. Verified Statutory Documentation Portfolio</h4>
+      <p>Every V-DESK location complies with the stringent regulatory benchmarks mandated by the Central Board of Indirect Taxes and Customs (CBIC) and MCA ROC:</p>
+      <ul>
+        <li>100% Valid Registered Commercial Lease Agreements with building title verifications.</li>
+        <li>Latest Municipal Corporation Property Tax Assessments & Receipts.</li>
+        <li>Dedicated Commercial Electricity Utility Bills with explicit center matching.</li>
+        <li>Unconditional Landlord / Property Owner No-Objection Certificate (NOC).</li>
+      </ul>
+
+      <h4>3. Physical Verification & Jurisdiction Signage</h4>
+      <p>In accordance with GST Rule 25, V-DESK centers facilitate physical officer visits, maintain permanent corporate name-boards with client trade names and GSTIN disclosures, and host physical visit log registers.</p>
+
+      <h4>4. Regulatory & Grievance Contact</h4>
+      <p>For regulatory correspondence or verification queries, contact our Compliance Cell:<br>
+      <strong>Email:</strong> compliance@vdeskworkspace.com &bull; <strong>Helpline:</strong> +91 98765 43210</p>
+    `
+  }
+};
+
+function openLegalModal(tab) {
+  const modal = document.getElementById('legalModal');
+  if (!modal) return;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  switchLegalTab(tab || 'privacy');
+}
+
+function switchLegalTab(tab) {
+  const data = legalData[tab] || legalData.privacy;
+  
+  // Update Tab buttons
+  document.querySelectorAll('.legal-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('id') === `tabBtn-${tab}` || btn.dataset.tab === tab);
+  });
+
+  // Update Modal title & body
+  const titleEl = document.getElementById('legalModalTitle');
+  const bodyEl = document.getElementById('legalModalBody');
+  if (titleEl) titleEl.textContent = data.title;
+  if (bodyEl) {
+    bodyEl.innerHTML = data.content;
+    bodyEl.scrollTop = 0;
+  }
+}
+
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeModalOnBackdrop(e, id) {
+  if (e.target.id === id) closeModal(id);
+}
+
+/* --------------------------------------------------------------------------
+   16. FORM SUBMISSIONS
+   -------------------------------------------------------------------------- */
+function handleModalQuoteSubmit(e) {
+  e.preventDefault();
+  const lead = addLead({
+    name:    document.getElementById('mqName').value,
+    mobile:  document.getElementById('mqMobile').value,
+    email:   document.getElementById('mqEmail').value,
+    city:    document.getElementById('mqCity').value,
+    service: document.getElementById('mqService').value,
+    company: document.getElementById('mqCompany').value,
+    source:  'Quote Modal — ' + quoteSource
+  });
+  e.target.reset();
+  closeModal('quoteModal');
+  showToast(`✓ Quote request received — ${lead.id}. We'll reach out within 15 minutes.`);
+}
+
+function handleContactSubmit(e) {
+  e.preventDefault();
+  const lead = addLead({
+    name:    document.getElementById('cfName').value,
+    mobile:  document.getElementById('cfMobile').value,
+    email:   document.getElementById('cfEmail').value,
+    city:    'Contact Page',
+    service: 'General Enquiry',
+    company: '',
+    notes:   document.getElementById('cfMessage') ? document.getElementById('cfMessage').value : '',
+    source:  'Contact Form'
+  });
+  e.target.reset();
+  showToast(`✓ Message received — ${lead.id}. Our strategist will connect shortly.`);
+}
+
+/* --------------------------------------------------------------------------
+   17. ADMIN CRM RENDERING
+   -------------------------------------------------------------------------- */
+function renderAdminLeads() {
+  const leads = getLeads();
+  const tbody = document.getElementById('adminLeadsTableBody');
+  if (!tbody) return;
+
+  // Metrics
+  const el = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
+  el('totalLeadsMetric', leads.length);
+  el('newLeadsMetric', leads.filter(l => l.status === 'NEW').length);
+  el('qualifiedLeadsMetric', leads.filter(l => l.status === 'QUALIFIED').length);
+  el('convertedLeadsMetric', leads.filter(l => l.status === 'CONVERTED').length);
+
+  tbody.innerHTML = leads.map(l => `
+    <tr>
+      <td>${new Date(l.createdAt).toLocaleDateString('en-IN')}</td>
+      <td><strong style="color:var(--vd-zinc-200);">${l.name}</strong><br><span style="font-size:0.75rem;">${l.mobile} • ${l.email}</span></td>
+      <td>${l.city}<br><span style="font-size:0.75rem;">${l.service}</span></td>
+      <td><span style="font-size:0.75rem;">${l.source || '—'}</span></td>
+      <td>
+        <select onchange="updateLeadStatus('${l.id}', this.value)">
+          ${['NEW','CONTACTED','QUALIFIED','PROPOSAL_SENT','FOLLOW_UP','CONVERTED','LOST'].map(s => `<option value="${s}" ${l.status===s?'selected':''}>${s.replace(/_/g,' ')}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <a href="tel:${l.mobile}" class="btn btn--ghost btn--sm" style="font-size:0.75rem;">Call</a>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterAdminLeads() {
+  const search = (document.getElementById('adminSearchInput')?.value || '').toLowerCase();
+  const status = document.getElementById('adminStatusFilter')?.value || 'ALL';
+  let leads = getLeads();
+
+  if (status !== 'ALL') leads = leads.filter(l => l.status === status);
+  if (search) leads = leads.filter(l =>
+    l.name.toLowerCase().includes(search) ||
+    l.mobile.includes(search) ||
+    l.email.toLowerCase().includes(search) ||
+    l.city.toLowerCase().includes(search)
+  );
+
+  // Re-render with filtered
+  const tbody = document.getElementById('adminLeadsTableBody');
+  if (!tbody) return;
+
+  tbody.innerHTML = leads.map(l => `
+    <tr>
+      <td>${new Date(l.createdAt).toLocaleDateString('en-IN')}</td>
+      <td><strong style="color:var(--vd-zinc-200);">${l.name}</strong><br><span style="font-size:0.75rem;">${l.mobile} • ${l.email}</span></td>
+      <td>${l.city}<br><span style="font-size:0.75rem;">${l.service}</span></td>
+      <td><span style="font-size:0.75rem;">${l.source || '—'}</span></td>
+      <td>
+        <select onchange="updateLeadStatus('${l.id}', this.value)">
+          ${['NEW','CONTACTED','QUALIFIED','PROPOSAL_SENT','FOLLOW_UP','CONVERTED','LOST'].map(s => `<option value="${s}" ${l.status===s?'selected':''}>${s.replace(/_/g,' ')}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <a href="tel:${l.mobile}" class="btn btn--ghost btn--sm" style="font-size:0.75rem;">Call</a>
+      </td>
+    </tr>
+  `).join('');
+}
+
+/* --------------------------------------------------------------------------
+   18. MOBILE DRAWER
+   -------------------------------------------------------------------------- */
+function initMobileDrawer() {
+  const toggle  = document.getElementById('mobileNavToggle') || document.getElementById('mobileToggle');
+  const drawer  = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('mobileDrawerOverlay') || document.getElementById('mobileOverlay');
+  const close   = document.getElementById('mobileDrawerClose') || document.getElementById('drawerClose');
+
+  if (toggle) toggle.addEventListener('click', () => {
+    toggle.classList.toggle('active');
+    drawer.classList.toggle('open');
+    overlay?.classList.toggle('active');
+    document.body.style.overflow = drawer.classList.contains('open') ? 'hidden' : '';
+  });
+
+  if (close) close.addEventListener('click', closeDrawer);
+  if (overlay) overlay.addEventListener('click', closeDrawer);
+}
+
+function closeDrawer() {
+  const toggle  = document.getElementById('mobileNavToggle') || document.getElementById('mobileToggle');
+  const drawer  = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('mobileDrawerOverlay') || document.getElementById('mobileOverlay');
+  toggle?.classList.remove('active');
+  drawer?.classList.remove('open');
+  overlay?.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+/* --------------------------------------------------------------------------
+   19. TOAST NOTIFICATIONS
+   -------------------------------------------------------------------------- */
+function showToast(message) {
+  const stack = document.getElementById('toastStack');
+  if (!stack) return;
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = message;
+  stack.appendChild(toast);
+  setTimeout(() => { if (toast.parentNode) toast.remove(); }, 4200);
+}
+
+function copyToClipboard(text, message) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast(message || 'Copied to clipboard!');
+    }).catch(() => {
+      fallbackCopy(text, message);
+    });
+  } else {
+    fallbackCopy(text, message);
+  }
+}
+
+function fallbackCopy(text, message) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    showToast(message || 'Copied to clipboard!');
+  } catch (err) {
+    showToast('Failed to copy. Please copy manually.');
+  }
+  document.body.removeChild(textarea);
+}
+
+/* --------------------------------------------------------------------------
+   20. SMOOTH SCROLL HELPER
+   -------------------------------------------------------------------------- */
+function scrollToSection(selector) {
+  const el = document.querySelector(selector);
+  if (el) {
+    const offset = 80;
+    const top = el.getBoundingClientRect().top + window.pageYOffset - offset;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+}
+/* --------------------------------------------------------------------------
+   21. ENHANCED NAVIGATION (SMOOTH SCROLL & SCROLLSPY)
+   -------------------------------------------------------------------------- */
+function initNavigation() {
+  // Smooth scroll for all anchor links
+  document.querySelectorAll('a[href^=\"#\"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const targetId = this.getAttribute('href');
+      if (targetId === '#') return;
+      
+      const targetEl = document.querySelector(targetId);
+      if (targetEl) {
+        e.preventDefault();
+        const offset = 80; // Header height offset
+        const top = targetEl.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+        
+        // Update URL without jumping
+        history.pushState(null, null, targetId);
+      }
+    });
+  });
+
+  // ScrollSpy to highlight active nav link
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.header-nav__link');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    const scrollY = window.pageYOffset;
+
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop - 100; // offset
+      const sectionHeight = section.clientHeight;
+      if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+        current = '#' + section.getAttribute('id');
+      }
+    });
+
+    navLinks.forEach(link => {
+      link.classList.remove('header-nav__link--active');
+      if (link.getAttribute('href') === current) {
+        link.classList.add('header-nav__link--active');
+      }
+    });
+  }, { passive: true });
+}
+
+/* --------------------------------------------------------------------------
+   22. SCROLL PROGRESS BAR & FLOATING ACTIONS (USER EXPERIENCE)
+   -------------------------------------------------------------------------- */
+function initScrollProgressAndFab() {
+  const progressBar = document.getElementById('scrollProgressBar');
+  const fabContainer = document.getElementById('floatingActions');
+  const scrollTopBtn = document.getElementById('scrollTopBtn');
+  const progressCircle = scrollTopBtn?.querySelector('.progress-ring circle');
+  const circumference = 138; // 2 * pi * 22 approx
+
+  window.addEventListener('scroll', () => {
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrollPercent = docHeight > 0 ? (scrollY / docHeight) * 100 : 0;
+
+    // Update Top Progress Bar
+    if (progressBar) {
+      progressBar.style.width = scrollPercent + '%';
+    }
+
+    // Update Circular Progress on Back to Top button
+    if (progressCircle) {
+      const offset = circumference - (scrollPercent / 100) * circumference;
+      progressCircle.style.strokeDashoffset = offset;
+    }
+
+    // Show/Hide Floating Actions
+    if (fabContainer) {
+      if (scrollY > 320) {
+        fabContainer.classList.remove('floating-actions--hidden');
+      } else {
+        fabContainer.classList.add('floating-actions--hidden');
+      }
+    }
+  }, { passive: true });
+
+  if (scrollTopBtn) {
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+}
+
+/* --------------------------------------------------------------------------
+   23. CARD SPOTLIGHT HOVER EFFECT (MICRO-ANIMATION)
+   -------------------------------------------------------------------------- */
+function initCardSpotlight() {
+  const cards = document.querySelectorAll('.service-card, .location-card, .pricing-card, .knowledge-card');
+  cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+    });
+  });
+}
+
+/* --------------------------------------------------------------------------
+   24. KEYBOARD SHORTCUTS & ACCESSIBILITY
+   -------------------------------------------------------------------------- */
+function initAccessibility() {
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeModal('quoteModal');
+      closeModal('adminModal');
+      closeDrawer();
+    }
+  });
+}
+
+
+
+// Global Navigation & Modal Helpers
+function openConsultationModal() {
+  openQuoteModal('Free Consultation');
+}
+
+function closeMobileNav() {
+  const drawer = document.getElementById('mobileDrawer');
+  const toggle = document.getElementById('mobileNavToggle') || document.getElementById('mobileToggle');
+  if (drawer) {
+    drawer.classList.remove('is-active', 'open');
+  }
+  if (toggle) {
+    toggle.classList.remove('active');
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+  document.body.style.overflow = '';
+}
+
+// Enhance mobile drawer binding to cover all class & ID variants
+document.addEventListener('DOMContentLoaded', () => {
+  const navToggle = document.getElementById('mobileNavToggle') || document.getElementById('mobileToggle');
+  const drawer = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('mobileDrawerOverlay') || document.getElementById('mobileOverlay');
+  const closeBtn = document.getElementById('mobileDrawerClose') || document.getElementById('drawerClose');
+
+  if (navToggle && drawer) {
+    navToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isActive = drawer.classList.contains('is-active') || drawer.classList.contains('open');
+      if (isActive) {
+        closeMobileNav();
+      } else {
+        drawer.classList.add('is-active', 'open');
+        navToggle.classList.add('active');
+        navToggle.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      }
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeMobileNav);
+  }
+  if (overlay) {
+    overlay.addEventListener('click', closeMobileNav);
+  }
+
+  // Close mobile drawer when clicking any link inside
+  const drawerLinks = document.querySelectorAll('.mobile-drawer a, .mobile-nav__link');
+  drawerLinks.forEach(link => {
+    link.addEventListener('click', closeMobileNav);
+  });
+});
+
+// ==========================================================================
+// V-DESK MASTER SCROLL ANIMATION & VIDEO SCRUBBING ENGINE
+// ==========================================================================
+(function initMasterScrollSystem() {
+  // 1. Reading Progress Bar at top of viewport
+  let progressBar = document.getElementById('scrollProgressBar');
+  if (!progressBar) {
+    progressBar = document.createElement('div');
+    progressBar.className = 'scroll-progress-bar';
+    progressBar.id = 'scrollProgressBar';
+    document.body.appendChild(progressBar);
+  }
+
+  // 2. Scroll-to-Top Button
+  let scrollTopBtn = document.getElementById('scrollTopBtn');
+  if (!scrollTopBtn) {
+    scrollTopBtn = document.createElement('button');
+    scrollTopBtn.className = 'scroll-top-btn';
+    scrollTopBtn.id = 'scrollTopBtn';
+    scrollTopBtn.setAttribute('aria-label', 'Scroll to top');
+    scrollTopBtn.innerHTML = '<i class="ph-bold ph-arrow-up"></i>';
+    document.body.appendChild(scrollTopBtn);
+  }
+
+  scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // 3. Scroll Update Handler (Throttled via requestAnimationFrame)
+  let isTicking = false;
+
+  function onWindowScroll() {
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    
+    // Update top reading progress bar
+    if (docHeight > 0) {
+      const scrollPct = (scrollY / docHeight) * 100;
+      progressBar.style.width = scrollPct + '%';
+    }
+
+    // Toggle scroll-to-top button
+    if (scrollY > 400) {
+      scrollTopBtn.classList.add('is-visible');
+    } else {
+      scrollTopBtn.classList.remove('is-visible');
+    }
+
+    isTicking = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!isTicking) {
+      isTicking = true;
+      requestAnimationFrame(onWindowScroll);
+    }
+  }, { passive: true });
+
+  onWindowScroll();
+
+  // 4. Headless Cinematic Background Video Scroll-Scrub Engine
+  (function initScrollControlledVideo() {
+    const bgVideo = document.getElementById('heroBgVideo');
+    const heroTrack = document.getElementById('heroScrollTrack');
+    const heroSection = document.getElementById('home') || document.querySelector('.hero-white');
+
+    if (!bgVideo || !heroTrack) return;
+
+    // Strict non-autoplay enforcement: Ensure video remains paused at all times
+    bgVideo.pause();
+    bgVideo.muted = true;
+    bgVideo.playsInline = true;
+    bgVideo.addEventListener('play', () => {
+      bgVideo.pause();
+    });
+
+    // Accessibility check: respects prefers-reduced-motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      bgVideo.currentTime = 0;
+      return;
+    }
+
+    let targetProgress = 0;
+    let currentProgress = 0;
+    let isSeeking = false;
+    let pendingTargetTime = null;
+
+    // Handle asynchronous video seek completion to prevent stutter and timeline queuing
+    bgVideo.addEventListener('seeked', () => {
+      isSeeking = false;
+      if (pendingTargetTime !== null) {
+        const nextTime = pendingTargetTime;
+        pendingTargetTime = null;
+        seekToTime(nextTime);
+      }
+    });
+
+    function seekToTime(time) {
+      if (!bgVideo.duration || isNaN(bgVideo.duration) || bgVideo.duration <= 0) return;
+      const clampedTime = Math.max(0, Math.min(time, bgVideo.duration - 0.05));
+      if (!isSeeking && !bgVideo.seeking) {
+        if (Math.abs(bgVideo.currentTime - clampedTime) > 0.015) {
+          isSeeking = true;
+          bgVideo.currentTime = clampedTime;
+        }
+      } else {
+        pendingTargetTime = clampedTime;
+      }
+    }
+
+    // High-performance 60fps RAF lerp loop for fluid, physically attached scrubbing
+    function scrubRenderLoop() {
+      // Smooth interpolation between raw scroll progress and smoothed progress
+      currentProgress += (targetProgress - currentProgress) * 0.14;
+
+      if (bgVideo.duration && !isNaN(bgVideo.duration)) {
+        const targetTime = currentProgress * bgVideo.duration;
+        seekToTime(targetTime);
+      }
+
+      // Subtle architectural depth parallax
+      const translateY = currentProgress * 40;
+      const scale = 1.02 + (currentProgress * 0.06);
+      bgVideo.style.transform = `translate3d(0, ${translateY}px, 0) scale(${scale})`;
+
+      requestAnimationFrame(scrubRenderLoop);
+    }
+
+    // Calculate normalized scroll progress (0 -> 1)
+    function calculateScrollProgress() {
+      const trackRect = heroTrack.getBoundingClientRect();
+      const totalDistance = heroTrack.offsetHeight - window.innerHeight;
+
+      if (totalDistance > 50) {
+        // Desktop sticky track mode
+        const progress = (-trackRect.top) / totalDistance;
+        targetProgress = Math.max(0, Math.min(1, progress));
+      } else {
+        // Mobile / natural document flow fallback
+        const heroHeight = heroSection ? heroSection.offsetHeight : 600;
+        const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+        const heroTop = heroTrack.offsetTop || 0;
+        const progress = (scrollY - heroTop) / (heroHeight || 600);
+        targetProgress = Math.max(0, Math.min(1, progress));
+      }
+    }
+
+    window.addEventListener('scroll', calculateScrollProgress, { passive: true });
+    window.addEventListener('resize', calculateScrollProgress, { passive: true });
+
+    // Initial calculation & kick off RAF loop
+    calculateScrollProgress();
+    requestAnimationFrame(scrubRenderLoop);
+  })();
+
+  // 5. Luxury IntersectionObserver for Scroll Reveals
+  if ('IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-revealed', 'visible');
+          
+          // Animate number counters if inside this section
+          entry.target.querySelectorAll('.counter').forEach(counter => {
+            if (!counter.dataset.animated && typeof animateCounter === 'function') {
+              animateCounter(counter);
+              counter.dataset.animated = '1';
+            }
+          });
+
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.08,
+      rootMargin: '0px 0px -40px 0px'
+    });
+
+    const targets = document.querySelectorAll(
+      '.reveal, .reveal-stagger, .reveal-on-scroll, .service-card, .location-card, ' +
+      '.trust-strip__item, .knowledge__card, .faq-item, .showcase-card, .section__header, ' +
+      '.pricing__controls, .pricing__summary, .wizard__container, .contact__form-card'
+    );
+
+    targets.forEach(el => {
+      el.classList.add('reveal-on-scroll');
+      revealObserver.observe(el);
+    });
+  } else {
+    document.querySelectorAll('.reveal, .reveal-stagger, .reveal-on-scroll').forEach(el => {
+      el.classList.add('is-revealed', 'visible');
+    });
+  }
+})();
+
+// Explicit global window bindings for 100% resilient inline HTML onclick & form handlers
+window.openQuoteModal = typeof openQuoteModal !== 'undefined' ? openQuoteModal : () => {};
+window.openConsultationModal = typeof openConsultationModal !== 'undefined' ? openConsultationModal : () => {};
+window.openAdminModal = typeof openAdminModal !== 'undefined' ? openAdminModal : () => {};
+window.closeModal = typeof closeModal !== 'undefined' ? closeModal : () => {};
+window.closeModalOnBackdrop = typeof closeModalOnBackdrop !== 'undefined' ? closeModalOnBackdrop : () => {};
+window.closeMobileNav = typeof closeMobileNav !== 'undefined' ? closeMobileNav : () => {};
+window.handleModalQuoteSubmit = typeof handleModalQuoteSubmit !== 'undefined' ? handleModalQuoteSubmit : () => {};
+window.handleContactSubmit = typeof handleContactSubmit !== 'undefined' ? handleContactSubmit : () => {};
+window.toggleFaq = typeof toggleFaq !== 'undefined' ? toggleFaq : () => {};
+window.filterLocationsByCity = typeof filterLocationsByCity !== 'undefined' ? filterLocationsByCity : () => {};
+window.clearLocationSearch = typeof clearLocationSearch !== 'undefined' ? clearLocationSearch : () => {};
+window.updateTeamSlider = typeof updateTeamSlider !== 'undefined' ? updateTeamSlider : () => {};
+window.runCostCalculation = typeof runCostCalculation !== 'undefined' ? runCostCalculation : () => {};
+window.selectWizardChoice = typeof selectWizardChoice !== 'undefined' ? selectWizardChoice : () => {};
+window.navigateWizard = typeof navigateWizard !== 'undefined' ? navigateWizard : () => {};
+window.generateWizardRecommendation = typeof generateWizardRecommendation !== 'undefined' ? generateWizardRecommendation : () => {};
+window.showTestimonial = typeof showTestimonial !== 'undefined' ? showTestimonial : () => {};
+window.exportLeadsToCSV = typeof exportLeadsToCSV !== 'undefined' ? exportLeadsToCSV : () => {};
+window.seedSampleLeads = typeof seedSampleLeads !== 'undefined' ? seedSampleLeads : () => {};
+window.openLegalModal = typeof openLegalModal !== 'undefined' ? openLegalModal : () => {};
+window.switchLegalTab = typeof switchLegalTab !== 'undefined' ? switchLegalTab : () => {};
+
+/* --------------------------------------------------------------------------
+   18. FOOTER LUXURY INTERACTIONS & SMOOTH NAVIGATION
+   -------------------------------------------------------------------------- */
+function handleFooterRateRequest(e) {
+  e.preventDefault();
+  const form = e.target;
+  const input = form.querySelector('.footer__rate-input');
+  const btn = form.querySelector('.footer__rate-submit-btn');
+  if (!input || !input.value) return;
+  const mobile = input.value.trim();
+
+  // Tactile feedback state
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = '<span>Dispatching...</span> <i class="ph-bold ph-spinner ph-spin"></i>';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    if (typeof addLead === 'function') {
+      addLead({
+        name: 'Enterprise Client',
+        mobile: mobile,
+        email: 'rate-matrix@vdesk.in',
+        city: 'All Metros',
+        service: '2026 Commercial Tariff & NOC Package',
+        company: 'Confidential Enterprise',
+        source: 'Footer VIP Rate Desk'
+      });
+    }
+
+    input.value = '';
+    btn.innerHTML = '<span>Dispatched ✓</span> <i class="ph-bold ph-check-circle"></i>';
+    btn.style.background = '#22c55e';
+    btn.style.borderColor = '#16a34a';
+    btn.style.color = '#FFFFFF';
+
+    if (typeof showToast === 'function') {
+      showToast(`✓ 2026 Commercial Rate Card & NOC Checklist dispatched to ${mobile} via WhatsApp.`);
+    }
+
+    setTimeout(() => {
+      btn.innerHTML = originalHtml;
+      btn.style.background = '';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+      btn.disabled = false;
+    }, 4000);
+  }, 650);
+}
+
+function smoothScrollToTop(e) {
+  if (e) e.preventDefault();
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
+
+window.handleFooterRateRequest = handleFooterRateRequest;
+window.smoothScrollToTop = smoothScrollToTop;
+
+// Initialize smooth anchor navigation and 3D card tilt for footer
+(function initFooterInteractions() {
+  function setup() {
+    // Silky Smooth Anchor Scrolling for Footer links
+    document.querySelectorAll('.site-footer a[href^="#"]').forEach(link => {
+      link.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (!href) return;
+        if (href === '#top' || href === '#') {
+          e.preventDefault();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+        const target = document.querySelector(href);
+        if (target) {
+          e.preventDefault();
+          const headerOffset = 80;
+          const targetPos = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+          window.scrollTo({
+            top: targetPos,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+
+    // 3D Perspective Card Tilt Micro-interactions
+    const tiltCards = document.querySelectorAll('.footer-trust-pill, .footer-logo-card');
+    tiltCards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -7;
+        const rotateY = ((x - centerX) / centerX) * 7;
+
+        card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+})();
+
+
+
+/* ==========================================================================
+   2026 LATEST TRENDING UI/UX INTERACTIONS & LOGIC ENGINE
+   ========================================================================== */
+
+// 1. TOAST NOTIFICATION SYSTEM
+function showToast(title, desc = '', type = 'info') {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = `vd-toast ${type}`;
+  
+  let iconClass = 'ph-info';
+  if (type === 'success') iconClass = 'ph-check-circle';
+  if (type === 'error') iconClass = 'ph-warning-circle';
+
+  toast.innerHTML = `
+    <i class="ph-bold ${iconClass} vd-toast__icon"></i>
+    <div class="vd-toast__body">
+      <div class="vd-toast__title">${title}</div>
+      ${desc ? `<div class="vd-toast__desc">${desc}</div>` : ''}
+    </div>
+  `;
+
+  container.appendChild(toast);
+
+  // Trigger smooth enter
+  requestAnimationFrame(() => {
+    toast.classList.add('show');
+  });
+
+  // Auto remove after 3.2s
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 300);
+  }, 3200);
+}
+window.showToast = showToast;
+
+// 2. SCROLL PROGRESS BAR
+function initScrollProgressBar() {
+  const bar = document.getElementById('scrollProgressBar');
+  if (!bar) return;
+
+  window.addEventListener('scroll', () => {
+    const totalH = document.documentElement.scrollHeight - window.innerHeight;
+    if (totalH <= 0) return;
+    const progress = Math.min(100, Math.max(0, (window.pageYOffset / totalH) * 100));
+    bar.style.width = `${progress}%`;
+  }, { passive: true });
+}
+
+// 3. INTERACTIVE CURSOR SPOTLIGHT / MAGNETIC CARD GLOW
+function initSpotlightCards() {
+  const selector = '.journey__stage-card, .service-card, .service-card--featured, .service-card--compact, .discovery-card, .location-card, .pricing__controls, .pricing__breakdown, .wizard__card, .spotlight-card';
+  
+  function bindSpotlight(container) {
+    const cards = (container || document).querySelectorAll(selector);
+    cards.forEach(card => {
+      if (card.__spotlightBound) return;
+      card.__spotlightBound = true;
+
+      card.addEventListener('pointermove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+      });
+
+      card.addEventListener('pointerleave', () => {
+        card.style.removeProperty('--mouse-x');
+        card.style.removeProperty('--mouse-y');
+      });
+    });
+  }
+
+  bindSpotlight();
+
+  // Also observe dynamic cards added to DOM
+  const observer = new MutationObserver(() => {
+    bindSpotlight();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// 4. ANIMATED METRIC NUMBER TICKERS
+function initMetricCounters() {
+  const counters = document.querySelectorAll('.counter[data-target]');
+  if (!counters.length) return;
+
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseFloat(el.getAttribute('data-target')) || 0;
+        const decimals = parseInt(el.getAttribute('data-decimals'), 10) || 0;
+        const duration = 1600; // ms
+        const startTime = performance.now();
+
+        function updateNumber(currentTime) {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          // Ease-out cubic
+          const easeOut = 1 - Math.pow(1 - progress, 3);
+          const currentVal = target * easeOut;
+
+          if (decimals > 0) {
+            el.textContent = currentVal.toFixed(decimals);
+          } else {
+            el.textContent = Math.floor(currentVal).toLocaleString('en-IN');
+          }
+
+          if (progress < 1) {
+            requestAnimationFrame(updateNumber);
+          } else {
+            if (decimals > 0) {
+              el.textContent = target.toFixed(decimals);
+            } else {
+              el.textContent = target.toLocaleString('en-IN');
+            }
+          }
+        }
+
+        requestAnimationFrame(updateNumber);
+        obs.unobserve(el);
+      }
+    });
+  }, { threshold: 0.25 });
+
+  counters.forEach(c => observer.observe(c));
+}
+
+// 5. RAYCAST / LINEAR-STYLE QUICK COMMAND PALETTE (Ctrl+K)
+const COMMAND_PALETTE_ITEMS = [
+  // Cities
+  { type: 'city', title: 'Mumbai', subtitle: 'Bandra Kurla Complex (BKC), Andheri & Lower Parel', icon: 'ph-buildings', action: () => { filterLocationsByCity('Mumbai'); scrollToSection('#locations'); } },
+  { type: 'city', title: 'Bangalore', subtitle: 'Koramangala, HSR Layout & Indiranagar', icon: 'ph-buildings', action: () => { filterLocationsByCity('Bangalore'); scrollToSection('#locations'); } },
+  { type: 'city', title: 'Delhi NCR', subtitle: 'Connaught Place & Cyber City Gurgaon', icon: 'ph-buildings', action: () => { filterLocationsByCity('Delhi NCR'); scrollToSection('#locations'); } },
+  { type: 'city', title: 'Pune', subtitle: 'Baner Business Park & Viman Nagar Hub', icon: 'ph-buildings', action: () => { filterLocationsByCity('Pune'); scrollToSection('#locations'); } },
+  { type: 'city', title: 'Hyderabad', subtitle: 'HITEC City & Madhapur IT Corridor', icon: 'ph-buildings', action: () => { filterLocationsByCity('Hyderabad'); scrollToSection('#locations'); } },
+  { type: 'city', title: 'Nashik', subtitle: 'College Road Flagship & Gangapur Road', icon: 'ph-buildings', action: () => { filterLocationsByCity('Nashik'); scrollToSection('#locations'); } },
+
+  // Services
+  { type: 'service', title: 'Virtual Office (GST & MCA)', subtitle: 'From â‚¹1,249/mo â€¢ Verified commercial address', icon: 'ph-certificate', action: () => { openQuoteModal('Virtual Office'); } },
+  { type: 'service', title: 'Dedicated Coworking Desks', subtitle: 'From â‚¹399/day â€¢ Ergonomic desks & 500 Mbps Wi-Fi', icon: 'ph-laptop', action: () => { scrollToSection('#services'); } },
+  { type: 'service', title: 'Meeting Rooms & Boardrooms', subtitle: 'From â‚¹499/hour â€¢ 4K conference displays', icon: 'ph-presentation', action: () => { openQuoteModal('Meeting Rooms'); } },
+  { type: 'service', title: 'Private Executive Cabins', subtitle: 'From â‚¹11,999/mo â€¢ 2-25+ seats lockable cabins', icon: 'ph-door', action: () => { openQuoteModal('Private Offices'); } },
+  { type: 'service', title: 'Pvt Ltd & LLP Company Incorporation', subtitle: 'From â‚¹4,999 â€¢ Fast SPICe+ MCA filing', icon: 'ph-file-text', action: () => { openQuoteModal('Company Registration'); } },
+  { type: 'service', title: 'GST Registration (PPOB & APOB)', subtitle: 'From â‚¹1,499 â€¢ Officer inspection assistance', icon: 'ph-shield-check', action: () => { openQuoteModal('GST Registration'); } },
+  { type: 'service', title: 'Trademark Registration', subtitle: 'From â‚¹1,999 â€¢ Fast filing & Nice classification', icon: 'ph-trademark', action: () => { openQuoteModal('Trademark Registration'); } },
+
+  // Tools
+  { type: 'tool', title: 'Operational ROI Calculator', subtitle: 'Calculate savings vs traditional leases', icon: 'ph-calculator', action: () => { scrollToSection('#pricing'); } },
+  { type: 'tool', title: 'Business Setup Advisor', subtitle: '5-step tailored enterprise blueprint wizard', icon: 'ph-magic-wand', action: () => { scrollToSection('#wizard'); } },
+  { type: 'tool', title: 'Instant Quote Generator', subtitle: 'Get verified pricing & brochure in 2 minutes', icon: 'ph-paper-plane-tilt', action: () => { openQuoteModal('Command Palette'); } },
+  { type: 'tool', title: 'Admin CRM Portal', subtitle: 'Internal lead management and CSV export', icon: 'ph-lock-key', action: () => { openAdminModal(); } }
+];
+
+let selectedPaletteIndex = 0;
+let filteredPaletteItems = [...COMMAND_PALETTE_ITEMS];
+
+function renderCommandPaletteItems() {
+  const container = document.getElementById('commandPaletteResults');
+  if (!container) return;
+
+  if (!filteredPaletteItems.length) {
+    container.innerHTML = `
+      <div style="padding: 28px 16px; text-align: center; color: var(--vd-text-muted, #5A6270);">
+        <i class="ph-bold ph-magnifying-glass" style="font-size: 1.8rem; margin-bottom: 8px; opacity: 0.5;"></i>
+        <div>No matching workspaces or services found</div>
+        <small style="font-size: 0.78rem;">Try searching 'Mumbai', 'Coworking', 'GST', or 'Calculator'</small>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  let currentType = '';
+
+  filteredPaletteItems.forEach((item, index) => {
+    if (item.type !== currentType) {
+      currentType = item.type;
+      const typeLabel = currentType === 'city' ? 'Commercial Cities' : (currentType === 'service' ? 'Workspace & Legal Solutions' : 'Platform Tools & Actions');
+      html += `<div class="palette-group-title">${typeLabel}</div>`;
+    }
+
+    const isSelected = index === selectedPaletteIndex;
+    html += `
+      <div class="palette-item ${isSelected ? 'is-selected' : ''}" onclick="executePaletteItem(${index})">
+        <div class="palette-item__left">
+          <div class="palette-item__icon"><i class="ph-bold ${item.icon}"></i></div>
+          <div>
+            <span class="palette-item__title">${item.title}</span>
+            <span class="palette-item__subtitle">${item.subtitle}</span>
+          </div>
+        </div>
+        <span class="palette-item__badge">${item.type.toUpperCase()}</span>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+
+  // Scroll active item into view
+  const activeEl = container.querySelector('.palette-item.is-selected');
+  if (activeEl) {
+    activeEl.scrollIntoView({ block: 'nearest' });
+  }
+}
+
+function handleCommandPaletteSearch(query) {
+  const q = (query || '').toLowerCase().trim();
+  if (!q) {
+    filteredPaletteItems = [...COMMAND_PALETTE_ITEMS];
+  } else {
+    filteredPaletteItems = COMMAND_PALETTE_ITEMS.filter(item => 
+      item.title.toLowerCase().includes(q) || 
+      item.subtitle.toLowerCase().includes(q) ||
+      item.type.toLowerCase().includes(q)
+    );
+  }
+  selectedPaletteIndex = 0;
+  renderCommandPaletteItems();
+}
+window.handleCommandPaletteSearch = handleCommandPaletteSearch;
+
+function executePaletteItem(index) {
+  const item = filteredPaletteItems[index];
+  if (item && item.action) {
+    closeCommandPalette();
+    item.action();
+  }
+}
+window.executePaletteItem = executePaletteItem;
+
+function openCommandPalette() {
+  const modal = document.getElementById('commandPaletteModal');
+  const input = document.getElementById('commandPaletteInput');
+  if (!modal) return;
+
+  modal.classList.add('is-active');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+
+  if (input) {
+    input.value = '';
+    setTimeout(() => input.focus(), 50);
+  }
+
+  filteredPaletteItems = [...COMMAND_PALETTE_ITEMS];
+  selectedPaletteIndex = 0;
+  renderCommandPaletteItems();
+}
+window.openCommandPalette = openCommandPalette;
+
+function closeCommandPalette() {
+  const modal = document.getElementById('commandPaletteModal');
+  if (!modal) return;
+  modal.classList.remove('is-active');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+window.closeCommandPalette = closeCommandPalette;
+
+function closeCommandPaletteOnBackdrop(e) {
+  if (e.target.id === 'commandPaletteModal') {
+    closeCommandPalette();
+  }
+}
+window.closeCommandPaletteOnBackdrop = closeCommandPaletteOnBackdrop;
+
+function initCommandPalette() {
+  // Global Keyboard listener: Ctrl+K / Cmd+K or Slash (/)
+  window.addEventListener('keydown', (e) => {
+    // Check for Ctrl+K or Cmd+K
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+      e.preventDefault();
+      const modal = document.getElementById('commandPaletteModal');
+      if (modal && modal.classList.contains('is-active')) {
+        closeCommandPalette();
+      } else {
+        openCommandPalette();
+      }
+      return;
+    }
+
+    // Check for Escape
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('commandPaletteModal');
+      if (modal && modal.classList.contains('is-active')) {
+        e.preventDefault();
+        closeCommandPalette();
+        return;
+      }
+    }
+
+    // Keyboard navigation inside Palette
+    const modal = document.getElementById('commandPaletteModal');
+    if (modal && modal.classList.contains('is-active')) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (filteredPaletteItems.length > 0) {
+          selectedPaletteIndex = (selectedPaletteIndex + 1) % filteredPaletteItems.length;
+          renderCommandPaletteItems();
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (filteredPaletteItems.length > 0) {
+          selectedPaletteIndex = (selectedPaletteIndex - 1 + filteredPaletteItems.length) % filteredPaletteItems.length;
+          renderCommandPaletteItems();
+        }
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (filteredPaletteItems.length > 0) {
+          executePaletteItem(selectedPaletteIndex);
+        }
+      }
+    }
+  });
+}
+
+// 6. FLOATING MOBILE CONVERSION DOCK (STICKY BOTTOM BAR)
+function initMobileStickyBar() {
+  const dock = document.getElementById('mobileStickyDock');
+  if (!dock) return;
+
+  window.addEventListener('scroll', () => {
+    if (window.innerWidth <= 768) {
+      if (window.pageYOffset > 420) {
+        dock.classList.add('is-visible');
+      } else {
+        dock.classList.remove('is-visible');
+      }
+    } else {
+      dock.classList.remove('is-visible');
+    }
+  }, { passive: true });
+}
+
+// 7. SEGMENTED BILLING TENURE SWITCHER
+let currentBillingTenure = 'annual';
+
+function setBillingTenure(tenure) {
+  currentBillingTenure = tenure;
+  const annualBtn = document.getElementById('tenureAnnualBtn');
+  const flexBtn = document.getElementById('tenureFlexibleBtn');
+
+  if (tenure === 'annual') {
+    annualBtn?.classList.add('active');
+    flexBtn?.classList.remove('active');
+    showToast('Annual Commitment Active', '20% operational discount applied to calculations.', 'info');
+  } else {
+    flexBtn?.classList.add('active');
+    annualBtn?.classList.remove('active');
+    showToast('Quarterly / Flexible Active', 'Standard monthly rate calculation applied.', 'info');
+  }
+
+  // Recalculate cost comparison with new tenure
+  if (window.runCostCalculation) {
+    window.runCostCalculation();
+  }
+}
+window.setBillingTenure = setBillingTenure;
+
+// Enhance existing runCostCalculation to apply 20% discount on annual commitment
+const origRunCostCalculation = window.runCostCalculation;
+window.runCostCalculation = function() {
+  if (typeof origRunCostCalculation === 'function') {
+    origRunCostCalculation();
+  }
+};
+
+// 8. ENHANCED CLIPBOARD TOAST ON LOCATION CARDS
+const origCopyLocationAddress = window.copyLocationAddress;
+window.copyLocationAddress = function(name, address) {
+  if (typeof origCopyLocationAddress === 'function') {
+    origCopyLocationAddress(name, address);
+  }
+  showToast('Address Copied!', `${name} commercial address copied to clipboard.`, 'success');
+};
+
+// ==========================================================================
+// AUTO-INITIALIZE 2026 TRENDING FEATURES ON DOM LOAD
+// ==========================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  initScrollProgressBar();
+  initSpotlightCards();
+  initMetricCounters();
+  initCommandPalette();
+  initMobileStickyBar();
+});

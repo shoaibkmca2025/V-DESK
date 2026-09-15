@@ -1,0 +1,72 @@
+/** Commercial centres (virtual office / coworking hubs) across India. */
+export const LOCATIONS = [
+  // ━━━ NASHIK (Flagship) ━━━
+  { id:'NSK-001', city:'Nashik', areaName:'College Road',  fullName:'V-DESK Headquarters — College Road',
+    address:'Landmark Trade Centre, 3rd Floor, College Road, Nashik – 422005',
+    services:['Virtual Office','Coworking','Meeting Rooms','Private Office','GST Registration','Company Registration'],
+    vo_price:1249, cw_price:399, meetingCapacity:'4–20 pax', status:'available', flagship:true },
+  { id:'NSK-002', city:'Nashik', areaName:'Gangapur Road', fullName:'V-DESK Premium — Gangapur Road',
+    address:'Phoenix Business Park, Near Sula Vineyards Road, Gangapur Road, Nashik – 422013',
+    services:['Virtual Office','Coworking','Meeting Rooms','GST Registration'],
+    vo_price:1349, cw_price:449, meetingCapacity:'4–12 pax', status:'available', flagship:true },
+  // ━━━ MUMBAI ━━━
+  { id:'MUM-001', city:'Mumbai', areaName:'Andheri East', fullName:'V-DESK Mumbai — Andheri East',
+    address:'Peninsula Business Hub, Andheri–Kurla Road, Andheri East, Mumbai – 400059',
+    services:['Virtual Office','Coworking','Meeting Rooms','GST Registration'],
+    vo_price:1999, cw_price:699, meetingCapacity:'6–20 pax', status:'available', flagship:false },
+  { id:'MUM-002', city:'Mumbai', areaName:'BKC',           fullName:'V-DESK Mumbai — BKC',
+    address:'BKC Business Center, G Block, Bandra Kurla Complex, Mumbai – 400051',
+    services:['Virtual Office','Private Office','Meeting Rooms','Company Registration'],
+    vo_price:2499, cw_price:899, meetingCapacity:'4–16 pax', status:'limited', flagship:false },
+  { id:'MUM-003', city:'Mumbai', areaName:'Lower Parel',   fullName:'V-DESK Mumbai — Lower Parel',
+    address:'Tower 5, High Street Phoenix, Lower Parel, Mumbai – 400013',
+    services:['Virtual Office','Coworking','GST Registration'],
+    vo_price:2199, cw_price:799, meetingCapacity:'4–12 pax', status:'available', flagship:false },
+  // ━━━ DELHI ━━━
+  { id:'DEL-001', city:'Delhi', areaName:'Connaught Place', fullName:'V-DESK Delhi — Connaught Place',
+    address:'Statesman House, Barakhamba Road, Connaught Place, New Delhi – 110001',
+    services:['Virtual Office','Coworking','Meeting Rooms','GST Registration','Company Registration'],
+    vo_price:2199, cw_price:799, meetingCapacity:'6–20 pax', status:'available', flagship:false },
+  { id:'DEL-002', city:'Delhi', areaName:'Nehru Place',     fullName:'V-DESK Delhi — Nehru Place',
+    address:'Hemkunt Chambers, Nehru Place, New Delhi – 110019',
+    services:['Virtual Office','GST Registration'],
+    vo_price:1799, cw_price:599, meetingCapacity:'4–8 pax', status:'available', flagship:false },
+  // ━━━ BANGALORE ━━━
+  { id:'BLR-001', city:'Bangalore', areaName:'Koramangala', fullName:'V-DESK Bangalore — Koramangala',
+    address:'Omega Tech Park, 5th Block, Koramangala, Bengaluru – 560034',
+    services:['Virtual Office','Coworking','Meeting Rooms','Private Office','GST Registration'],
+    vo_price:1999, cw_price:699, meetingCapacity:'6–20 pax', status:'available', flagship:false },
+  { id:'BLR-002', city:'Bangalore', areaName:'HSR Layout',  fullName:'V-DESK Bangalore — HSR Layout',
+    address:'Bridge+ Workspaces, Sector 7, HSR Layout, Bengaluru – 560102',
+    services:['Virtual Office','Coworking','GST Registration'],
+    vo_price:1799, cw_price:649, meetingCapacity:'4–12 pax', status:'available', flagship:false },
+  // ━━━ PUNE ━━━
+  { id:'PNE-001', city:'Pune', areaName:'Baner',       fullName:'V-DESK Pune — Baner',
+    address:'Embassy Business Park, Baner Road, Pune – 411045',
+    services:['Virtual Office','Coworking','Meeting Rooms','GST Registration','Company Registration'],
+    vo_price:1599, cw_price:549, meetingCapacity:'6–16 pax', status:'available', flagship:false },
+  { id:'PNE-002', city:'Pune', areaName:'Viman Nagar', fullName:'V-DESK Pune — Viman Nagar',
+    address:'Nyati Emporius, Viman Nagar Road, Pune – 411014',
+    services:['Virtual Office','GST Registration'],
+    vo_price:1449, cw_price:499, meetingCapacity:'4–8 pax', status:'available', flagship:false },
+  // ━━━ HYDERABAD ━━━
+  { id:'HYD-001', city:'Hyderabad', areaName:'HITEC City',  fullName:'V-DESK Hyderabad — HITEC City',
+    address:'Laxmi Cyber City, Whitefields, HITEC City, Hyderabad – 500081',
+    services:['Virtual Office','Coworking','Meeting Rooms','Private Office','GST Registration'],
+    vo_price:1799, cw_price:649, meetingCapacity:'6–20 pax', status:'available', flagship:false },
+  // ━━━ NOIDA ━━━
+  { id:'NOI-001', city:'Noida', areaName:'Sector 62',  fullName:'V-DESK Noida — Sector 62',
+    address:'Express Trade Tower, Sector 62, Noida – 201301',
+    services:['Virtual Office','Coworking','GST Registration'],
+    vo_price:1599, cw_price:549, meetingCapacity:'4–12 pax', status:'available', flagship:false },
+  // ━━━ GURGAON ━━━
+  { id:'GUR-001', city:'Gurgaon', areaName:'Cyber City', fullName:'V-DESK Gurgaon — DLF Cyber City',
+    address:'DLF Cyber City, Building 10, Tower C, Gurgaon – 122002',
+    services:['Virtual Office','Coworking','Meeting Rooms','Private Office','GST Registration','Company Registration'],
+    vo_price:2299, cw_price:799, meetingCapacity:'6–20 pax', status:'limited', flagship:false },
+  // ━━━ CHENNAI ━━━
+  { id:'CHN-001', city:'Chennai', areaName:'Nungambakkam', fullName:'V-DESK Chennai — Nungambakkam',
+    address:'Presidium Business Hub, Nungambakkam High Road, Chennai – 600034',
+    services:['Virtual Office','Coworking','Meeting Rooms','GST Registration'],
+    vo_price:1699, cw_price:599, meetingCapacity:'4–16 pax', status:'available', flagship:false }
+];

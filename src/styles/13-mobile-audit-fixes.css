@@ -1,0 +1,133 @@
+/* ==========================================================================
+   MOBILE RESPONSIVENESS & AUDIT FIXES (360px - 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .top-utility-bar {
+    padding: 6px 0 !important;
+  }
+  .top-utility-text {
+    display: none !important;
+  }
+  .top-utility-right {
+    gap: 8px !important;
+  }
+  .top-utility-link {
+    font-size: 0.75rem !important;
+  }
+  .top-utility-btn {
+    font-size: 0.72rem !important;
+    padding: 2px 8px !important;
+  }
+
+  /* Header mobile polish */
+  .header-contact-link {
+    display: none !important;
+  }
+  .header-btn-quote {
+    display: none !important;
+  }
+  .header-actions {
+    gap: 8px !important;
+  }
+  .mobile-nav-toggle {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    background: #FFFFFF !important;
+    border: 1px solid var(--vd-border-soft, #E2E8F0) !important;
+    border-radius: var(--radius-sm, 6px) !important;
+    cursor: pointer !important;
+  }
+
+  /* Hero adjustments */
+  .hero-white__headline {
+    font-size: clamp(1.85rem, 6.8vw, 2.45rem) !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+    hyphens: none !important;
+    letter-spacing: -0.01em !important;
+    line-height: 1.18 !important;
+  }
+
+  .hero-white__subtitle {
+    font-size: 1rem !important;
+  }
+
+  .hero-white__ctas {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .hero-white__ctas .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .hero-white__trust-row {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+  .hero-trust-divider {
+    display: none !important;
+  }
+
+  /* Prevent floating badges from overflowing horizontally */
+  .floating-badge {
+    position: static !important;
+    margin: 10px 0 0 !important;
+    width: 100% !important;
+    box-shadow: none !important;
+  }
+  .showcase-card {
+    padding: 16px !important;
+    overflow: hidden !important;
+  }
+
+  /* Trust strip mobile */
+  .trust-strip__grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px !important;
+  }
+
+  /* Journey stages mobile */
+  .journey__stages-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Pricing layout mobile */
+  .pricing__layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Wizard mobile */
+  .wizard__progress {
+    overflow-x: auto !important;
+    padding-bottom: 8px !important;
+  }
+
+  /* Contact mobile */
+  .contact__grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-btn-quote {
+    display: none !important;
+  }
+  .trust-strip__grid {
+    grid-template-columns: 1fr !important;
+    text-align: center !important;
+  }
+  .trust-strip__item {
+    padding: 12px 0 !important;
+    border-bottom: 1px dashed var(--vd-border-soft, #E2E8F0) !important;
+  }
+  .trust-strip__item:last-child {
+    border-bottom: none !important;
+  }
+}

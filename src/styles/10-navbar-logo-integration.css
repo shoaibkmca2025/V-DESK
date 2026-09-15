@@ -1,0 +1,48 @@
+/* ==========================================================================
+   OFFICIAL V-DESK NAVBAR & BRAND LOGO INTEGRATION
+   ========================================================================== */
+
+.header-logo {
+  display: inline-flex !important;
+  align-items: center !important;
+  text-decoration: none !important;
+  flex-shrink: 0 !important;
+  padding: 2px 0 !important;
+  transition: opacity 0.2s ease, transform 0.2s ease !important;
+}
+
+.header-logo:hover {
+  opacity: 0.9 !important;
+  transform: translateY(-1px) !important;
+}
+
+.header-logo__full-img {
+  height: 52px !important;
+  width: auto !important;
+  max-width: 175px !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+/* Mobile Drawer Logo */
+.mobile-drawer__brand-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.mobile-drawer__full-logo {
+  height: 44px !important;
+  width: auto !important;
+  max-width: 150px !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+@media (max-width: 768px) {
+  .header-logo__full-img {
+    height: 42px !important;
+    max-width: 140px !important;
+  }
+}
+

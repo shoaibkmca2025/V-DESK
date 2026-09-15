@@ -1,0 +1,60 @@
+{
+  "name": "V-DESK — Business Infrastructure & Workspace Platform",
+  "short_name": "V-DESK",
+  "description": "Flexible workspaces, Virtual Office for GST, 4K Meeting Rooms, and Business Infrastructure across India.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#05132B",
+  "theme_color": "#05132B",
+  "orientation": "any",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "assets/vdesk-emblem.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Virtual Office & GST",
+      "url": "./virtual-office",
+      "description": "Configure Virtual Office with 100% GST approval"
+    },
+    {
+      "name": "Book Meeting Room",
+      "url": "./meeting-rooms",
+      "description": "On-demand 4K Boardrooms & Conference Suites"
+    },
+    {
+      "name": "Client Portal",
+      "url": "./portal",
+      "description": "Customer self-service command center & vault"
+    },
+    {
+      "name": "Super Admin CRM",
+      "url": "./admin",
+      "description": "Operations & Lead Management Suite"
+    }
+  ]
+}

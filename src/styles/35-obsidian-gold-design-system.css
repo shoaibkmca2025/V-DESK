@@ -1,0 +1,592 @@
+/* ==========================================================================
+   UNIVERSAL OBSIDIAN-NAVY & CHAMPAGNE-GOLD DESIGN SYSTEM (SITE-WIDE ELEVATION)
+   Applied across index.html, meeting-rooms.html, locations.html, pricing.html,
+   company-registration.html, and contact.html.
+   ========================================================================== */
+
+/* 1. UNIVERSAL SPLIT HERO ENGINE */
+.site-hero-split,
+.home-hero-split,
+.mr-hero-split,
+.loc-hero-split,
+.pricing-hero-split,
+.compreg-hero-split,
+.contact-hero-split {
+  background: radial-gradient(circle at top right, #0B254E 0%, #05132B 65%, #020B18 100%) !important;
+  padding: 64px 0 74px 0;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(197, 146, 57, 0.2);
+}
+
+.site-hero-split::before,
+.home-hero-split::before,
+.mr-hero-split::before,
+.loc-hero-split::before,
+.pricing-hero-split::before,
+.compreg-hero-split::before,
+.contact-hero-split::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(197, 146, 57, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.site-hero-grid,
+.home-hero-grid,
+.mr-hero-grid,
+.loc-hero-grid,
+.pricing-hero-grid,
+.compreg-hero-grid,
+.contact-hero-grid {
+  display: grid;
+  grid-template-columns: 1.18fr 0.82fr;
+  gap: 48px;
+  align-items: start;
+}
+
+/* Hero Left Column Typography & Badges */
+.hero-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(197, 146, 57, 0.15);
+  border: 1px solid rgba(197, 146, 57, 0.4);
+  color: #DFB15B !important;
+  border-radius: 30px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: 0.02em;
+}
+
+.hero-luxury-title {
+  font-size: clamp(2.2rem, 3.8vw, 3.3rem);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  line-height: 1.16;
+  color: #FFFFFF !important;
+  margin-bottom: 18px;
+  letter-spacing: -0.02em;
+}
+
+.hero-luxury-desc {
+  font-size: 1.06rem;
+  line-height: 1.68;
+  color: #CBD5E1 !important;
+  margin-bottom: 28px;
+  max-width: 640px;
+}
+
+/* 4-Stat Metrics Row */
+.hero-stats-quad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.hero-stat-box {
+  background: rgba(5, 19, 43, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 14px 10px;
+  text-align: center;
+  backdrop-filter: blur(8px);
+}
+
+.hero-stat-box strong {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #DFB15B !important;
+  display: block;
+}
+
+.hero-stat-box span {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9DB2CF !important;
+  display: block;
+  margin-top: 3px;
+  font-weight: 600;
+}
+
+/* Trust Pill Grid */
+.hero-trust-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 16px;
+  margin-bottom: 28px;
+}
+
+.hero-trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #E2E8F0 !important;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.hero-trust-badge i {
+  color: #DFB15B !important;
+  font-size: 1.1rem;
+}
+
+/* Hero Button Group */
+.hero-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
+/* Embedded Luxury Lead Capture Cards (Right Column) */
+.hero-lead-card {
+  background: #081D40 !important;
+  border: 1px solid rgba(197, 146, 57, 0.35) !important;
+  border-radius: 16px !important;
+  padding: 30px !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45) !important;
+  position: relative;
+}
+
+.hero-card-ribbon {
+  position: absolute;
+  top: -12px;
+  right: 24px;
+  background: linear-gradient(135deg, #DFB15B 0%, #C59239 100%);
+  color: #05132B !important;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(197, 146, 57, 0.4);
+}
+
+.hero-card-header {
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hero-card-header h3 {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: #FFFFFF !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.hero-card-header p {
+  font-size: 0.82rem !important;
+  color: #CBD5E1 !important;
+  margin: 0;
+}
+
+.hero-lead-form .form-group {
+  margin-bottom: 14px;
+}
+
+.hero-lead-form label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #CBD5E1 !important;
+  margin-bottom: 5px;
+}
+
+.hero-lead-form .form-control,
+.hero-lead-form select,
+.hero-lead-form input {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(5, 19, 43, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 8px !important;
+  color: #FFFFFF !important;
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.hero-lead-form .form-control:focus,
+.hero-lead-form select:focus,
+.hero-lead-form input:focus {
+  outline: none;
+  border-color: #DFB15B !important;
+  box-shadow: 0 0 0 2px rgba(223, 177, 91, 0.25) !important;
+}
+
+.hero-lead-form select option {
+  background: #081D40;
+  color: #FFFFFF;
+}
+
+/* 2. 4-PILLAR ECOSYSTEM SHOWCASE (HOMEPAGE & BEYOND) */
+.home-pillars-section {
+  background: #05132B !important;
+  padding: 70px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.home-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.pillar-card {
+  background: #081D40 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 14px;
+  padding: 26px 20px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.pillar-card:hover {
+  transform: translateY(-5px);
+  border-color: #DFB15B !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+}
+
+.pillar-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: rgba(197, 146, 57, 0.15);
+  border: 1px solid rgba(197, 146, 57, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #DFB15B;
+  margin-bottom: 18px;
+}
+
+.pillar-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #DFB15B !important;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.pillar-title {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: #FFFFFF !important;
+  margin-bottom: 10px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.pillar-desc {
+  font-size: 0.86rem !important;
+  color: #94A3B8 !important;
+  line-height: 1.55;
+  margin-bottom: 18px;
+}
+
+.pillar-features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #CBD5E1;
+}
+
+.pillar-features-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pillar-features-list li i {
+  color: #DFB15B;
+  font-size: 1rem;
+}
+
+.pillar-card-footer {
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pillar-price-label {
+  font-size: 0.72rem;
+  color: #94A3B8;
+  display: block;
+}
+
+.pillar-price-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #DFB15B;
+}
+
+/* 3. DARK LUXURY CARDS FOR LOCATIONS, PRICING & COMPLIANCE */
+.dark-luxury-section {
+  background: #05132B !important;
+  padding: 70px 0;
+}
+
+.dark-luxury-section .section__title,
+.process-flow-section .section__title,
+.meeting-rooms-section .section__title,
+.pricing-matrix-section .section__title {
+  color: #FFFFFF !important;
+}
+
+.dark-luxury-section .section__desc,
+.process-flow-section .section__desc,
+.meeting-rooms-section .section__desc,
+.pricing-matrix-section .section__desc {
+  color: #CBD5E1 !important;
+}
+
+/* Dark Metro Hub Cards (locations.html & index.html) */
+.metro-hub-card {
+  background: #081D40 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.metro-hub-card:hover {
+  transform: translateY(-5px);
+  border-color: #DFB15B !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45) !important;
+}
+
+.metro-hub-card h3 {
+  color: #FFFFFF !important;
+}
+
+.metro-hub-card p {
+  color: #CBD5E1 !important;
+}
+
+.metro-hub-card strong {
+  color: #DFB15B !important;
+}
+
+/* Dark Pricing Entity Cards (pricing.html & company-registration.html) */
+.pricing-matrix-section {
+  background: #05132B !important;
+}
+
+.entity-card {
+  background: #081D40 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  padding: 28px 24px !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.3s ease;
+}
+
+.entity-card:hover {
+  transform: translateY(-4px);
+  border-color: #DFB15B !important;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4) !important;
+}
+
+.entity-card h3,
+.entity-card h4 {
+  color: #FFFFFF !important;
+}
+
+.entity-card p {
+  color: #CBD5E1 !important;
+}
+
+.entity-card strong,
+.entity-card .plan-price-val {
+  color: #DFB15B !important;
+}
+
+.entity-card ul li {
+  color: #E2E8F0 !important;
+}
+
+/* Meeting Scheduler Luxury Styling */
+.meeting-scheduler-box {
+  background: #081D40 !important;
+  border: 1px solid rgba(197, 146, 57, 0.3) !important;
+  border-radius: 16px !important;
+  padding: 30px !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4) !important;
+}
+
+.meeting-scheduler-box .form-label {
+  color: #CBD5E1 !important;
+}
+
+.meeting-scheduler-box .form-select,
+.meeting-scheduler-box .form-input {
+  background: rgba(5, 19, 43, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #FFFFFF !important;
+}
+
+.meeting-scheduler-box .form-select option {
+  background: #081D40;
+  color: #FFFFFF;
+}
+
+.mr-state-ticker {
+  background: rgba(5, 19, 43, 0.95) !important;
+  border: 1px solid rgba(197, 146, 57, 0.3) !important;
+  border-radius: 12px !important;
+  padding: 16px 20px !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.mr-state-ticker strong {
+  color: #10B981 !important;
+}
+
+.mr-pricing-tally .mr-rate-calc {
+  color: #94A3B8 !important;
+}
+
+.mr-pricing-tally .mr-final-cost {
+  color: #DFB15B !important;
+}
+
+/* 4. UNIVERSAL FLOATING ACTION HIERARCHY & COLLISION PREVENTION */
+.whatsapp-concierge-float,
+.footer-whatsapp-launcher {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  z-index: 999 !important;
+}
+
+.callback-float-btn {
+  position: fixed !important;
+  bottom: 84px !important;
+  right: 24px !important;
+  z-index: 998 !important;
+}
+
+.scroll-top-btn {
+  position: fixed !important;
+  bottom: 144px !important;
+  right: 24px !important;
+  z-index: 997 !important;
+}
+
+#pwaInstallBanner,
+.pwa-install-banner {
+  position: fixed !important;
+  bottom: 24px !important;
+  left: 24px !important;
+  right: auto !important;
+  z-index: 996 !important;
+  max-width: 340px !important;
+}
+
+@media (max-width: 768px) {
+  .site-hero-grid,
+  .home-hero-grid,
+  .mr-hero-grid,
+  .loc-hero-grid,
+  .pricing-hero-grid,
+  .compreg-hero-grid,
+  .contact-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .home-pillars-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-stats-quad {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hero-trust-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .scroll-top-btn {
+    bottom: 136px !important;
+    right: 18px !important;
+  }
+
+  .callback-float-btn {
+    bottom: 80px !important;
+    right: 18px !important;
+  }
+
+  .whatsapp-concierge-float,
+  .footer-whatsapp-launcher {
+    bottom: 20px !important;
+    right: 18px !important;
+  }
+
+  #pwaInstallBanner,
+  .pwa-install-banner {
+    bottom: 84px !important;
+    left: 14px !important;
+    right: 14px !important;
+    max-width: calc(100% - 28px) !important;
+  }
+}
+
+/* 5. UNIVERSAL SPECIFICITY OVERRIDES FOR ALL SUBPAGES */
+.subpage-hero .subpage-hero__title,
+.site-hero-split h1,
+.home-hero-split h1,
+.mr-hero-split h1,
+.loc-hero-split h1,
+.pricing-hero-split h1,
+.compreg-hero-split h1,
+.contact-hero-split h1,
+.hero-luxury-title {
+  color: #FFFFFF !important;
+}
+
+.subpage-hero .subpage-hero__desc,
+.hero-luxury-desc {
+  color: #CBD5E1 !important;
+}
+
+.highlight-gold {
+  background: linear-gradient(135deg, #DFB15B 0%, #C59239 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline-block !important;
+}
+

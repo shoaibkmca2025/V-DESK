@@ -1,0 +1,329 @@
+/* ==========================================================================
+   2026 MOBILE RESPONSIVE HARDENING & TOUCH ERGONOMICS SUITE
+   ========================================================================== */
+
+/* 1. Global Touch Hygiene & Viewport Overflow Protection */
+html, body {
+  overflow-x: clip !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  position: relative !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+img, video, iframe, canvas, svg {
+  max-width: 100% !important;
+  height: auto;
+}
+
+/* 2. Top Announcement Bar on Mobile */
+@media (max-width: 640px) {
+  .top-utility-bar {
+    padding: 6px 0 !important;
+    background: #0F3B60 !important;
+  }
+  .top-utility-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 12px !important;
+    gap: 8px !important;
+  }
+  .top-utility-left .utility-text {
+    display: none !important;
+  }
+  .top-utility-right .top-utility-btn {
+    display: none !important;
+  }
+  .utility-badge {
+    font-size: 0.68rem !important;
+    padding: 2px 7px !important;
+    white-space: nowrap !important;
+    background: rgba(0, 168, 150, 0.18) !important;
+    color: #00A896 !important;
+  }
+  .top-utility-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+  .top-utility-link {
+    font-size: 0.72rem !important;
+    white-space: nowrap !important;
+    color: #F8FAFC !important;
+  }
+}
+
+/* 3. Hero Section Tablet & Mobile Hardening */
+@media (max-width: 768px) {
+  .hero-white__pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    max-width: 100% !important;
+    padding: 5px 12px !important;
+    margin-bottom: 16px !important;
+  }
+  .pill-text {
+    font-size: 0.68rem !important;
+    letter-spacing: 0.06em !important;
+  }
+  .pill-badge {
+    font-size: 0.64rem !important;
+    padding: 2px 6px !important;
+  }
+  .hero-white__headline {
+    font-size: clamp(1.95rem, 6.8vw, 2.6rem) !important;
+    line-height: 1.15 !important;
+    margin-bottom: 14px !important;
+  }
+  .hero-white__subtitle {
+    font-size: 0.96rem !important;
+    line-height: 1.55 !important;
+    margin-bottom: 22px !important;
+  }
+  .hero-white__ctas {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px !important;
+    margin-bottom: 24px !important;
+  }
+  .hero-white__ctas .btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 13px 20px !important;
+    font-size: 0.92rem !important;
+    border-radius: 10px !important;
+    min-height: 48px !important;
+  }
+  .hero-white__trust-row {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+    padding-top: 16px !important;
+    border-top: 1px solid var(--vd-border-soft, #E2E8F0) !important;
+  }
+  .hero-trust-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 3px !important;
+  }
+  .hero-trust-item i {
+    font-size: 1.25rem !important;
+    color: var(--vd-gold-primary, #00A896) !important;
+  }
+  .hero-trust-item strong {
+    font-size: 0.76rem !important;
+    line-height: 1.2 !important;
+  }
+  .hero-trust-item span {
+    font-size: 0.65rem !important;
+    line-height: 1.2 !important;
+    color: var(--vd-text-muted, #5A6270) !important;
+  }
+  .hero-trust-divider {
+    display: none !important;
+  }
+}
+
+/* 4. Showcase Card & Floating Badges Mobile Optimization */
+@media (max-width: 640px) {
+  .hero-white__showcase {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 8px !important;
+  }
+  .showcase-card--glass {
+    padding: 22px 14px !important;
+    border-radius: 16px !important;
+  }
+  .floating-badge {
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+    gap: 8px !important;
+    box-shadow: 0 4px 14px rgba(11, 27, 51, 0.10) !important;
+  }
+  .floating-badge--top {
+    top: -12px !important;
+    left: 8px !important;
+  }
+  .floating-badge--bottom {
+    bottom: -12px !important;
+    right: 8px !important;
+  }
+  .floating-badge__icon {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.95rem !important;
+  }
+  .badge-title {
+    font-size: 0.72rem !important;
+  }
+  .badge-sub {
+    font-size: 0.62rem !important;
+  }
+  .spotlight-metric-grid {
+    gap: 6px !important;
+    margin-bottom: 12px !important;
+  }
+  .spotlight-metric {
+    padding: 8px 4px !important;
+  }
+  .spotlight-val {
+    font-size: 1.05rem !important;
+  }
+  .spotlight-lbl {
+    font-size: 0.62rem !important;
+  }
+  .spotlight-cities {
+    gap: 4px !important;
+  }
+  .spotlight-city-pill {
+    font-size: 0.68rem !important;
+    padding: 3px 8px !important;
+  }
+}
+
+/* 5. Credibility Trust Strip 2-Column Dashboard on Mobile */
+@media (max-width: 768px) {
+  .trust-strip {
+    padding: 32px 0 !important;
+  }
+  .trust-strip__grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  .trust-strip__item:last-child {
+    grid-column: span 2 !important;
+  }
+  .trust-strip__item {
+    background: #FFFFFF !important;
+    padding: 14px 10px !important;
+    border-radius: 12px !important;
+    text-align: center !important;
+    box-shadow: 0 2px 8px rgba(11, 27, 51, 0.04) !important;
+    border: 1px solid var(--vd-border-soft, #E2E8F0) !important;
+  }
+  .trust-strip__value {
+    font-size: 1.45rem !important;
+    font-weight: 800 !important;
+    color: var(--vd-navy-deep, #0F3B60) !important;
+  }
+  .trust-strip__label {
+    font-size: 0.74rem !important;
+    margin-top: 2px !important;
+    font-weight: 600 !important;
+  }
+  .trust-strip__sub {
+    font-size: 0.65rem !important;
+    color: var(--vd-text-muted, #5A6270) !important;
+  }
+}
+
+/* 6. City Tabs & Filter Pills Horizontal Swipe Strip */
+@media (max-width: 768px) {
+  .discovery__tabs,
+  .location-filter-pills,
+  .locations__tabs,
+  .city-filters {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 16px !important;
+    gap: 8px !important;
+  }
+  .discovery__tabs::-webkit-scrollbar,
+  .location-filter-pills::-webkit-scrollbar,
+  .locations__tabs::-webkit-scrollbar,
+  .city-filters::-webkit-scrollbar {
+    display: none !important;
+  }
+  .discovery__tab,
+  .location-filter-btn {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    padding: 8px 14px !important;
+    font-size: 0.82rem !important;
+  }
+}
+
+/* 7. Interactive Slider & Form Touch Controls */
+input[type="range"] {
+  touch-action: pan-y !important;
+  min-height: 36px !important;
+}
+input[type="range"]::-webkit-slider-thumb {
+  width: 26px !important;
+  height: 26px !important;
+  cursor: pointer !important;
+}
+
+/* 8. Mobile Drawer Full Touch Height & Z-Index */
+.mobile-drawer {
+  z-index: 10005 !important;
+}
+.mobile-nav__link {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-height: 44px !important;
+  padding: 10px 14px !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+.mobile-drawer__panel {
+  background: #06152F !important;
+  max-width: 340px !important;
+}
+
+/* 9. Mobile Sticky Bottom Dock & Back-to-Top Clearance */
+@media (max-width: 768px) {
+  .scroll-to-top,
+  .back-to-top {
+    bottom: 78px !important;
+    right: 14px !important;
+    width: 40px !important;
+    height: 40px !important;
+    z-index: 998 !important;
+  }
+  .mobile-sticky-dock {
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 10px)) !important;
+    z-index: 997 !important;
+  }
+}
+
+/* 10. Modals Touch Optimization & iOS Zoom Prevention */
+@media (max-width: 640px) {
+  .modal-panel,
+  .modal__card,
+  .quote-modal__card {
+    width: 94% !important;
+    max-width: 420px !important;
+    max-height: 88vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 20px 16px !important;
+    border-radius: 16px !important;
+  }
+  input, select, textarea {
+    font-size: 16px !important; /* Prevents iOS Safari auto-zoom on input focus */
+  }
+  .container {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+  section {
+    padding: 56px 0 !important;
+  }
+}
+
+
+

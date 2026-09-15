@@ -1,0 +1,287 @@
+/* ==========================================================================
+   22. ENHANCED USER EXPERIENCE & ANIMATION SYSTEM
+   ========================================================================== */
+
+/* Top Scroll Progress Bar */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--vd-accent), var(--vd-accent-warm), var(--vd-emerald));
+  z-index: 1000;
+  pointer-events: none;
+  transition: width 0.1s ease-out;
+  box-shadow: 0 0 10px var(--vd-accent-glow);
+}
+
+/* Ambient Floating Glow Orbs for Depth */
+.ambient-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.15;
+  animation: floatOrb 16s ease-in-out infinite alternate;
+}
+
+.ambient-glow--1 {
+  top: 15%;
+  left: 10%;
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, var(--vd-accent), transparent 70%);
+}
+
+.ambient-glow--2 {
+  top: 45%;
+  right: 8%;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, #3b82f6, transparent 70%);
+  animation-duration: 22s;
+  animation-delay: -5s;
+}
+
+.ambient-glow--3 {
+  bottom: 10%;
+  left: 30%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, var(--vd-emerald), transparent 70%);
+  animation-duration: 18s;
+  animation-delay: -10s;
+}
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -30px) scale(1.08); }
+  100% { transform: translate(-30px, 40px) scale(0.95); }
+}
+
+/* Shimmer Effect on Primary Buttons */
+.btn--primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn--primary::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transform: rotate(25deg);
+  transition: none;
+  pointer-events: none;
+}
+
+.btn--primary:hover::after {
+  left: 120%;
+  transition: left 0.75s ease-in-out;
+}
+
+/* Card Interactive Hover Lift & Accent Glow */
+.service-card,
+.location-card,
+.pricing-card,
+.knowledge-card,
+.float-card {
+  position: relative;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.35s ease;
+}
+
+.service-card:hover,
+.location-card:hover,
+.pricing-card:hover,
+.knowledge-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), 0 0 24px rgba(0, 168, 150, 0.1);
+  border-color: rgba(0, 168, 150, 0.35);
+}
+
+/* Floating Quick Action Widget */
+.floating-actions {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 990;
+  pointer-events: auto;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.floating-actions--hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+}
+
+.fab-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--vd-slate);
+  border: 1px solid var(--border-medium);
+  color: var(--vd-white);
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.fab-btn:hover {
+  background: var(--vd-accent);
+  color: var(--vd-black);
+  border-color: var(--vd-accent-warm);
+  transform: scale(1.08);
+  box-shadow: 0 10px 28px rgba(0, 168, 150, 0.35);
+}
+
+.fab-btn--chat {
+  background: #25D366;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+}
+
+.fab-btn--chat:hover {
+  background: #20BA5A;
+  color: #FFFFFF;
+  border-color: #FFFFFF;
+  box-shadow: 0 10px 28px rgba(37, 211, 102, 0.4);
+}
+
+.fab-btn--scroll-top svg.progress-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.fab-btn--scroll-top svg.progress-ring circle {
+  fill: none;
+  stroke: var(--vd-accent);
+  stroke-width: 2.5;
+  stroke-dasharray: 138;
+  stroke-dashoffset: 138;
+  transition: stroke-dashoffset 0.1s ease-out;
+}
+
+/* Floating WhatsApp / Quick Assist Pill */
+.quick-assist-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(24, 24, 27, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-medium);
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  color: var(--vd-zinc-200);
+  font-size: 0.825rem;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: all 0.25s ease;
+}
+
+.quick-assist-pill:hover {
+  border-color: var(--vd-accent);
+  color: var(--vd-white);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0, 168, 150, 0.2);
+}
+
+.quick-assist-pill__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--vd-emerald);
+  box-shadow: 0 0 8px var(--vd-emerald);
+  animation: pulseDot 2s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+}
+
+/* Micro-interaction for Clickable Elements */
+.header-nav__link {
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.header-nav__link:hover {
+  transform: translateY(-1px);
+}
+
+/* Active Nav Indicator (User-Friendly Highlight) */
+.header-nav__link--active {
+  color: var(--vd-accent) !important;
+  font-weight: 600;
+}
+
+.header-nav__link--active::after {
+  width: 100% !important;
+  background: var(--vd-accent) !important;
+  box-shadow: 0 0 8px var(--vd-accent-glow);
+}
+
+/* Smooth Accordion Motion */
+.faq-item {
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.faq-item.open {
+  border-color: rgba(0, 168, 150, 0.4);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.faq-item__answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  opacity: 0;
+}
+
+.faq-item.open .faq-item__answer {
+  max-height: 500px;
+  opacity: 1;
+}
+
+.faq-item__arrow {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+  display: inline-block;
+}
+
+.faq-item.open .faq-item__arrow {
+  transform: rotate(180deg);
+  color: var(--vd-accent);
+}
+
+/* Cost Calculator Animated Result Update */
+.cost-calc__result-val {
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.cost-calc__result-val.bump {
+  transform: scale(1.08);
+  color: var(--vd-accent);
+}
+

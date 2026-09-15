@@ -1,0 +1,96 @@
+/* ==========================================================================
+   REFINED V-DESK BRAND LOGO (PERFECT COLOR HARMONY WITH DARK THEME)
+   ========================================================================== */
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.header-logo:hover {
+  transform: translateY(-1px);
+}
+
+.header-logo__emblem-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  background: radial-gradient(circle at center, #0b1e42 0%, #06152f 100%);
+  border: 1.5px solid rgba(0, 168, 150, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 
+              0 0 14px rgba(0, 168, 150, 0.2), 
+              inset 0 0 8px rgba(0, 168, 150, 0.15);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.header-logo:hover .header-logo__emblem-wrap {
+  border-color: #00A896;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7), 
+              0 0 20px rgba(0, 168, 150, 0.4), 
+              inset 0 0 12px rgba(0, 168, 150, 0.25);
+  transform: scale(1.04);
+}
+
+.header-logo__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+  display: block;
+}
+
+.header-logo__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-logo__brand {
+  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.header-logo__brand span {
+  background: linear-gradient(135deg, #ffffff 10%, #02C39A 50%, #00A896 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header-logo__tagline {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #00A896;
+  font-weight: 600;
+  margin-top: 3px;
+}
+
+/* Mobile Drawer Brand Harmony */
+.mobile-drawer__logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 9px;
+  background: radial-gradient(circle at center, #0b1e42 0%, #06152f 100%);
+  border: 1.5px solid rgba(0, 168, 150, 0.4);
+  padding: 4px;
+  object-fit: contain;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 168, 150, 0.2);
+}
+
+/* Obsolete Footer Brand Harmony removed */
+
+

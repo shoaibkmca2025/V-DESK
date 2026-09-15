@@ -1,0 +1,101 @@
+/* ==========================================================================
+   23. MOBILE STICKY BAR & RESPONSIVE UX ENHANCEMENTS
+   ========================================================================== */
+
+/* Desktop: hide mobile sticky bar */
+.mobile-sticky-bar {
+  display: none;
+}
+
+/* Mobile: show sticky bar and adjust offsets */
+@media (max-width: 768px) {
+  body {
+    padding-bottom: 74px;
+  }
+
+  .mobile-sticky-bar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: rgba(10, 10, 11, 0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border-medium);
+    padding: 0.5rem 1rem;
+    z-index: 980;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6);
+  }
+
+  .mobile-cta-wa {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    flex: 1.1;
+    height: 44px;
+    border-radius: 8px;
+    background: #25D366;
+    color: #FFFFFF;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+
+  .mobile-cta-wa:active {
+    background: #1eb954;
+  }
+
+  .mobile-cta-call {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background: var(--vd-slate);
+    border: 1px solid var(--border-light);
+    color: var(--vd-white);
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+
+  .mobile-cta-call:active {
+    background: var(--vd-slate-light);
+  }
+
+  .mobile-cta-quote {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    flex: 1.4;
+    height: 44px;
+    border-radius: 8px;
+    background: var(--vd-accent);
+    color: var(--vd-black);
+    font-size: 0.825rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .mobile-cta-quote:active {
+    background: var(--vd-accent-warm);
+  }
+
+  /* Offset floating back-to-top on mobile so it does not overlap sticky bar */
+  .floating-actions {
+    bottom: 5.25rem;
+    right: 1.25rem;
+  }
+}
+
+

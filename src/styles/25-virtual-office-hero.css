@@ -1,0 +1,271 @@
+/* ==========================================================================
+   V-DESK VIRTUAL OFFICE PREMIUM REFERENCE ENHANCEMENTS (myHQ Standard)
+   ========================================================================== */
+
+.vo-hero-split {
+  padding: clamp(3rem, 6vw, 5.5rem) 0 clamp(2.5rem, 5vw, 4rem);
+  background: radial-gradient(circle at 80% 20%, rgba(0, 168, 150, 0.12) 0%, transparent 60%),
+              radial-gradient(circle at 10% 70%, rgba(197, 146, 57, 0.12) 0%, transparent 50%),
+              linear-gradient(180deg, #05132B 0%, #081D40 100%);
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(197, 146, 57, 0.15);
+}
+
+.vo-hero-split::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+
+.vo-hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.vo-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  background: rgba(197, 146, 57, 0.15);
+  border: 1px solid rgba(197, 146, 57, 0.4);
+  border-radius: 9999px;
+  color: var(--vd-gold-primary, #DFB15B);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 10px rgba(197, 146, 57, 0.1);
+}
+
+.vo-hero-title {
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.15;
+  color: #FFFFFF;
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.vo-hero-title .highlight-gold {
+  background: linear-gradient(135deg, #DFB15B 0%, #C59239 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.vo-hero-desc {
+  font-size: clamp(1rem, 1.3vw, 1.12rem);
+  line-height: 1.65;
+  color: #C2D1E5;
+  margin-bottom: 1.75rem;
+  max-width: 620px;
+}
+
+.vo-hero-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(5, 19, 43, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+
+.vo-stat-box {
+  text-align: center;
+}
+
+.vo-stat-num {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #DFB15B;
+  line-height: 1.1;
+  margin-bottom: 0.2rem;
+}
+
+.vo-stat-label {
+  font-size: 0.78rem;
+  color: #9DB2CF;
+  font-weight: 500;
+}
+
+.vo-hero-trust-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.vo-trust-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #E2E8F0;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.vo-trust-item i {
+  color: var(--vd-teal-primary, #00A896);
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.vo-hero-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* Hero Lead Form Card */
+.vo-hero-card {
+  background: rgba(8, 29, 64, 0.85);
+  border: 1px solid rgba(197, 146, 57, 0.35);
+  border-radius: 16px;
+  padding: clamp(1.5rem, 2.5vw, 2.25rem);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(197, 146, 57, 0.08);
+  backdrop-filter: blur(16px);
+  position: relative;
+}
+
+.vo-card-ribbon {
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  background: linear-gradient(135deg, #00A896, #028090);
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.3rem 0.85rem;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 168, 150, 0.35);
+}
+
+.vo-card-header {
+  margin-bottom: 1.25rem;
+}
+
+.vo-card-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vo-card-title i {
+  color: #DFB15B;
+}
+
+.vo-card-sub {
+  font-size: 0.84rem;
+  color: #9DB2CF;
+  line-height: 1.4;
+}
+
+.vo-form-group {
+  margin-bottom: 0.9rem;
+}
+
+.vo-form-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #C2D1E5;
+  margin-bottom: 0.35rem;
+}
+
+.vo-form-control {
+  width: 100%;
+  padding: 0.75rem 0.95rem;
+  background: #05132B;
+  border: 1px solid rgba(197, 146, 57, 0.25);
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-size: 0.88rem;
+  transition: all 0.2s ease;
+  outline: none;
+  font-family: inherit;
+}
+
+.vo-form-control:focus {
+  border-color: #DFB15B;
+  box-shadow: 0 0 0 3px rgba(197, 146, 57, 0.15);
+  background: #081D40;
+}
+
+.vo-phone-input-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.vo-phone-prefix {
+  padding: 0.75rem 0.85rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(197, 146, 57, 0.25);
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  color: #DFB15B;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.vo-phone-input-wrap .vo-form-control {
+  border-radius: 0 8px 8px 0;
+}
+
+.vo-form-submit-btn {
+  width: 100%;
+  padding: 0.9rem;
+  background: linear-gradient(135deg, #DFB15B 0%, #C59239 100%);
+  color: #05132B;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.1rem;
+  box-shadow: 0 6px 20px rgba(197, 146, 57, 0.3);
+}
+
+.vo-form-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(197, 146, 57, 0.45);
+  background: linear-gradient(135deg, #F0C46E 0%, #DFB15B 100%);
+}
+
+.vo-form-footer {
+  margin-top: 0.85rem;
+  text-align: center;
+  font-size: 0.74rem;
+  color: #7E94B3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+

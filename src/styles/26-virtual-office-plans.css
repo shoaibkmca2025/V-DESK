@@ -1,0 +1,142 @@
+/* ==========================================================================
+   2. CHOOSE VIRTUAL OFFICE BASED ON NEEDS (3-TIER USE CASES)
+   ========================================================================== */
+
+.vo-needs-section {
+  padding: 5rem 0;
+  background: #081D40;
+  position: relative;
+}
+
+.vo-needs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+  margin-top: 2.5rem;
+}
+
+.vo-need-card {
+  background: rgba(5, 19, 43, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 2rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.vo-need-card.featured {
+  border-color: rgba(197, 146, 57, 0.45);
+  background: rgba(8, 29, 64, 0.9);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35), 0 0 24px rgba(197, 146, 57, 0.1);
+  transform: translateY(-6px);
+}
+
+.vo-need-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(197, 146, 57, 0.5);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+}
+
+.vo-need-badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 0.25rem 0.75rem;
+  background: rgba(0, 168, 150, 0.15);
+  border: 1px solid rgba(0, 168, 150, 0.3);
+  color: #00A896;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 1rem;
+}
+
+.vo-need-card.featured .vo-need-badge {
+  background: rgba(197, 146, 57, 0.2);
+  border-color: rgba(197, 146, 57, 0.45);
+  color: #DFB15B;
+}
+
+.vo-need-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: rgba(197, 146, 57, 0.12);
+  color: #DFB15B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  margin-bottom: 1.25rem;
+}
+
+.vo-need-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 0.6rem;
+  line-height: 1.3;
+}
+
+.vo-need-desc {
+  font-size: 0.88rem;
+  color: #9DB2CF;
+  line-height: 1.55;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.vo-need-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.vo-need-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.84rem;
+  color: #CBD5E1;
+  line-height: 1.4;
+}
+
+.vo-need-features li i {
+  color: #00A896;
+  font-size: 1rem;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+}
+
+.vo-need-pricing {
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.vo-price-label {
+  font-size: 0.78rem;
+  color: #7E94B3;
+}
+
+.vo-price-value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.vo-price-value span {
+  font-size: 0.82rem;
+  color: #9DB2CF;
+  font-weight: 400;
+}
+

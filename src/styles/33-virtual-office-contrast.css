@@ -1,0 +1,165 @@
+/* ==========================================================================
+   VIRTUAL OFFICE DARK THEME CONTRAST & SPECIFICITY OVERRIDES
+   ========================================================================== */
+
+.vo-hero-split h1,
+.vo-hero-title,
+.vo-card-title,
+.vo-needs-section .section__title,
+.vo-guarantees-section .section__title,
+.vo-services-section .section__title,
+.vo-markets-section .section__title,
+.vo-process-section .section__title,
+.vo-faq-section .section__title,
+.vo-need-title,
+.vo-guarantee-title,
+.vo-service-content h4,
+.vo-market-name,
+.vo-process-step-card h3,
+.vo-faq-trigger {
+  color: #FFFFFF !important;
+}
+
+.vo-hero-desc,
+.vo-card-sub,
+.vo-needs-section .section__desc,
+.vo-guarantees-section .section__desc,
+.vo-services-section .section__desc,
+.vo-markets-section .section__desc,
+.vo-process-section .section__desc,
+.vo-faq-section .section__desc,
+.vo-need-desc,
+.vo-guarantee-desc,
+.vo-service-content p,
+.vo-market-addr,
+.vo-process-step-card p,
+.vo-faq-body p,
+.vo-trust-item span,
+.vo-form-label {
+  color: #C2D1E5 !important;
+}
+
+.vo-hero-card {
+  background: rgba(8, 29, 64, 0.95) !important;
+  border: 1px solid rgba(197, 146, 57, 0.4) !important;
+}
+
+.vo-hero-card .vo-form-control {
+  background: #05132B !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(197, 146, 57, 0.3) !important;
+}
+
+.vo-hero-card .vo-form-control option {
+  background: #081D40;
+  color: #FFFFFF;
+}
+
+.vo-hero-card .vo-phone-prefix {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #DFB15B !important;
+  border: 1px solid rgba(197, 146, 57, 0.3) !important;
+  border-right: none !important;
+}
+
+.vo-hero-card .vo-form-label {
+  color: #CBD5E1 !important;
+}
+
+.vo-hero-card .vo-card-title {
+  color: #FFFFFF !important;
+}
+
+.vo-hero-card .vo-card-sub {
+  color: #9DB2CF !important;
+}
+
+.vo-hero-card .vo-card-ribbon {
+  background: linear-gradient(135deg, #00A896, #028090) !important;
+  color: #FFFFFF !important;
+}
+
+.vo-hero-stats-row {
+  background: rgba(5, 19, 43, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.vo-stat-num {
+  color: #DFB15B !important;
+}
+
+.vo-stat-label {
+  color: #9DB2CF !important;
+}
+
+.vo-need-card {
+  background: rgba(5, 19, 43, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.vo-need-card.featured {
+  background: rgba(8, 29, 64, 0.95) !important;
+  border-color: rgba(197, 146, 57, 0.55) !important;
+}
+
+.vo-guarantee-card {
+  background: rgba(8, 29, 64, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.vo-service-card {
+  background: rgba(5, 19, 43, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.vo-market-card {
+  background: rgba(8, 29, 64, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.vo-market-badge {
+  background: rgba(5, 19, 43, 0.9) !important;
+  color: #DFB15B !important;
+}
+
+.vo-process-step-card {
+  background: rgba(5, 19, 43, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.vo-faq-item {
+  background: rgba(8, 29, 64, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.vo-faq-item.active {
+  background: rgba(8, 29, 64, 0.98) !important;
+  border-color: rgba(197, 146, 57, 0.5) !important;
+}
+
+.vo-faq-trigger span {
+  color: #FFFFFF !important;
+}
+
+.vo-faq-body {
+  color: #CBD5E1 !important;
+}
+
+.vo-faq-body p,
+.vo-faq-body li {
+  color: #CBD5E1 !important;
+}
+
+.vo-hero-title .highlight-gold,
+.cw-hero-title .highlight-gold,
+.section__title .highlight-gold {
+  background: linear-gradient(135deg, #DFB15B 0%, #C59239 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: #DFB15B !important;
+  display: inline-block;
+}
+
+
+
+

@@ -1,0 +1,264 @@
+/* ==========================================================================
+   PRD V2.0 EXTENDED MODULES: TAX INVOICE, ENTERPRISE SUITE & PWA INSTALLER
+   ========================================================================== */
+
+/* 1. OFFICIAL GST TAX INVOICE MODAL */
+.tax-invoice-sheet {
+  background: #FFFFFF;
+  color: #0F172A;
+  padding: 32px;
+  border-radius: 12px;
+  max-width: 680px;
+  margin: 0 auto;
+  font-family: var(--vd-font-body, 'Inter', sans-serif);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  border: 1px solid #E2E8F0;
+  position: relative;
+}
+
+.tax-invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid #081D40;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.tax-invoice-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #081D40;
+  margin: 0;
+}
+
+.tax-invoice-subtitle {
+  font-size: 0.8rem;
+  color: #64748B;
+  margin-top: 4px;
+}
+
+.tax-invoice-meta {
+  text-align: right;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.tax-invoice-parties {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  background: #F8FAFC;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.tax-invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+}
+
+.tax-invoice-table th {
+  background: #081D40;
+  color: #FFFFFF;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.tax-invoice-table td {
+  padding: 12px;
+  border-bottom: 1px solid #E2E8F0;
+  color: #1E293B;
+}
+
+.tax-invoice-total-card {
+  background: #FAF8F3;
+  border: 1px solid #E8E2D8;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.tax-invoice-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.86rem;
+  padding: 4px 0;
+}
+
+.tax-invoice-total-row.grand {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #081D40;
+  border-top: 2px dashed #C59239;
+  padding-top: 8px;
+  margin-top: 6px;
+}
+
+.tax-invoice-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #E2E8F0;
+  padding-top: 16px;
+  font-size: 0.75rem;
+  color: #64748B;
+}
+
+.tax-invoice-qr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .tax-invoice-sheet, .tax-invoice-sheet * {
+    visibility: visible;
+  }
+  .tax-invoice-sheet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-width: 100%;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* 2. P2 ENTERPRISE PLATFORM MODAL */
+.enterprise-kpi-banner {
+  background: linear-gradient(135deg, rgba(8, 29, 64, 0.95), rgba(5, 19, 43, 0.98));
+  border: 1px solid rgba(197, 146, 57, 0.3);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.enterprise-cities-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.enterprise-city-chip {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.enterprise-city-chip.active {
+  background: #C59239;
+  color: #05132B;
+  font-weight: 700;
+  border-color: #C59239;
+}
+
+/* 3. PWA FLOATING INSTALL BANNER (Relocated to bottom-left to prevent collision with WhatsApp/Callback buttons) */
+#pwaInstallBanner,
+.pwa-install-banner {
+  position: fixed !important;
+  bottom: 28px !important;
+  left: 28px !important;
+  right: auto !important;
+  background: #081D40 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #C59239 !important;
+  border-radius: 14px !important;
+  padding: 14px 18px !important;
+  display: none;
+  align-items: center !important;
+  gap: 14px !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45) !important;
+  z-index: 9998 !important;
+  max-width: 380px !important;
+  animation: slideUpFade 0.4s ease forwards !important;
+}
+
+.pwa-install-banner.is-active {
+  display: flex;
+}
+
+@media (max-width: 640px) {
+  .pwa-install-banner {
+    left: 14px;
+    right: 14px;
+    bottom: 86px;
+    max-width: calc(100vw - 28px);
+    padding: 10px 14px;
+  }
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.pwa-banner-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #05132B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #C59239;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.pwa-banner-content h5 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.pwa-banner-content p {
+  margin: 2px 0 0 0;
+  font-size: 0.75rem;
+  color: #94A3B8;
+}
+
+.pwa-banner-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* 4. CROSS-SELL SMART NOTIFICATION */
+.cross-sell-prompt {
+  background: rgba(197, 146, 57, 0.1);
+  border: 1px dashed #C59239;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.85rem;
+}
+
+.cross-sell-prompt strong {
+  color: #C59239;
+}
+

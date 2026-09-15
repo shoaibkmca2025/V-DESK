@@ -1,0 +1,62 @@
+/* ==========================================================================
+   ENHANCED MOBILE DRAWER & HAMBURGER BAR VISIBILITY GUARANTEE
+   ========================================================================== */
+.hamburger-bar {
+  display: block !important;
+  width: 20px !important;
+  height: 2px !important;
+  background: var(--vd-navy-deep, #0B1B33) !important;
+  border-radius: 2px !important;
+  transition: transform 0.25s ease, opacity 0.25s ease !important;
+}
+
+.mobile-nav-toggle {
+  display: none;
+  background: #FFFFFF !important;
+  border: 1px solid var(--vd-border-soft, #E2E8F0) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 3px rgba(11, 27, 51, 0.06) !important;
+  padding: 0 !important;
+  width: 42px !important;
+  height: 42px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  z-index: 1001 !important;
+}
+
+@media (max-width: 1024px) {
+  .mobile-nav-toggle {
+    display: flex !important;
+  }
+}
+
+.mobile-nav-toggle.active .hamburger-bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg) !important;
+}
+.mobile-nav-toggle.active .hamburger-bar:nth-child(2) {
+  opacity: 0 !important;
+}
+.mobile-nav-toggle.active .hamburger-bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg) !important;
+}
+
+.mobile-drawer.open,
+.mobile-drawer.is-active {
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.mobile-drawer.open .mobile-drawer__overlay,
+.mobile-drawer.is-active .mobile-drawer__overlay {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.mobile-drawer.open .mobile-drawer__panel,
+.mobile-drawer.is-active .mobile-drawer__panel {
+  transform: translateX(0) !important;
+}
+

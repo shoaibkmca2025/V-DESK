@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>V-DESK &mdash; Business Infrastructure, Reimagined. | Virtual Office, Coworking & Business Solutions</title>
+  <meta name="description" content="Your business deserves a better address. V-DESK provides premium virtual offices, coworking spaces, meeting rooms, company registration and GST infrastructure across 10+ prime commercial hubs in India.">
+  <link rel="canonical" href="https://vdeskworkspace.com/">
+
+  <!-- OpenGraph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="V-DESK &mdash; Your Business Deserves a Better Address.">
+  <meta property="og:description" content="Virtual Office | Coworking | Meeting Rooms | Company Registration | GST Infrastructure across India's prime commercial locations.">
+  <meta property="og:image" content="assets/vdesk-logo.jpg">
+  <meta property="og:url" content="https://vdeskworkspace.com/">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Fonts: Outfit (Editorial Headings) + Inter (UI/Body) + JetBrains Mono (Data) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/jpeg" href="assets/vdesk-logo.jpg">
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "ProfessionalService",
+        "@id": "https://vdeskworkspace.com/#organization",
+        "name": "V-DESK Workspace & Consulting LLP",
+        "url": "https://vdeskworkspace.com",
+        "logo": "https://vdeskworkspace.com/assets/vdesk-logo.jpg",
+        "image": "https://vdeskworkspace.com/assets/vdesk-logo.jpg",
+        "telephone": "+919876543210",
+        "priceRange": "&#8377;&#8377;",
+        "description": "India's premier business infrastructure platform &mdash; Virtual Offices, Coworking, Meeting Rooms & Business Registration.",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "V-DESK Corporate Tower, College Road",
+          "addressLocality": "Nashik",
+          "addressRegion": "Maharashtra",
+          "postalCode": "422005",
+          "addressCountry": "IN"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "reviewCount": "2400"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://vdeskworkspace.com/#faqs",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is a Virtual Office 100% legal for GST and Company Registration in India?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, absolutely. Under the CGST Act 2017 and MCA SPICe+ rules, a business is fully permitted to operate from a commercial address provided they hold a registered commercial rent agreement, owner NOC, and a recent electricity bill copy. V-DESK provides all verified documents."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How quickly can V-DESK activate my Virtual Office address?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Upon submission of basic KYC documents (PAN, Aadhaar, photo), V-DESK delivers your notarized rent agreement, landlord NOC, and electricity bill within 24 working hours."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body id="top">
+
+  <!-- Top Scroll Progress Bar -->
+  <div id="scrollProgressBar" class="scroll-progress-bar"></div>
+
+  <!-- ====================================================================
+       TOP ANNOUNCEMENT & UTILITY BAR
+       ==================================================================== -->
+  <div class="top-utility-bar">
+    <div class="container top-utility-container">
+      <div class="top-utility-left">
+        <span class="utility-badge"><i class="ph-bold ph-shield-check"></i> GST & MCA Compliant</span>
+        <span class="utility-text">India's Premier Virtual Office & Business Infrastructure Network</span>
+      </div>
+      <div class="top-utility-right">
+        <a href="tel:+919876543210" class="top-utility-link"><i class="ph-bold ph-phone-call"></i> +91 98765 43210</a>
+        <a href="https://wa.me/919876543210?text=Hi%20V-DESK,%20I%20need%20assistance%20with%20workspace%20infrastructure" target="_blank" rel="noopener" class="top-utility-link whatsapp-link"><i class="ph-bold ph-whatsapp-logo"></i> WhatsApp</a>
+        <button class="top-utility-btn" onclick="openAdminModal()"><i class="ph-bold ph-lock-key"></i> Admin CRM</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       SITE HEADER / STICKY NAVIGATION
+       Desktop: Logo -> Workspaces -> Business Services -> Locations -> Pricing -> Resources
+       Right: WhatsApp / Contact -> Get a Quote
+       ==================================================================== -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-container">
+      <!-- BRAND LOGO -->
+      <a href="#top" class="header-logo" aria-label="V-DESK Home">
+        <img src="assets/vdesk-navbar-logo.png" alt="V-DESK Workspace & Consulting LLP" class="header-logo__full-img">
+      </a>
+
+      <!-- DESKTOP PRIMARY NAVIGATION -->
+      <nav class="header-nav" id="desktopNav" aria-label="Main Navigation">
+        <ul class="header-nav__list">
+          <li class="header-nav__item">
+            <a href="#top" class="header-nav__link active">Home</a>
+          </li>
+          
+          <!-- WORKSPACES DROPDOWN -->
+          <li class="header-nav__item header-nav__item--has-dropdown">
+            <a href="#services" class="header-nav__link">Workspaces <i class="ph-bold ph-caret-down"></i></a>
+            <ul class="header-nav__dropdown">
+              <li><a href="#services" class="dropdown-item"><i class="ph-bold ph-buildings"></i> <div><strong>Virtual Office</strong><span>GST & Business Registration</span></div></a></li>
+              <li><a href="#services" class="dropdown-item"><i class="ph-bold ph-laptop"></i> <div><strong>Coworking Spaces</strong><span>Dedicated & Flex Desks</span></div></a></li>
+              <li><a href="#services" class="dropdown-item"><i class="ph-bold ph-presentation"></i> <div><strong>Meeting Rooms</strong><span>Hourly & Daily Bookings</span></div></a></li>
+              <li><a href="#services" class="dropdown-item"><i class="ph-bold ph-door"></i> <div><strong>Private Cabins</strong><span>Secure Executive Cabins</span></div></a></li>
+            </ul>
+          </li>
+
+          <!-- BUSINESS SERVICES DROPDOWN -->
+          <li class="header-nav__item header-nav__item--has-dropdown">
+            <a href="#wizard" class="header-nav__link">Business Services <i class="ph-bold ph-caret-down"></i></a>
+            <ul class="header-nav__dropdown">
+              <li><a href="#wizard" class="dropdown-item"><i class="ph-bold ph-file-text"></i> <div><strong>Company Registration</strong><span>Pvt Ltd, LLP, OPC Incorporation</span></div></a></li>
+              <li><a href="#services" class="dropdown-item"><i class="ph-bold ph-certificate"></i> <div><strong>GST Registration</strong><span>PPOB & Multi-State APOB</span></div></a></li>
+              <li><a href="#services" class="dropdown-item"><i class="ph-bold ph-trademark"></i> <div><strong>Trademark Protection</strong><span>Search, Filing & Class Support</span></div></a></li>
+            </ul>
+          </li>
+
+          <li class="header-nav__item">
+            <a href="#locations" class="header-nav__link">Locations</a>
+          </li>
+          <li class="header-nav__item">
+            <a href="#pricing" class="header-nav__link">Pricing</a>
+          </li>
+          <li class="header-nav__item">
+            <a href="#knowledge" class="header-nav__link">Resources</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- HEADER ACTIONS -->
+      <div class="header-actions">
+        <button class="header-search-trigger" onclick="openCommandPalette()" aria-label="Quick Search (Ctrl+K)">
+          <i class="ph-bold ph-magnifying-glass"></i>
+          <span class="search-label">Quick Search</span>
+          <kbd class="search-kbd">⌘K</kbd>
+        </button>
+        <a href="https://wa.me/919876543210?text=Hi%20V-DESK,%20I%20need%20a%20workspace%20quote" target="_blank" rel="noopener" class="header-contact-link">
+          <i class="ph-bold ph-whatsapp-logo"></i> <span>Contact</span>
+        </a>
+        <button class="btn btn--gold btn--sm header-btn-quote" onclick="openQuoteModal('Navbar Header')">
+          <i class="ph-bold ph-paper-plane-tilt"></i> Get a Quote
+        </button>
+        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle Navigation Menu" aria-expanded="false">
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================================================================
+       MOBILE SLIDE-IN DRAWER
+       ==================================================================== -->
+  <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+    <div class="mobile-drawer__overlay" id="mobileDrawerOverlay"></div>
+    <div class="mobile-drawer__panel">
+      <div class="mobile-drawer__header">
+        <div class="mobile-drawer__brand">
+          <a href="#top" class="mobile-drawer__brand-link" onclick="closeMobileNav()">
+            <img src="assets/vdesk-navbar-logo.png" alt="V-DESK Workspace & Consulting LLP" class="mobile-drawer__full-logo">
+          </a>
+        </div>
+        <button class="mobile-drawer__close" id="mobileDrawerClose" aria-label="Close Navigation Menu">
+          <i class="ph-bold ph-x"></i>
+        </button>
+      </div>
+
+      <div class="mobile-drawer__body">
+        <button class="mobile-search-btn" onclick="closeMobileNav(); openCommandPalette();">
+          <i class="ph-bold ph-magnifying-glass"></i>
+          <span>Search Cities &amp; Workspaces...</span>
+          <kbd>Ctrl+K</kbd>
+        </button>
+        <nav class="mobile-nav" aria-label="Mobile Navigation">
+          <ul class="mobile-nav__list">
+            <li><a href="#top" class="mobile-nav__link active" onclick="closeMobileNav()"><i class="ph-bold ph-house"></i> Home</a></li>
+            <li class="mobile-nav__heading">Workspaces & Solutions</li>
+            <li><a href="#services" class="mobile-nav__link" onclick="closeMobileNav()"><i class="ph-bold ph-buildings"></i> Virtual Office</a></li>
+            <li><a href="#services" class="mobile-nav__link" onclick="closeMobileNav()"><i class="ph-bold ph-laptop"></i> Coworking Spaces</a></li>
+            <li><a href="#services" class="mobile-nav__link" onclick="closeMobileNav()"><i class="ph-bold ph-presentation"></i> Meeting Rooms</a></li>
+            <li><a href="#services" class="mobile-nav__link" onclick="closeMobileNav()"><i class="ph-bold ph-door"></i> Private Cabins</a></li>
+            <li class="mobile-nav__heading">Business Services</li>
+            <li><a href="#wizard" class="mobile-nav__link" onclick="closeMobileNav()"><i class="ph-bold ph-file-text"></i> Business Registration</a></li>
+            <li><a href="#pricing" class="mobile-nav__link" onclick="closeMobileNav()"><i class="ph-bold ph-tag"></i> ROI Pricing Calculator</a></li>
+            <li><a href="#locations" class="mobile-nav__link" onclick="closeMobileNav()"><i class="ph-bold ph-map-pin"></i> Locations (10+ Cities)</a></li>
+            <li><a href="#knowledge" class="mobile-nav__link" onclick="closeMobileNav()"><i class="ph-bold ph-book-open"></i> Resources & Blog</a></li>
+            <li><a href="#contact" class="mobile-nav__link" onclick="closeMobileNav()"><i class="ph-bold ph-envelope"></i> Contact Us</a></li>
+          </ul>
+        </nav>
+
+        <div class="mobile-drawer__ctas">
+          <button class="btn btn--gold btn--full" onclick="openQuoteModal('Mobile Drawer'); closeMobileNav();">
+            <i class="ph-bold ph-paper-plane-tilt"></i> Get Instant Quote
+          </button>
+          <button class="btn btn--outline btn--full" onclick="openConsultationModal(); closeMobileNav();">
+            <i class="ph-bold ph-calendar-check"></i> Book Free Consultation
+          </button>
+          <div class="mobile-drawer__quick-links">
+            <a href="tel:+919876543210" class="btn btn--glass btn--sm"><i class="ph-bold ph-phone-call"></i> Call Us</a>
+            <a href="https://wa.me/919876543210?text=Hi%20V-DESK" target="_blank" rel="noopener" class="btn btn--glass btn--sm"><i class="ph-bold ph-whatsapp-logo"></i> WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       SECTION 01 &mdash; HERO SECTION
+       Headline: "Your Business Deserves a Better Address."
+       ==================================================================== -->
+  <div class="hero-scroll-track" id="heroScrollTrack">
+    <section class="hero-white" id="home">
+      <!-- Ambient Workspace Video Background Track -->
+      <div class="hero-video-bg" id="heroVideoBg">
+        <video 
+          class="hero-video-bg__media" 
+          id="heroBgVideo" 
+          src="assets/vdesk-hero-video.mp4" 
+          muted 
+          playsinline 
+          preload="metadata"
+        ></video>
+        <div class="hero-video-bg__overlay"></div>
+        <div class="hero-video-bg__grid-mesh"></div>
+      </div>
+
+      <div class="container hero-white__container">
+        <div class="hero-white__grid">
+          
+          <!-- Left: Editorial Content & Conversion Engine -->
+          <div class="hero-white__content">
+            <div class="hero-white__pill">
+              <span class="pill-dot"></span>
+              <span class="pill-text">V-DESK WORKSPACE &amp; CONSULTING LLP</span>
+              <span class="pill-badge">GST &amp; MCA Verified</span>
+            </div>
+
+            <h1 class="hero-white__headline">
+              Your Business Deserves <br><span class="highlight-gold">a Better Address.</span>
+            </h1>
+
+            <p class="hero-white__subtitle">
+              Virtual offices, coworking spaces, meeting rooms and business registration infrastructure across India's prime commercial locations.
+            </p>
+
+            <div class="hero-white__ctas">
+              <a href="#solutionFinder" class="btn btn--primary btn--lg">
+                <i class="ph-bold ph-magnifying-glass"></i> Find Your Workspace
+              </a>
+              <button class="btn btn--gold btn--lg" onclick="openQuoteModal('Hero Primary Quote')">
+                <i class="ph-bold ph-paper-plane-tilt"></i> Get Instant Quote
+              </button>
+              <button class="btn btn--secondary btn--lg" onclick="openConsultationModal()">
+                <i class="ph-bold ph-calendar-check"></i> Book Consultation
+              </button>
+            </div>
+
+            <!-- Trust Badges Strip -->
+            <div class="hero-white__trust-row">
+              <div class="hero-trust-item">
+                <i class="ph-bold ph-shield-check"></i>
+                <div>
+                  <strong>100% Verified</strong>
+                  <span>Tax &amp; MCA NOC Guarantee</span>
+                </div>
+              </div>
+              <div class="hero-trust-divider"></div>
+              <div class="hero-trust-item">
+                <i class="ph-bold ph-lightning"></i>
+                <div>
+                  <strong>Same-Day</strong>
+                  <span>Activation &amp; Agreements</span>
+                </div>
+              </div>
+              <div class="hero-trust-divider"></div>
+              <div class="hero-trust-item">
+                <i class="ph-bold ph-buildings"></i>
+                <div>
+                  <strong>10+ Cities</strong>
+                  <span>50+ Grade-A Hubs</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Architectural Workspace Showcase -->
+          <div class="hero-white__showcase">
+            <div class="showcase-card showcase-card--glass">
+              
+              <!-- Executive Portfolio Header -->
+              <div class="showcase-card__header">
+                <div class="showcase-card__brand">
+                  <span class="showcase-card__dot"></span>
+                  <span class="showcase-card__title">V-DESK EXECUTIVE PORTFOLIO</span>
+                </div>
+                <span class="showcase-card__badge"><i class="ph-bold ph-seal-check"></i> Grade-A Verified</span>
+              </div>
+
+              <!-- Workspace Features Spotlight -->
+              <div class="showcase-card__spotlight">
+                <div class="spotlight-metric-grid">
+                  <div class="spotlight-metric">
+                    <span class="spotlight-val">50+</span>
+                    <span class="spotlight-lbl">Grade-A Hubs</span>
+                  </div>
+                  <div class="spotlight-metric">
+                    <span class="spotlight-val">&#8377;1,249<small>/mo</small></span>
+                    <span class="spotlight-lbl">Starting Price</span>
+                  </div>
+                  <div class="spotlight-metric">
+                    <span class="spotlight-val">24 Hrs</span>
+                    <span class="spotlight-lbl">Fast Activation</span>
+                  </div>
+                </div>
+
+                <div class="spotlight-cities">
+                  <span class="spotlight-city-pill"><i class="ph-bold ph-map-pin"></i> Mumbai</span>
+                  <span class="spotlight-city-pill"><i class="ph-bold ph-map-pin"></i> Bangalore</span>
+                  <span class="spotlight-city-pill"><i class="ph-bold ph-map-pin"></i> Delhi</span>
+                  <span class="spotlight-city-pill"><i class="ph-bold ph-map-pin"></i> Pune</span>
+                  <span class="spotlight-city-pill"><i class="ph-bold ph-map-pin"></i> Nashik</span>
+                </div>
+              </div>
+
+              <!-- Floating Architectural Badges -->
+              <div class="floating-badge floating-badge--top">
+                <div class="floating-badge__icon"><i class="ph-bold ph-check-circle"></i></div>
+                <div class="floating-badge__text">
+                  <span class="badge-title">Zero Brokerage</span>
+                  <span class="badge-sub">Direct Grade-A Pricing</span>
+                </div>
+              </div>
+
+              <div class="floating-badge floating-badge--bottom">
+                <div class="floating-badge__icon"><i class="ph-bold ph-users-three"></i></div>
+                <div class="floating-badge__text">
+                  <span class="badge-title">10,000+ Founders</span>
+                  <span class="badge-sub">Incorporated &amp; Scaled</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ====================================================================
+       SECTION 02 &mdash; CREDIBILITY TRUST BAR
+       10+ Cities | 50+ Grade-A Hubs | 10,000+ Businesses Served | 4.9&#9733; Client Rating
+       ==================================================================== -->
+  <section class="trust-strip">
+    <div class="container">
+      <div class="trust-strip__grid reveal-stagger" id="trustStrip">
+        <div class="trust-strip__item">
+          <div class="trust-strip__value"><span class="counter" data-target="10">0</span><span class="accent">+</span></div>
+          <div class="trust-strip__label">Prime Metros &amp; Cities</div>
+          <div class="trust-strip__sub">Pan-India Commercial Network</div>
+        </div>
+        <div class="trust-strip__item">
+          <div class="trust-strip__value"><span class="counter" data-target="50">0</span><span class="accent">+</span></div>
+          <div class="trust-strip__label">Grade-A Hubs</div>
+          <div class="trust-strip__sub">Premium Commercial Towers</div>
+        </div>
+        <div class="trust-strip__item">
+          <div class="trust-strip__value"><span class="counter" data-target="10000">0</span><span class="accent">+</span></div>
+          <div class="trust-strip__label">Businesses Served</div>
+          <div class="trust-strip__sub">Founders, CAs &amp; Enterprises</div>
+        </div>
+        <div class="trust-strip__item">
+          <div class="trust-strip__value"><span class="counter" data-target="100">0</span><span class="accent">%</span></div>
+          <div class="trust-strip__label">Tax Compliance</div>
+          <div class="trust-strip__sub">Guaranteed NOC &amp; Bill</div>
+        </div>
+        <div class="trust-strip__item">
+          <div class="trust-strip__value"><span class="counter" data-target="4.9" data-decimals="1">0</span><span class="accent">&#9733;</span></div>
+          <div class="trust-strip__label">Client Rating</div>
+          <div class="trust-strip__sub">2,400+ Verified Reviews</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       SECTION 03 &mdash; BUSINESS JOURNEY
+       START -> ESTABLISH -> WORK -> GROW
+       Visually Immersive Narrative Experience
+       ==================================================================== -->
+  <section class="section journey" id="journey">
+    <div class="container">
+      <div class="section__header section__header--center reveal">
+        <span class="section__eyebrow">The V-DESK Growth Pathway</span>
+        <h2 class="section__title">FROM FIRST REGISTRATION<br>TO MULTI-CITY SCALE.</h2>
+        <p class="section__desc">A unified commercial infrastructure platform designed to support your enterprise at every step of its lifecycle.</p>
+      </div>
+
+      <div class="journey__stages-grid reveal-stagger">
+        <!-- 01 START -->
+        <div class="journey__stage-card">
+          <div class="journey__stage-badge">01</div>
+          <div class="journey__stage-media">
+            <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=600&q=80" alt="Company Registration Foundation" loading="lazy">
+            <span class="journey__stage-pill">Foundation</span>
+          </div>
+          <div class="journey__stage-content">
+            <h3 class="journey__stage-name">START</h3>
+            <p class="journey__stage-summary">Incorporate your company with complete MCA, PAN, TAN, and DSC compliance through certified experts.</p>
+            <div class="journey__stage-services">
+              <span class="journey__tag"><i class="ph-bold ph-check"></i> Pvt Ltd / LLP Registration</span>
+              <span class="journey__tag"><i class="ph-bold ph-check"></i> MCA SPICe+ &amp; DIN</span>
+              <span class="journey__tag"><i class="ph-bold ph-check"></i> Trademark Protection</span>
+            </div>
+            <button class="btn btn--outline btn--sm" onclick="scrollToSection('#wizard')">Start Incorporation &rarr;</button>
+          </div>
+        </div>
+
+        <!-- 02 ESTABLISH -->
+        <div class="journey__stage-card">
+          <div class="journey__stage-badge">02</div>
+          <div class="journey__stage-media">
+            <img src="assets/vdesk-reception.jpg" alt="Virtual Office Commercial Address" loading="lazy">
+            <span class="journey__stage-pill">Presence</span>
+          </div>
+          <div class="journey__stage-content">
+            <h3 class="journey__stage-name">ESTABLISH</h3>
+            <p class="journey__stage-summary">Secure a prime commercial business address with notarized rent agreements and landlord NOC for GST &amp; MCA.</p>
+            <div class="journey__stage-services">
+              <span class="journey__tag"><i class="ph-bold ph-check"></i> Prime Virtual Office</span>
+              <span class="journey__tag"><i class="ph-bold ph-check"></i> GST PPOB &amp; APOB</span>
+              <span class="journey__tag"><i class="ph-bold ph-check"></i> Physical Name Board</span>
+            </div>
+            <button class="btn btn--outline btn--sm" onclick="openQuoteModal('Virtual Office Setup')">Explore Addresses &rarr;</button>
+          </div>
+        </div>
+
+        <!-- 03 WORK -->
+        <div class="journey__stage-card">
+          <div class="journey__stage-badge">03</div>
+          <div class="journey__stage-media">
+            <img src="assets/vdesk-coworking.jpg" alt="Coworking and Private Offices" loading="lazy">
+            <span class="journey__stage-pill">Operations</span>
+          </div>
+          <div class="journey__stage-content">
+            <h3 class="journey__stage-name">WORK</h3>
+            <p class="journey__stage-summary">Flexible workspaces designed for productivity: dedicated desks, private executive cabins, and 4K boardrooms.</p>
+            <div class="journey__stage-services">
+              <span class="journey__tag"><i class="ph-bold ph-check"></i> Dedicated Coworking</span>
+              <span class="journey__tag"><i class="ph-bold ph-check"></i> Private Cabins</span>
+              <span class="journey__tag"><i class="ph-bold ph-check"></i> Hourly Boardrooms</span>
+            </div>
+            <button class="btn btn--outline btn--sm" onclick="scrollToSection('#services')">View Workspaces &rarr;</button>
+          </div>
+        </div>
+
+        <!-- 04 GROW -->
+        <div class="journey__stage-card">
+          <div class="journey__stage-badge">04</div>
+          <div class="journey__stage-media">
+            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80" alt="Pan-India Business Scale" loading="lazy">
+            <span class="journey__stage-pill">Expansion</span>
+          </div>
+          <div class="journey__stage-content">
+            <h3 class="journey__stage-name">GROW</h3>
+            <p class="journey__stage-summary">Expand into new Indian commercial metros without real estate lock-in or long-term lease liabilities.</p>
+            <div class="journey__stage-services">
+              <span class="journey__tag"><i class="ph-bold ph-check"></i> Multi-City Network</span>
+              <span class="journey__tag"><i class="ph-bold ph-check"></i> Multi-State APOB GST</span>
+              <span class="journey__tag"><i class="ph-bold ph-check"></i> Enterprise Dedicated Desk</span>
+            </div>
+            <button class="btn btn--outline btn--sm" onclick="scrollToSection('#locations')">Explore Locations &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       SECTION 04 &mdash; SERVICES SHOWCASE
+       7 Upgraded Architectural Service Cards
+       ==================================================================== -->
+  <section class="section services" id="services">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__eyebrow">Enterprise Solutions</span>
+        <h2 class="section__title">EVERYTHING YOUR<br>BUSINESS NEEDS TO OPERATE.</h2>
+        <p class="section__desc">Grade-A workspace and corporate compliance infrastructure designed to eliminate overhead and scale seamlessly.</p>
+      </div>
+
+      <div class="services__grid">
+        <!-- 01: VIRTUAL OFFICE (Featured Card) -->
+        <article class="service-card--featured reveal">
+          <div class="service-card__image">
+            <img src="assets/vdesk-reception.jpg" alt="V-DESK Virtual Office &mdash; Premium business address" loading="lazy">
+            <span class="service-card__badge">Most Popular</span>
+          </div>
+          <div class="service-card__body">
+            <div class="service-card__category">Corporate Presence</div>
+            <h3 class="service-card__name">Virtual Office</h3>
+            <p class="service-card__desc">Prestigious commercial business addresses for companies, founders, and e-commerce brands. 100% compliant for GST and MCA incorporation.</p>
+            <div class="service-card__features">
+              <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> Registered Rent Agreement &amp; Landlord NOC</div>
+              <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> Latest Commercial Electricity Bill Copy</div>
+              <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> Physical Company Name Board Display</div>
+              <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> Official Mail &amp; Courier Intake with WhatsApp Alerts</div>
+            </div>
+            <div class="service-card__footer">
+              <span class="service-card__price">From &#8377;1,249<small>/mo</small></span>
+              <button class="btn btn--primary btn--sm" onclick="openQuoteModal('Virtual Office')">Choose Plan &rarr;</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 02: COWORKING SPACES -->
+        <article class="service-card--standard reveal">
+          <div class="service-card__image">
+            <img src="assets/vdesk-coworking.jpg" alt="V-DESK Coworking Spaces" loading="lazy">
+            <span class="service-card__badge-subtle">High Flexibility</span>
+          </div>
+          <div class="service-card__body">
+            <div class="service-card__category">Productive Space</div>
+            <h3 class="service-card__name">Coworking Spaces</h3>
+            <p class="service-card__desc">Flexible hot desks and dedicated workstations with ergonomic seating, enterprise-grade Wi-Fi, and barista coffee.</p>
+            <div class="service-card__features">
+              <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> Hot Desks &amp; Dedicated Workstations</div>
+              <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> 500 Mbps High-Speed Secure Wi-Fi</div>
+              <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> Unlimited Tea, Coffee &amp; Community Access</div>
+            </div>
+            <div class="service-card__footer">
+              <span class="service-card__price">From &#8377;399<small>/day</small></span>
+              <button class="btn btn--primary btn--sm" onclick="openQuoteModal('Coworking Spaces')">Book Desk &rarr;</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 03: MEETING ROOMS -->
+        <article class="service-card--standard reveal">
+          <div class="service-card__image">
+            <img src="assets/vdesk-boardroom.jpg" alt="V-DESK Meeting Rooms" loading="lazy">
+            <span class="service-card__badge-subtle">4K High-Tech</span>
+          </div>
+          <div class="service-card__body">
+            <div class="service-card__category">Client Conferences</div>
+            <h3 class="service-card__name">Meeting Rooms</h3>
+            <p class="service-card__desc">Executive boardrooms and collaboration suites equipped with wireless presentation screens and video conferencing.</p>
+            <div class="service-card__features">
+              <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> 4-Pax Huddles to 20-Pax Executive Boardrooms</div>
+              <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> Zoom &amp; Teams Wireless Presentation Displays</div>
+              <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> Instant Hourly &amp; Daily Booking Options</div>
+            </div>
+            <div class="service-card__footer">
+              <span class="service-card__price">From &#8377;499<small>/hour</small></span>
+              <button class="btn btn--primary btn--sm" onclick="openQuoteModal('Meeting Rooms')">Reserve Room &rarr;</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 04: PRIVATE OFFICES (Featured Card) -->
+        <article class="service-card--featured reveal">
+          <div class="service-card__image">
+            <img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=800&q=80" alt="V-DESK Private Office Cabins" loading="lazy">
+            <span class="service-card__badge">Dedicated Team</span>
+          </div>
+          <div class="service-card__body">
+            <div class="service-card__category">Executive Cabins</div>
+            <h3 class="service-card__name">Private Offices</h3>
+            <p class="service-card__desc">Dedicated, lockable private cabins tailored for growing teams of 2 to 25+ people. Fully furnished with custom branding and 24/7 access.</p>
+            <div class="service-card__features">
+              <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> 24/7 Secure Access with RFID Keycards</div>
+              <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> Dedicated High-Speed Private LAN &amp; Subnet</div>
+              <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> Custom Acoustic Glass &amp; Company Branding</div>
+              <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> Daily Housekeeping, Concierge &amp; Facilities</div>
+            </div>
+            <div class="service-card__footer">
+              <span class="service-card__price">From &#8377;11,999<small>/mo</small></span>
+              <button class="btn btn--primary btn--sm" onclick="openQuoteModal('Private Offices')">Tour Cabins &rarr;</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 05: COMPANY REGISTRATION -->
+        <article class="service-card--compact reveal">
+          <div class="service-card__icon"><i class="ph-bold ph-shield-check"></i></div>
+          <div class="service-card__category">Legal Foundation</div>
+          <h3 class="service-card__name">Company Registration</h3>
+          <p class="service-card__desc">End-to-end incorporation via MCA SPICe+. Pvt Ltd, LLP, OPC &amp; Section 8 with complete legal guidance.</p>
+          <div class="service-card__features">
+            <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> DIN, PAN, TAN &amp; Class-3 DSC</div>
+            <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> MOA, AOA &amp; Certified Incorporation Deed</div>
+            <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> Complimentary Senior CA Consultation</div>
+          </div>
+          <div class="service-card__footer">
+            <span class="service-card__price">From &#8377;4,999</span>
+            <button class="btn btn--primary btn--sm" onclick="openQuoteModal('Company Registration')">Incorporate &rarr;</button>
+          </div>
+        </article>
+
+        <!-- 06: GST REGISTRATION -->
+        <article class="service-card--compact reveal">
+          <div class="service-card__icon"><i class="ph-bold ph-certificate"></i></div>
+          <div class="service-card__category">Tax Compliance</div>
+          <h3 class="service-card__name">GST Registration</h3>
+          <p class="service-card__desc">Single-state PPOB and multi-state APOB registration with document preparation and officer visit support.</p>
+          <div class="service-card__features">
+            <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> Full ARN Tracking &amp; Clarification Handling</div>
+            <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> GST Officer Physical Inspection Assistance</div>
+            <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> Amazon &amp; Flipkart Marketplace Compliance</div>
+          </div>
+          <div class="service-card__footer">
+            <span class="service-card__price">From &#8377;1,499</span>
+            <button class="btn btn--primary btn--sm" onclick="openQuoteModal('GST Registration')">Register GST &rarr;</button>
+          </div>
+        </article>
+
+        <!-- 07: TRADEMARK REGISTRATION -->
+        <article class="service-card--compact reveal">
+          <div class="service-card__icon"><i class="ph-bold ph-trademark"></i></div>
+          <div class="service-card__category">Brand Protection</div>
+          <h3 class="service-card__name">Trademark Registration</h3>
+          <p class="service-card__desc">Complete trademark search, Nice classification analysis, expedited online filing, and objection defense.</p>
+          <div class="service-card__features">
+            <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> In-Depth Comprehensive Conflict Search</div>
+            <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> TM Application Receipt Within 24 Hours</div>
+            <div class="service-card__feature"><span class="check"><i class="ph-bold ph-check"></i></span> Legal Examination &amp; Hearing Representation</div>
+          </div>
+          <div class="service-card__footer">
+            <span class="service-card__price">From &#8377;1,999</span>
+            <button class="btn btn--primary btn--sm" onclick="openQuoteModal('Trademark Registration')">Protect Brand &rarr;</button>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       SECTION 05 &mdash; WORKSPACE DISCOVERY ENGINE
+       Interactive Filters + Real-time Results Grid
+       ==================================================================== -->
+  <section class="section solution-finder" id="solutionFinder">
+    <div class="container">
+      <div class="section__header section__header--center reveal">
+        <span class="section__eyebrow">Smart Discovery</span>
+        <h2 class="section__title">FIND YOUR PERFECT<br>WORKSPACE SETUP.</h2>
+        <p class="section__desc">Filter our verified commercial portfolio by city, workspace model, team capacity, and duration.</p>
+      </div>
+
+      <!-- Quick Pathway Cards -->
+      <div class="finder__grid reveal-stagger">
+        <div class="finder__card" onclick="scrollToSection('#wizard')">
+          <div class="finder__card-icon"><i class="ph-bold ph-rocket-launch"></i></div>
+          <div class="finder__card-label">Start</div>
+          <div class="finder__card-title">Set up my business</div>
+          <div class="finder__card-desc">Incorporate your company, obtain GST, and establish your brand correctly.</div>
+          <div class="finder__card-services">
+            <span>Pvt Ltd / LLP Incorporation</span>
+            <span>GST Registration &amp; Filing</span>
+            <span>Trademark Protection</span>
+          </div>
+          <div class="finder__card-cta">
+            <button class="btn btn--primary btn--sm">Get Started &rarr;</button>
+          </div>
+        </div>
+
+        <div class="finder__card" onclick="scrollToSection('#services')">
+          <div class="finder__card-icon"><i class="ph-bold ph-map-pin"></i></div>
+          <div class="finder__card-label">Establish</div>
+          <div class="finder__card-title">Professional business address</div>
+          <div class="finder__card-desc">Verified commercial address with registered deed and landlord NOC.</div>
+          <div class="finder__card-services">
+            <span>Virtual Office Address</span>
+            <span>GST Address (PPOB/APOB)</span>
+            <span>Mail &amp; Courier Handling</span>
+          </div>
+          <div class="finder__card-cta">
+            <button class="btn btn--primary btn--sm">Explore Addresses &rarr;</button>
+          </div>
+        </div>
+
+        <div class="finder__card" onclick="scrollToSection('#services')">
+          <div class="finder__card-icon"><i class="ph-bold ph-laptop"></i></div>
+          <div class="finder__card-label">Work</div>
+          <div class="finder__card-title">Dedicated workspace</div>
+          <div class="finder__card-desc">Ergonomic desks, private team cabins, and conference rooms.</div>
+          <div class="finder__card-services">
+            <span>Hot Desk &amp; Dedicated Desk</span>
+            <span>Private Team Cabins</span>
+            <span>4K-Enabled Boardrooms</span>
+          </div>
+          <div class="finder__card-cta">
+            <button class="btn btn--primary btn--sm">Find Workspace &rarr;</button>
+          </div>
+        </div>
+
+        <div class="finder__card" onclick="scrollToSection('#locations')">
+          <div class="finder__card-icon"><i class="ph-bold ph-chart-line-up"></i></div>
+          <div class="finder__card-label">Expand</div>
+          <div class="finder__card-title">Enter a new city</div>
+          <div class="finder__card-desc">Establish presence in 10+ major metros with zero capital expenditure.</div>
+          <div class="finder__card-services">
+            <span>Multi-City Virtual Office</span>
+            <span>Multi-State GST (APOB)</span>
+            <span>Nationwide Boardrooms</span>
+          </div>
+          <div class="finder__card-cta">
+            <button class="btn btn--primary btn--sm">Explore Hubs &rarr;</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Discovery Filter Engine -->
+      <div class="discovery-filter-engine reveal" id="discoveryFilterEngine">
+        <div class="discovery-filter-bar">
+          <div class="filter-group">
+            <label class="filter-label" for="discCity"><i class="ph-bold ph-map-pin"></i> City</label>
+            <select id="discCity" class="filter-select" onchange="filterDiscoveryEngine()">
+              <option value="all">All Cities (10+)</option>
+              <option value="Nashik">Nashik (Flagship)</option>
+              <option value="Mumbai">Mumbai</option>
+              <option value="Delhi">Delhi NCR</option>
+              <option value="Bangalore">Bangalore</option>
+              <option value="Pune">Pune</option>
+              <option value="Hyderabad">Hyderabad</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label" for="discType"><i class="ph-bold ph-buildings"></i> Workspace Type</label>
+            <select id="discType" class="filter-select" onchange="filterDiscoveryEngine()">
+              <option value="all">All Workspaces</option>
+              <option value="Virtual Office">Virtual Office</option>
+              <option value="Coworking">Coworking Desk</option>
+              <option value="Private Office">Private Cabin</option>
+              <option value="Meeting Rooms">Meeting Room</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label" for="discTeam"><i class="ph-bold ph-users-three"></i> Team Size</label>
+            <select id="discTeam" class="filter-select" onchange="filterDiscoveryEngine()">
+              <option value="all">Any Team Size</option>
+              <option value="solo">1&mdash;2 Solo / Founders</option>
+              <option value="growth">3&mdash;8 Growth Team</option>
+              <option value="team">9&mdash;20 Enterprise</option>
+              <option value="large">20+ Custom Suite</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label" for="discDuration"><i class="ph-bold ph-calendar"></i> Duration</label>
+            <select id="discDuration" class="filter-select" onchange="filterDiscoveryEngine()">
+              <option value="all">Flexible</option>
+              <option value="daily">Hourly / Daily</option>
+              <option value="monthly">Monthly</option>
+              <option value="annual">Annual (Save 20%)</option>
+            </select>
+          </div>
+
+          <div class="filter-group filter-group--btn">
+            <button class="btn btn--primary btn--full" onclick="filterDiscoveryEngine()">
+              <i class="ph-bold ph-funnel"></i> Apply Filter
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Discovery Results Grid -->
+        <div class="discovery-results-grid" id="discoveryResultsContainer">
+          <!-- Rendered dynamically by app.js filterDiscoveryEngine() -->
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       SECTION 06 &mdash; LOCATION EXPLORER
+       Large Editorial Location Cards + Search + Filter
+       ==================================================================== -->
+  <section class="section locations" id="locations">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__eyebrow">Nationwide Network</span>
+        <h2 class="section__title">FIND YOUR<br>BUSINESS BASE.</h2>
+        <p class="section__desc">Explore prime commercial business centers across India's most vibrant commercial hubs.</p>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="locations__search reveal">
+        <i class="ph-bold ph-magnifying-glass locations__search-icon"></i>
+        <input type="text" id="citySearchInput" class="locations__search-input" placeholder="Search by city (Mumbai, Nashik, Bangalore...) or area (BKC, Baner, CP)..." oninput="handleLocationSearch(this.value)">
+        <button class="locations__search-clear" id="clearSearchBtn" onclick="clearLocationSearch()">&times;</button>
+      </div>
+
+      <!-- City Filter Chips -->
+      <div class="locations__filters reveal" id="cityFilters">
+        <button class="locations__filter-btn active" onclick="filterLocationsByCity('all', this)">All Hubs</button>
+        <button class="locations__filter-btn" onclick="filterLocationsByCity('Nashik', this)">&#9733; Nashik</button>
+        <button class="locations__filter-btn" onclick="filterLocationsByCity('Mumbai', this)">Mumbai</button>
+        <button class="locations__filter-btn" onclick="filterLocationsByCity('Delhi', this)">Delhi</button>
+        <button class="locations__filter-btn" onclick="filterLocationsByCity('Bangalore', this)">Bangalore</button>
+        <button class="locations__filter-btn" onclick="filterLocationsByCity('Pune', this)">Pune</button>
+        <button class="locations__filter-btn" onclick="filterLocationsByCity('Hyderabad', this)">Hyderabad</button>
+        <button class="locations__filter-btn" onclick="filterLocationsByCity('Noida', this)">Noida</button>
+        <button class="locations__filter-btn" onclick="filterLocationsByCity('Gurgaon', this)">Gurgaon</button>
+        <button class="locations__filter-btn" onclick="filterLocationsByCity('Chennai', this)">Chennai</button>
+      </div>
+
+      <!-- Location Cards Grid (rendered dynamically by app.js renderLocations()) -->
+      <div class="locations__grid" id="locationsContainer"></div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       SECTION 07 &mdash; PRICING / ROI FINANCIAL CALCULATOR
+       Traditional Lease vs. V-DESK Smart Solution Comparison
+       ==================================================================== -->
+  <section class="section pricing" id="pricing">
+    <div class="container">
+      <div class="section__header section__header--center reveal">
+        <span class="section__eyebrow">Financial Efficiency</span>
+        <h2 class="section__title">CALCULATE YOUR<br>OPERATIONAL SAVINGS.</h2>
+        <p class="section__desc">See how modern commercial infrastructure saves up to 88% compared to traditional lock-in commercial leases.</p>
+      </div>
+
+      <!-- Segmented Billing Tenure Switcher (Linear / Stripe Style) -->
+      <div class="pricing-tenure-wrap reveal">
+        <div class="pricing-tenure-toggle" role="group" aria-label="Billing Commitment">
+          <button type="button" class="tenure-pill active" id="tenureAnnualBtn" onclick="setBillingTenure('annual')">
+            <span>Annual Commitment</span>
+            <span class="tenure-save-badge">Save 20%</span>
+          </button>
+          <button type="button" class="tenure-pill" id="tenureFlexibleBtn" onclick="setBillingTenure('flexible')">
+            <span>Quarterly / Flexible</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="pricing__layout">
+        <!-- Controls -->
+        <div class="pricing__controls reveal">
+          <div class="pricing__field">
+            <div class="pricing__label">
+              <span>1. Select Target Commercial Tier</span>
+            </div>
+            <select id="calcCity" class="pricing__select" onchange="runCostCalculation()">
+              <option value="Tier-1 Metro (Mumbai / Delhi / BLR)">Tier-1 Metro (Mumbai / Delhi / Bangalore)</option>
+              <option value="Tier-2 Commercial Hub (Pune / Nashik)" selected>Tier-2 Commercial Hub (Pune / Nashik)</option>
+              <option value="Tier-3 Emerging Cities">Tier-3 Emerging Commercial Hubs</option>
+            </select>
+          </div>
+
+          <div class="pricing__field">
+            <div class="pricing__label">
+              <span>2. Primary Workspace Service</span>
+            </div>
+            <select id="calcService" class="pricing__select" onchange="runCostCalculation()">
+              <option value="Virtual Office for GST" selected>Virtual Office for GST</option>
+              <option value="Coworking Dedicated Desks">Coworking Dedicated Desks</option>
+              <option value="Private Office Cabin">Private Office Cabin</option>
+              <option value="Hybrid Combo">Hybrid Virtual + Workspaces</option>
+            </select>
+          </div>
+
+          <div class="pricing__field">
+            <div class="pricing__label">
+              <span>3. Team Capacity</span>
+              <span class="pricing__label-badge" id="calcTeamDisplay">5 Members</span>
+            </div>
+            <div class="pricing__range-wrap">
+              <input type="range" id="calcTeamSlider" class="pricing__range" min="1" max="50" value="5" oninput="updateTeamSlider(this.value)">
+            </div>
+          </div>
+
+          <div class="pricing__field">
+            <div class="pricing__label">
+              <span>4. Agreement Duration</span>
+            </div>
+            <select id="calcDuration" class="pricing__select" onchange="runCostCalculation()">
+              <option value="12" selected>12 Months (20% Annual Savings)</option>
+              <option value="6">6 Months</option>
+              <option value="24">24 Months (Long-Term Rate Lock)</option>
+            </select>
+          </div>
+
+          <div class="pricing__field">
+            <div class="pricing__label">
+              <span>5. Enterprise Add-ons</span>
+            </div>
+            <div class="pricing__checkbox-group">
+              <label class="pricing__checkbox-label">
+                <input type="checkbox" id="calcAddonGST" checked onchange="runCostCalculation()">
+                <span>GST Monthly Filing &amp; Senior CA Support</span>
+              </label>
+              <label class="pricing__checkbox-label">
+                <input type="checkbox" id="calcAddonMeeting" onchange="runCostCalculation()">
+                <span>Monthly 10-Hour Executive Boardroom Bundle</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analysis & Savings Summary -->
+        <div class="pricing__summary reveal">
+          <div class="pricing__summary-kicker">Comparative Cost Breakdown</div>
+
+          <div class="pricing__comparison">
+            <div class="pricing__bar">
+              <div class="pricing__bar-header">
+                <span class="pricing__bar-title">Traditional Commercial Lease (Deposit, Fitouts, Rent)</span>
+                <span class="pricing__bar-value" id="tradLeaseVal">&#8377;14,40,000 / yr</span>
+              </div>
+              <div class="pricing__bar-track">
+                <div class="pricing__bar-fill pricing__bar-fill--trad" style="width:100%;"></div>
+              </div>
+            </div>
+
+            <div class="pricing__bar">
+              <div class="pricing__bar-header">
+                <span class="pricing__bar-title">V-DESK Smart Solution (Zero Brokerage, Zero Fitouts)</span>
+                <span class="pricing__bar-value pricing__bar-value--accent" id="vdeskEstVal">&#8377;17,988 / yr</span>
+              </div>
+              <div class="pricing__bar-track">
+                <div class="pricing__bar-fill pricing__bar-fill--vdesk" id="vdeskFillBar" style="width:15%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pricing__savings">
+            <div class="pricing__savings-value" id="vdeskSavingsPercent">88%</div>
+            <div class="pricing__savings-label">Net Annual Capital Saved</div>
+          </div>
+
+          <div class="pricing__breakdown">
+            <div class="pricing__breakdown-row">
+              <span>Selected Plan:</span>
+              <strong id="calcPlanSummary">Virtual Office for GST</strong>
+            </div>
+            <div class="pricing__breakdown-row">
+              <span>Agreement Duration:</span>
+              <strong id="calcDurationSummary">12 Months</strong>
+            </div>
+            <div class="pricing__breakdown-row">
+              <span>Included Add-ons:</span>
+              <strong id="calcAddonsSummary">GST Filing &amp; CA Support</strong>
+            </div>
+          </div>
+
+          <button class="btn btn--primary btn--block btn--lg" onclick="openQuoteModal('Calculator CTA')">
+            GET MY EXACT QUOTE &rarr;
+          </button>
+
+          <p class="pricing__disclaimer">*Cost comparison is an automated projection for financial planning based on market real estate benchmarks. Final binding quotations are issued following KYC verification.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       SECTION 08 &mdash; BUSINESS SETUP ADVISOR
+       Clean 5-Step Progressive Setup Blueprint
+       ==================================================================== -->
+  <section class="section wizard" id="wizard">
+    <div class="container">
+      <div class="section__header section__header--center reveal">
+        <span class="section__eyebrow">Interactive Advisory</span>
+        <h2 class="section__title">CUSTOMIZE YOUR<br>BUSINESS SETUP BLUEPRINT.</h2>
+        <p class="section__desc">Complete our 5-step advisory flow to receive a personalized legal and workspace roadmap.</p>
+      </div>
+
+      <div class="wizard__container reveal">
+        <!-- Step Progress Nodes -->
+        <div class="wizard__progress">
+          <div class="wizard__step-node active" id="wizNode1">1</div>
+          <div class="wizard__step-line" id="wizLine1"></div>
+          <div class="wizard__step-node" id="wizNode2">2</div>
+          <div class="wizard__step-line" id="wizLine2"></div>
+          <div class="wizard__step-node" id="wizNode3">3</div>
+          <div class="wizard__step-line" id="wizLine3"></div>
+          <div class="wizard__step-node" id="wizNode4">4</div>
+          <div class="wizard__step-line" id="wizLine4"></div>
+          <div class="wizard__step-node" id="wizNode5">5</div>
+        </div>
+
+        <!-- Step 1: Legal Entity -->
+        <div class="wizard__pane active" id="wizPane1">
+          <h3 class="wizard__pane-title">01. What is your intended business structure?</h3>
+          <p class="wizard__pane-desc">Choose your legal entity type or operational model.</p>
+          <div class="wizard__choices">
+            <button class="wizard__choice selected" onclick="selectWizardChoice('entity','Private Limited Company',this)">
+              <strong>Private Limited (Pvt Ltd)</strong>
+              <span>Ideal for scalable startups, equity funding &amp; enterprise operations</span>
+            </button>
+            <button class="wizard__choice" onclick="selectWizardChoice('entity','LLP',this)">
+              <strong>LLP (Limited Liability Partnership)</strong>
+              <span>Best for professional consultants, agencies &amp; medium partnerships</span>
+            </button>
+            <button class="wizard__choice" onclick="selectWizardChoice('entity','E-Commerce (APOB/VPOB)',this)">
+              <strong>E-Commerce (Amazon/Flipkart)</strong>
+              <span>Multi-state GST registration for e-commerce fulfillment hubs</span>
+            </button>
+            <button class="wizard__choice" onclick="selectWizardChoice('entity','Branch Expansion',this)">
+              <strong>Branch / Satellite Presence</strong>
+              <span>Fast commercial entry into new Indian metropolitan territories</span>
+            </button>
+          </div>
+          <div class="wizard__nav">
+            <div></div>
+            <button class="btn btn--primary" onclick="navigateWizard(2)">Next: Select City &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Target City -->
+        <div class="wizard__pane" id="wizPane2">
+          <h3 class="wizard__pane-title">02. Select your primary operating city</h3>
+          <p class="wizard__pane-desc">Where would you like to register your business address?</p>
+          <div class="wizard__choices">
+            <button class="wizard__choice selected" onclick="selectWizardChoice('city','Nashik (Flagship)',this)">
+              <strong>Nashik (Flagship)</strong>
+              <span>College Road &amp; Gangapur Road Hubs</span>
+            </button>
+            <button class="wizard__choice" onclick="selectWizardChoice('city','Mumbai',this)">
+              <strong>Mumbai</strong>
+              <span>BKC, Andheri East &amp; Lower Parel</span>
+            </button>
+            <button class="wizard__choice" onclick="selectWizardChoice('city','Delhi NCR',this)">
+              <strong>Delhi NCR</strong>
+              <span>Connaught Place &amp; Cyber City Gurgaon</span>
+            </button>
+            <button class="wizard__choice" onclick="selectWizardChoice('city','Bangalore',this)">
+              <strong>Bangalore</strong>
+              <span>Koramangala &amp; HSR Layout</span>
+            </button>
+            <button class="wizard__choice" onclick="selectWizardChoice('city','Pune',this)">
+              <strong>Pune</strong>
+              <span>Baner &amp; Viman Nagar</span>
+            </button>
+            <button class="wizard__choice" onclick="selectWizardChoice('city','Hyderabad',this)">
+              <strong>Hyderabad</strong>
+              <span>HITEC City &amp; Madhapur</span>
+            </button>
+          </div>
+          <div class="wizard__nav">
+            <button class="btn btn--secondary" onclick="navigateWizard(1)">&rarr; Back</button>
+            <button class="btn btn--primary" onclick="navigateWizard(3)">Next: Select Services &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Requirements -->
+        <div class="wizard__pane" id="wizPane3">
+          <h3 class="wizard__pane-title">03. What specific solutions do you require?</h3>
+          <p class="wizard__pane-desc">Select all that apply to your current business phase.</p>
+          <div class="wizard__multi-grid">
+            <label class="wizard__multi-option"><input type="checkbox" id="wizReqVO" checked> Virtual Office (Registered Commercial Address)</label>
+            <label class="wizard__multi-option"><input type="checkbox" id="wizReqGST" checked> GST Registration &amp; Filing Support</label>
+            <label class="wizard__multi-option"><input type="checkbox" id="wizReqReg" checked> Company Incorporation (MCA SPICe+)</label>
+            <label class="wizard__multi-option"><input type="checkbox" id="wizReqTM"> Trademark Search &amp; Protection</label>
+            <label class="wizard__multi-option"><input type="checkbox" id="wizReqCW"> Coworking Dedicated Workstations</label>
+            <label class="wizard__multi-option"><input type="checkbox" id="wizReqMR"> On-Demand Executive Boardroom Access</label>
+          </div>
+          <div class="wizard__nav">
+            <button class="btn btn--secondary" onclick="navigateWizard(2)">&rarr; Back</button>
+            <button class="btn btn--primary" onclick="navigateWizard(4)">Next: Operational Details &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Operational Details -->
+        <div class="wizard__pane" id="wizPane4">
+          <h3 class="wizard__pane-title">04. Operational timeframe &amp; scale</h3>
+          <p class="wizard__pane-desc">Helps us allocate center resources and schedule document preparation.</p>
+          <div class="wizard__form-fields">
+            <div class="form-field">
+              <label class="form-label" for="wizUrgency">Required Activation Timeline</label>
+              <select id="wizUrgency" class="form-select">
+                <option value="Urgent (Under 24 Hours)">Urgent (Within 24 Hours)</option>
+                <option value="This Week">Within This Week</option>
+                <option value="Next Month">Next Month</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="wizTeam">Estimated Team Headcount</label>
+              <select id="wizTeam" class="form-select">
+                <option value="Solo / 1-2 Co-founders">Solo / 1&mdash;2 Co-founders</option>
+                <option value="3-8 Team Members">3&mdash;8 Team Members</option>
+                <option value="9+ Members">9+ Enterprise Members</option>
+              </select>
+            </div>
+          </div>
+          <div class="wizard__nav">
+            <button class="btn btn--secondary" onclick="navigateWizard(3)">&rarr; Back</button>
+            <button class="btn btn--primary" onclick="generateWizardRecommendation()">Generate Recommendation &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Step 5: Recommendation Blueprint -->
+        <div class="wizard__pane" id="wizPane5">
+          <div class="wizard__result">
+            <span class="wizard__result-badge">Personalized Consultation Blueprint</span>
+            <h3 class="wizard__result-title">YOUR V-DESK BUSINESS BLUEPRINT IS READY.</h3>
+
+            <div class="wizard__result-card">
+              <h4 class="wizard__result-heading" id="recBundleHeading">Virtual Office + GST + Company Registration</h4>
+              <p class="wizard__result-desc" id="recBundleDesc">Complete turnkey package including certified commercial rent deed, landlord NOC, MCA SPICe+ incorporation filing, and dedicated CA consultation.</p>
+              <div class="wizard__result-meta">
+                <div class="wizard__result-stat">
+                  <span>Estimated Investment:</span>
+                  <strong id="recCost">&#8377;18,999 (All-Inclusive)</strong>
+                </div>
+                <div class="wizard__result-stat">
+                  <span>Activation Turnaround:</span>
+                  <strong id="recTime">24&mdash;48 Working Hours</strong>
+                </div>
+                <div class="wizard__result-stat">
+                  <span>Selected Prime Hub:</span>
+                  <strong id="recCity">Nashik (Flagship)</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="wizard__result-docs">
+              <h4>Required KYC Document Checklist:</h4>
+              <ul>
+                <li>PAN Card &amp; Aadhaar Card of Directors / Partners / Proprietor</li>
+                <li>Passport Size Color Photograph &amp; Specimen Signature</li>
+                <li>Two Proposed Corporate Names for MCA Name Approval</li>
+              </ul>
+            </div>
+
+            <button class="btn btn--primary btn--lg btn--block" onclick="openQuoteModal('Wizard Result')">
+              GET MY PERSONALIZED BLUEPRINT QUOTE &rarr;
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       SECTION 09 &mdash; TESTIMONIALS / SOCIAL PROOF
+       Verified Accounts from Serious Indian Founders & Enterprises
+       ==================================================================== -->
+  <section class="section testimonials" id="testimonials">
+    <div class="container">
+      <div class="section__header section__header--center reveal">
+        <span class="section__eyebrow">Verified Experiences</span>
+        <h2 class="section__title">TRUSTED BY FOUNDERS,<br>CAs &amp; ENTERPRISES.</h2>
+        <p class="section__desc">Real stories from businesses operating across our commercial network.</p>
+      </div>
+
+      <div class="testimonial-display reveal" id="testimonialDisplay">
+        <p class="testimonial-display__quote" id="testiQuote">
+          Getting our GST registration in Maharashtra was seamless with V-DESK. The registered rent agreement and electricity bill were delivered in less than 24 hours. Their team even assisted when the tax officer conducted a physical verification.
+        </p>
+        <div class="testimonial-display__author">
+          <strong class="testimonial-display__name" id="testiName">Priya Kulkarni</strong>
+          <span class="testimonial-display__role" id="testiRole">Founder &amp; Director, Zenith D2C Brands</span>
+          <span class="testimonial-display__location" id="testiLocation">Nashik &amp; Mumbai Hub</span>
+        </div>
+
+        <div class="testimonial-dots" id="testiDots">
+          <button class="testimonial-dot active" onclick="showTestimonial(0)" aria-label="Testimonial 1"></button>
+          <button class="testimonial-dot" onclick="showTestimonial(1)" aria-label="Testimonial 2"></button>
+          <button class="testimonial-dot" onclick="showTestimonial(2)" aria-label="Testimonial 3"></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       SECTION 10 &mdash; KNOWLEDGE CENTER & FAQS
+       Editorial Resource Guides & Legal Clarifications
+       ==================================================================== -->
+  <section class="section knowledge" id="knowledge">
+    <div class="container">
+      <div class="section__header section__header--center reveal">
+        <span class="section__eyebrow">Compliance &amp; Insights</span>
+        <h2 class="section__title">KNOWLEDGE FOR<br>BUILDING BUSINESS.</h2>
+        <p class="section__desc">Authoritative guides on GST regulations, corporate structures, and modern commercial real estate.</p>
+      </div>
+
+      <div class="knowledge__grid reveal-stagger">
+        <!-- Article 1 -->
+        <article class="knowledge__card">
+          <div class="knowledge__card-image">
+            <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=600&q=80" alt="Virtual Office GST Guide" loading="lazy">
+          </div>
+          <div class="knowledge__card-body">
+            <div class="knowledge__card-meta">
+              <span class="knowledge__card-category">GST Compliance</span>
+              <span class="knowledge__card-time">8 min read</span>
+            </div>
+            <h3 class="knowledge__card-title">Is a Virtual Office 100% Legal for GST Registration in India?</h3>
+            <p class="knowledge__card-excerpt">A comprehensive analysis of CGST Act 2017 provisions, mandatory landlord documentation, and how V-DESK facilitates successful officer inspections.</p>
+          </div>
+        </article>
+
+        <!-- Article 2 -->
+        <article class="knowledge__card">
+          <div class="knowledge__card-image">
+            <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80" alt="Company Registration Entity Guide" loading="lazy">
+          </div>
+          <div class="knowledge__card-body">
+            <div class="knowledge__card-meta">
+              <span class="knowledge__card-category">Incorporation</span>
+              <span class="knowledge__card-time">12 min read</span>
+            </div>
+            <h3 class="knowledge__card-title">Pvt Ltd vs. LLP: Choosing the Right Entity Structure in 2026</h3>
+            <p class="knowledge__card-excerpt">A detailed comparison of compliance obligations, taxation rates, director liabilities, and institutional funding eligibility for Indian founders.</p>
+          </div>
+        </article>
+
+        <!-- Article 3 -->
+        <article class="knowledge__card">
+          <div class="knowledge__card-image">
+            <img src="https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=600&q=80" alt="Commercial Real Estate Cost Comparison" loading="lazy">
+          </div>
+          <div class="knowledge__card-body">
+            <div class="knowledge__card-meta">
+              <span class="knowledge__card-category">Commercial Real Estate</span>
+              <span class="knowledge__card-time">6 min read</span>
+            </div>
+            <h3 class="knowledge__card-title">Traditional Lease vs. Smart Infrastructure: 88% Cost Reduction</h3>
+            <p class="knowledge__card-excerpt">An itemized financial audit contrasting security deposits, maintenance, and civil fitouts against V-DESK verified commercial infrastructure.</p>
+          </div>
+        </article>
+      </div>
+
+      <!-- FAQs -->
+      <div class="faq-section reveal">
+        <div class="faq-item open">
+          <button class="faq-item__question" onclick="toggleFaq(this)">
+            <span>Is a Virtual Office 100% legal for GST and Company Registration?</span>
+            <span class="faq-item__arrow">&#9660;</span>
+          </button>
+          <div class="faq-item__answer">
+            <p>Yes, absolutely. Under the CGST Act 2017 and MCA SPICe+ regulations, any enterprise can operate legally from a commercial premises provided they possess: (1) A registered commercial rent agreement, (2) An NOC from the legal property owner, and (3) A recent electricity bill. V-DESK provides 100% genuine and verified documents.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-item__question" onclick="toggleFaq(this)">
+            <span>What documents are required to activate a V-DESK Virtual Office?</span>
+            <span class="faq-item__arrow">&#9660;</span>
+          </button>
+          <div class="faq-item__answer">
+            <p>Basic KYC documents: PAN Card, Aadhaar Card, passport photo and Certificate of Incorporation (if already incorporated). Once uploaded, your notarized agreement and NOC are issued within 24 working hours.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-item__question" onclick="toggleFaq(this)">
+            <span>What happens during a GST physical premises inspection?</span>
+            <span class="faq-item__arrow">&#9660;</span>
+          </button>
+          <div class="faq-item__answer">
+            <p>Our center managers facilitate GST inspections. Your company name is displayed on the physical directory board, legal files are maintained on site, and our concierge coordinates with the visiting officer for smooth approval.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-item__question" onclick="toggleFaq(this)">
+            <span>How does V-DESK handle incoming mail and couriers?</span>
+            <span class="faq-item__arrow">&#9660;</span>
+          </button>
+          <div class="faq-item__answer">
+            <p>All incoming mail is logged on arrival. You receive instant WhatsApp and email notifications. On your instruction, we can scan and email contents or forward the physical courier to your address.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       SECTION 11 &mdash; FINAL CLOSING CTA
+       "Build Your Business Without Building the Overhead."
+       ==================================================================== -->
+  <section class="section final-cta">
+    <div class="container">
+      <div class="reveal">
+        <div class="section__eyebrow" style="justify-content:center;">Scale Smarter</div>
+        <h2 class="final-cta__title">BUILD YOUR BUSINESS WITHOUT<br>BUILDING THE OVERHEAD.</h2>
+        <p class="final-cta__desc">From your first registration to your next city, V-DESK gives you the infrastructure to grow.</p>
+        <div class="final-cta__actions">
+          <button class="btn btn--gold btn--lg" onclick="openQuoteModal('Final CTA')">
+            <i class="ph-bold ph-paper-plane-tilt"></i> Get Your Exact Quote
+          </button>
+          <button class="btn btn--secondary btn--lg" onclick="openConsultationModal()">
+            <i class="ph-bold ph-calendar-check"></i> Book a Consultation
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       SECTION 12 &mdash; DIRECT CONNECT / CONTACT
+       ==================================================================== -->
+  <section class="section contact" id="contact">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__eyebrow">Direct Connect</span>
+        <h2 class="section__title">TALK TO A V-DESK<br>BUSINESS STRATEGIST.</h2>
+        <p class="section__desc">Questions regarding GST documentation, multi-city expansion, or private cabin availability? We're ready to assist.</p>
+      </div>
+
+      <div class="contact__grid">
+        <div class="reveal">
+          <a href="tel:+919876543210" class="contact__channel">
+            <div class="contact__channel-icon">
+              <i class="ph-bold ph-phone-call"></i>
+            </div>
+            <div>
+              <div class="contact__channel-title">Helpline &amp; Support</div>
+              <div class="contact__channel-desc">+91 98765 43210 (Mon&mdash;Sat, 9:00 AM &mdash; 7:30 PM IST)</div>
+            </div>
+          </a>
+
+          <a href="mailto:contact@vdeskworkspace.com" class="contact__channel">
+            <div class="contact__channel-icon">
+              <i class="ph-bold ph-envelope"></i>
+            </div>
+            <div>
+              <div class="contact__channel-title">Official Enterprise Email</div>
+              <div class="contact__channel-desc">contact@vdeskworkspace.com</div>
+            </div>
+          </a>
+
+          <a href="https://wa.me/919876543210?text=Hi%20V-DESK,%20I%20would%20like%20to%20connect%20with%20a%20business%20advisor." target="_blank" rel="noopener" class="contact__channel">
+            <div class="contact__channel-icon" style="background:rgba(37,211,102,0.1);border-color:rgba(37,211,102,0.2);color:#25D366;">
+              <i class="ph-bold ph-whatsapp-logo"></i>
+            </div>
+            <div>
+              <div class="contact__channel-title">WhatsApp Fast Channel</div>
+              <div class="contact__channel-desc">Instant response &bull; Document checklist &amp; rate card</div>
+            </div>
+          </a>
+        </div>
+
+        <div class="contact__form-card reveal">
+          <h3 class="contact__form-title">Send Us a Direct Message</h3>
+          <p class="contact__form-desc">Our corporate strategists reply within 15 minutes during business hours.</p>
+          <form id="contactPageForm" onsubmit="handleContactSubmit(event)">
+            <div class="form-field">
+              <label class="form-label" for="cfName">Your Full Name *</label>
+              <input type="text" id="cfName" class="form-input" placeholder="e.g. Rahul Sharma" required>
+            </div>
+            <div class="form-row-2">
+              <div class="form-field">
+                <label class="form-label" for="cfMobile">Mobile Number *</label>
+                <input type="tel" id="cfMobile" class="form-input" placeholder="10-digit mobile" pattern="[0-9]{10}" required>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="cfEmail">Work Email *</label>
+                <input type="email" id="cfEmail" class="form-input" placeholder="name@company.com" required>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="cfMessage">Requirement Details *</label>
+              <textarea id="cfMessage" class="form-textarea" rows="3" placeholder="e.g. We need Virtual Office for GST in Mumbai &amp; Bangalore..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn--primary btn--block">
+              Send Message <i class="ph-bold ph-paper-plane-tilt"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       FOOTER
+       Multi-Column Luxury Footer with Real-Time Rate Desk & Legal Modal
+       ==================================================================== -->
+  <footer class="site-footer" id="siteFooter">
+    <div class="footer__shimmer-beam" aria-hidden="true"></div>
+    <div class="footer__mesh-grid" aria-hidden="true"></div>
+    <div class="footer__aurora footer__aurora--1" aria-hidden="true"></div>
+    <div class="footer__aurora footer__aurora--2" aria-hidden="true"></div>
+    <div class="footer__aurora footer__aurora--3" aria-hidden="true"></div>
+
+    <div class="footer__star footer__star--1" aria-hidden="true"></div>
+    <div class="footer__star footer__star--2" aria-hidden="true"></div>
+    <div class="footer__star footer__star--3" aria-hidden="true"></div>
+    <div class="footer__star footer__star--4" aria-hidden="true"></div>
+    <div class="footer__star footer__star--5" aria-hidden="true"></div>
+
+    <div class="container">
+      <div class="footer__grid">
+        
+        <!-- Column 1: Brand Authority -->
+        <div class="footer__col-brand">
+          <div class="footer-brand-wrap">
+            <a href="#top" class="footer-logo-card" aria-label="V-DESK Home">
+              <img src="assets/vdesk-navbar-logo.png" alt="V-DESK Workspace & Consulting LLP" class="footer-logo__img">
+              <span class="card-glare" aria-hidden="true"></span>
+            </a>
+
+            <div class="footer__live-status">
+              <span class="status-indicator">
+                <span class="status-ping"></span>
+                <span class="status-dot"></span>
+              </span>
+              <span><strong>Operational Network Active</strong> &bull; 10+ Prime Metros</span>
+            </div>
+
+            <p class="footer__brand-desc">V-DESK Workspace &amp; Consulting LLP is India's premier business infrastructure platform, uniting verified virtual offices, coworking, private cabins and enterprise compliance across 10+ prime commercial hubs.</p>
+            
+            <div class="footer__badge">
+              <i class="ph-bold ph-shield-check"></i>
+              <span>LLPIN: AAY-9842 &bull; MCA &amp; GST Authorized Network</span>
+            </div>
+
+            <!-- VIP Rate Desk Micro-Card -->
+            <div class="footer__rate-desk">
+              <div class="footer__rate-header">
+                <span class="footer__rate-tag"><i class="ph-bold ph-lightning"></i> 2026 Rate Matrix</span>
+                <span class="footer__rate-sub">Instant Dispatch</span>
+              </div>
+              <form class="footer__rate-form" onsubmit="handleFooterRateRequest(event)">
+                <div class="footer__rate-input-group">
+                  <input type="tel" id="footerRatePhone" class="footer__rate-input" placeholder="Enter WhatsApp No." pattern="[0-9]{10}" required>
+                  <button type="submit" class="footer__rate-btn" aria-label="Get Rate Matrix">
+                    <i class="ph-bold ph-arrow-right"></i>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Workspaces -->
+        <div class="footer__col">
+          <h4 class="footer__heading"><i class="ph-bold ph-buildings"></i> Workspaces</h4>
+          <ul class="footer__nav">
+            <li><a href="#services" class="footer__link"><i class="ph-bold ph-caret-right"></i> Virtual Office (GST)</a></li>
+            <li><a href="#services" class="footer__link"><i class="ph-bold ph-caret-right"></i> Dedicated Coworking</a></li>
+            <li><a href="#services" class="footer__link"><i class="ph-bold ph-caret-right"></i> Executive Private Cabins</a></li>
+            <li><a href="#services" class="footer__link"><i class="ph-bold ph-caret-right"></i> 4K Boardrooms &amp; Huddles</a></li>
+            <li><a href="#pricing" class="footer__link"><i class="ph-bold ph-caret-right"></i> Enterprise Flex Desks</a></li>
+            <li><a href="#solutionFinder" class="footer__link"><i class="ph-bold ph-caret-right"></i> Multi-State APOB Network</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Corporate Services -->
+        <div class="footer__col">
+          <h4 class="footer__heading"><i class="ph-bold ph-scales"></i> Corporate Services</h4>
+          <ul class="footer__nav">
+            <li><a href="#wizard" class="footer__link"><i class="ph-bold ph-caret-right"></i> Pvt Ltd Incorporation</a></li>
+            <li><a href="#wizard" class="footer__link"><i class="ph-bold ph-caret-right"></i> LLP Registration</a></li>
+            <li><a href="#services" class="footer__link"><i class="ph-bold ph-caret-right"></i> GST Registration &amp; Filing</a></li>
+            <li><a href="#services" class="footer__link"><i class="ph-bold ph-caret-right"></i> Trademark Class Search</a></li>
+            <li><a href="#wizard" class="footer__link"><i class="ph-bold ph-caret-right"></i> MCA Annual Compliance</a></li>
+            <li><a href="#services" class="footer__link"><i class="ph-bold ph-caret-right"></i> CA / CS Advisory</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 4: Nationwide Hubs -->
+        <div class="footer__col">
+          <h4 class="footer__heading"><i class="ph-bold ph-map-pin"></i> Nationwide Hubs</h4>
+          <ul class="footer__nav">
+            <li><a href="#locations" class="footer__link" onclick="filterLocationsByCity('Nashik')"><i class="ph-bold ph-caret-right"></i> Nashik (Flagship Hub)</a></li>
+            <li><a href="#locations" class="footer__link" onclick="filterLocationsByCity('Mumbai')"><i class="ph-bold ph-caret-right"></i> Mumbai (BKC &amp; Andheri)</a></li>
+            <li><a href="#locations" class="footer__link" onclick="filterLocationsByCity('Delhi')"><i class="ph-bold ph-caret-right"></i> Delhi (Connaught Place)</a></li>
+            <li><a href="#locations" class="footer__link" onclick="filterLocationsByCity('Bangalore')"><i class="ph-bold ph-caret-right"></i> Bangalore (Koramangala)</a></li>
+            <li><a href="#locations" class="footer__link" onclick="filterLocationsByCity('Pune')"><i class="ph-bold ph-caret-right"></i> Pune (Baner Road)</a></li>
+            <li><a href="#locations" class="footer__link" onclick="filterLocationsByCity('Hyderabad')"><i class="ph-bold ph-caret-right"></i> Hyderabad (HITEC City)</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 5: Direct Contact -->
+        <div class="footer__col footer__col-contact">
+          <h4 class="footer__heading"><i class="ph-bold ph-headset"></i> Direct Desk</h4>
+          <div class="footer__contact-cards">
+            <a href="tel:+919876543210" class="footer-contact-item">
+              <div class="contact-item__icon"><i class="ph-bold ph-phone-call"></i></div>
+              <div class="contact-item__info">
+                <span class="contact-item__label">Direct Helpline</span>
+                <span class="contact-item__val">+91 98765 43210</span>
+              </div>
+            </a>
+            <a href="https://wa.me/919876543210?text=Hi%20V-DESK" target="_blank" rel="noopener" class="footer-contact-item footer-contact-item--whatsapp">
+              <div class="contact-item__icon"><i class="ph-bold ph-whatsapp-logo"></i></div>
+              <div class="contact-item__info">
+                <span class="contact-item__label">WhatsApp Concierge</span>
+                <span class="contact-item__val">Instant Connect</span>
+              </div>
+            </a>
+            <a href="mailto:contact@vdeskworkspace.com" class="footer-contact-item">
+              <div class="contact-item__icon"><i class="ph-bold ph-envelope"></i></div>
+              <div class="contact-item__info">
+                <span class="contact-item__label">Official Inquiries</span>
+                <span class="contact-item__val">contact@vdeskworkspace.com</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Legal Bottom Bar -->
+      <div class="footer__bottom">
+        <div class="footer__bottom-left">
+          <span>&copy; 2026 V-DESK Workspace &amp; Consulting LLP. All Rights Reserved.</span>
+          <span class="footer__divider">&bull;</span>
+          <span>Government Registered Commercial Network</span>
+        </div>
+        <div class="footer__bottom-links">
+          <button type="button" class="footer__legal-btn" onclick="openLegalModal('terms')">Terms of Service</button>
+          <span class="footer__divider">&bull;</span>
+          <button type="button" class="footer__legal-btn" onclick="openLegalModal('privacy')">Privacy Policy</button>
+          <span class="footer__divider">&bull;</span>
+          <button type="button" class="footer__legal-btn" onclick="openLegalModal('refund')">Refund Policy</button>
+          <span class="footer__divider">&bull;</span>
+          <button type="button" class="footer__legal-btn" onclick="openLegalModal('compliance')">GST/MCA Compliance</button>
+        </div>
+        <button class="footer__scroll-top" onclick="smoothScrollToTop()" aria-label="Scroll back to top">
+          <i class="ph-bold ph-arrow-up"></i>
+        </button>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ====================================================================
+       MODAL 1: INSTANT QUOTE MODAL
+       ==================================================================== -->
+  <div class="modal-overlay" id="quoteModal" onclick="closeModalOnBackdrop(event, 'quoteModal')">
+    <div class="modal-card">
+      <div class="modal-card__header">
+        <h3 class="modal-card__title" id="modalQuoteTitle">Get Your Instant Quote</h3>
+        <button class="modal-card__close" onclick="closeModal('quoteModal')">&times;</button>
+      </div>
+      <p class="modal-card__subtitle">Our business infrastructure specialists will send you an itemized proposal within 15 minutes.</p>
+      
+      <form id="modalQuoteForm" onsubmit="handleModalQuoteSubmit(event)">
+        <div class="form-field">
+          <label class="form-label" for="mqName">Full Name *</label>
+          <input type="text" id="mqName" class="form-input" placeholder="Your name" required>
+        </div>
+        <div class="form-row-2">
+          <div class="form-field">
+            <label class="form-label" for="mqPhone">Mobile Number *</label>
+            <input type="tel" id="mqPhone" class="form-input" placeholder="10-digit mobile" pattern="[0-9]{10}" required>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="mqEmail">Work Email *</label>
+            <input type="email" id="mqEmail" class="form-input" placeholder="name@company.com" required>
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-field">
+            <label class="form-label" for="mqCity">Target City</label>
+            <select id="mqCity" class="form-select">
+              <option value="Nashik">Nashik (Flagship)</option>
+              <option value="Mumbai">Mumbai</option>
+              <option value="Delhi">Delhi NCR</option>
+              <option value="Bangalore">Bangalore</option>
+              <option value="Pune">Pune</option>
+              <option value="Hyderabad">Hyderabad</option>
+              <option value="Noida">Noida</option>
+              <option value="Gurgaon">Gurgaon</option>
+              <option value="Chennai">Chennai</option>
+              <option value="Other">Other Metro</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="mqService">Primary Service</label>
+            <select id="mqService" class="form-select">
+              <option value="Virtual Office">Virtual Office for GST</option>
+              <option value="Coworking">Coworking Space</option>
+              <option value="Private Office">Private Office Cabin</option>
+              <option value="Meeting Rooms">Meeting Room</option>
+              <option value="Company Registration">Company Registration</option>
+              <option value="GST Registration">GST Registration</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="mqMessage">Specific Notes</label>
+          <textarea id="mqMessage" class="form-textarea" rows="2" placeholder="e.g. We require registered rent agreement in Mumbai BKC within 48 hours..."></textarea>
+        </div>
+        <button type="submit" class="btn btn--primary btn--block">
+          Submit Quote Request <i class="ph-bold ph-paper-plane-tilt"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 2: ADMIN CRM DASHBOARD
+       ==================================================================== -->
+  <div class="modal-overlay" id="adminModal" onclick="closeModalOnBackdrop(event, 'adminModal')">
+    <div class="modal-card modal-card--wide">
+      <div class="modal-card__header">
+        <h3 class="modal-card__title">V-DESK Lead CRM Pipeline</h3>
+        <button class="modal-card__close" onclick="closeModal('adminModal')">&times;</button>
+      </div>
+      <p class="modal-card__subtitle">In-memory &amp; localStorage Lead Pipeline Management System.</p>
+
+      <div class="admin-metrics-row">
+        <div class="admin-metric-card">
+          <span class="admin-metric-lbl">Total Inquiries</span>
+          <strong class="admin-metric-val" id="totalLeadsMetric">0</strong>
+        </div>
+        <div class="admin-metric-card">
+          <span class="admin-metric-lbl">New Leads</span>
+          <strong class="admin-metric-val" id="newLeadsMetric">0</strong>
+        </div>
+        <div class="admin-metric-card">
+          <span class="admin-metric-lbl">Qualified</span>
+          <strong class="admin-metric-val" id="qualifiedLeadsMetric">0</strong>
+        </div>
+        <div class="admin-metric-card">
+          <span class="admin-metric-lbl">Converted</span>
+          <strong class="admin-metric-val" id="convertedLeadsMetric">0</strong>
+        </div>
+      </div>
+
+      <div class="admin-controls-row">
+        <input type="text" id="adminSearchInput" class="form-input" placeholder="Search by name, phone or city..." oninput="filterAdminLeads()">
+        <select id="adminStatusFilter" class="form-select" onchange="filterAdminLeads()">
+          <option value="all">All Statuses</option>
+          <option value="NEW">New Inquiries</option>
+          <option value="QUALIFIED">Qualified</option>
+          <option value="CONVERTED">Converted</option>
+          <option value="LOST">Lost</option>
+        </select>
+        <button class="btn btn--outline btn--sm" onclick="exportLeadsToCSV()"><i class="ph-bold ph-download-simple"></i> Export CSV</button>
+        <button class="btn btn--secondary btn--sm" onclick="seedSampleLeads()"><i class="ph-bold ph-arrows-clockwise"></i> Seed Demo Data</button>
+      </div>
+
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Lead ID</th>
+              <th>Name</th>
+              <th>Contact</th>
+              <th>City</th>
+              <th>Service</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="adminLeadsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 3: LEGAL & COMPLIANCE MODAL
+       ==================================================================== -->
+  <div class="modal-overlay" id="legalModal" onclick="closeModalOnBackdrop(event, 'legalModal')">
+    <div class="modal-card modal-card--legal">
+      <div class="modal-card__header">
+        <div class="legal-modal__title-wrap">
+          <span class="legal-modal__badge"><i class="ph-bold ph-shield-check"></i> Verified LLP Compliance</span>
+          <h3 class="modal-card__title">V-DESK Corporate Legal Framework</h3>
+        </div>
+        <button class="modal-card__close" onclick="closeModal('legalModal')">&times;</button>
+      </div>
+
+      <div class="legal-modal__tabs">
+        <button class="legal-modal__tab-btn active" id="tabBtn-terms" onclick="switchLegalTab('terms')">Terms of Service</button>
+        <button class="legal-modal__tab-btn" id="tabBtn-privacy" onclick="switchLegalTab('privacy')">Privacy Policy</button>
+        <button class="legal-modal__tab-btn" id="tabBtn-refund" onclick="switchLegalTab('refund')">Refund Policy</button>
+        <button class="legal-modal__tab-btn" id="tabBtn-compliance" onclick="switchLegalTab('compliance')">GST &amp; MCA Compliance</button>
+      </div>
+
+      <div class="legal-modal__body" id="legalModalBody">
+        <!-- Rendered dynamically by app.js switchLegalTab() -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 4: RAYCAST / LINEAR-STYLE QUICK COMMAND PALETTE (Ctrl+K)
+       ==================================================================== -->
+  <div class="command-palette-overlay" id="commandPaletteModal" onclick="closeCommandPaletteOnBackdrop(event)" aria-hidden="true">
+    <div class="command-palette-card" role="dialog" aria-modal="true" aria-label="Command Palette">
+      <div class="command-palette__header">
+        <i class="ph-bold ph-magnifying-glass command-palette__search-icon"></i>
+        <input 
+          type="text" 
+          id="commandPaletteInput" 
+          class="command-palette__input" 
+          placeholder="Search cities, services, or workspaces (e.g. Mumbai, Coworking, GST)..." 
+          autocomplete="off"
+          spellcheck="false"
+          oninput="handleCommandPaletteSearch(this.value)"
+        >
+        <span class="command-palette__esc-badge" onclick="closeCommandPalette()"><kbd>ESC</kbd></span>
+      </div>
+
+      <div class="command-palette__body" id="commandPaletteResults">
+        <!-- Rendered dynamically by app.js renderCommandPaletteItems() -->
+      </div>
+
+      <div class="command-palette__footer">
+        <div class="command-palette__hints">
+          <span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> Navigate</span>
+          <span><kbd>&crarr;</kbd> Select</span>
+          <span><kbd>ESC</kbd> Close</span>
+        </div>
+        <div class="command-palette__status">
+          <span class="pulse-indicator"></span> V-DESK Instant Finder
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MOBILE CONVERSION DOCK (Sticky Bottom Action Bar on Scroll)
+       ==================================================================== -->
+  <aside class="mobile-sticky-dock" id="mobileStickyDock" aria-label="Quick Booking Actions">
+    <div class="mobile-sticky-dock__inner">
+      <div class="mobile-sticky-dock__info">
+        <div class="mobile-sticky-dock__price">From <strong>&#8377;1,249</strong><small>/mo</small></div>
+        <div class="mobile-sticky-dock__rating"><i class="ph-fill ph-star"></i> 4.9 (2,400+ reviews)</div>
+      </div>
+      <div class="mobile-sticky-dock__actions">
+        <a href="https://wa.me/919876543210?text=Hi%20V-DESK,%20I%20need%20a%20workspace%20quote" target="_blank" rel="noopener" class="btn-dock-whatsapp" aria-label="Chat on WhatsApp">
+          <i class="ph-bold ph-whatsapp-logo"></i>
+        </a>
+        <button class="btn btn--gold btn--sm btn-dock-quote" onclick="openQuoteModal('Mobile Sticky Dock')">
+          <i class="ph-bold ph-paper-plane-tilt"></i> Get Quote
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Application Interaction Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
