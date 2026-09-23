@@ -43,7 +43,7 @@ export default function TaxInvoiceModal() {
           <div className="tax-invoice-header">
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                <img src={asset('assets/vdesk-logo.svg')} alt="V-DESK" style={{ height: '32px' }} />
+                <img src={asset('assets/vdesk-logo-compact.png')} alt="V-DESK" style={{ height: '32px' }} />
                 <span
                   style={{
                     fontSize: '0.75rem',
@@ -183,7 +183,7 @@ export default function TaxInvoiceModal() {
             </div>
             <div style={{ textAlign: 'right' }}>
               <img
-                src={asset('assets/vdesk-logo.svg')}
+                src={asset('assets/vdesk-logo-compact.png')}
                 alt="V-DESK Seal"
                 style={{ height: '20px', opacity: '0.7', marginBottom: '2px' }}
               />

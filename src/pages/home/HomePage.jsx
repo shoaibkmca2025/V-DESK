@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import FaqAccordion from '@/components/page/FaqAccordion.jsx';
-import { Button, CityGrid, CtaBand, FeatureCards, Plans, SearchHero, Section, StatsRow, Steps, Testimonials } from '@/components/ui/index.js';
+import { Button, CityGrid, CityStrip, CtaBand, FeatureCards, Plans, SearchHero, Section, StatsRow, Steps, Testimonials } from '@/components/ui/index.js';
 import { FAQ_GROUPS } from '@/data/faqs.js';
 import { GUIDES } from '@/data/guides.js';
 import { asset } from '@/lib/assets.js';
@@ -109,6 +109,8 @@ export default function HomePage() {
           ['4.9★', 'Client rating'],
         ]}
       />
+
+      <CityStrip />
 
       <Section id="services" tone="white" kicker="What we offer" title="What does your business need?" lead="Start with the service you need. Every plan includes a GST invoice and support from a real advisor.">
         <div className="ui-grid ui-grid--3">

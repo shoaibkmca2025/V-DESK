@@ -5,6 +5,7 @@ export { default as SplitHero } from './SplitHero.jsx';
 export { default as Steps } from './Steps.jsx';
 export { default as Plans } from './Plans.jsx';
 export { default as CityGrid } from './CityGrid.jsx';
+export { default as CityStrip } from './CityStrip.jsx';
 export { default as Testimonials } from './Testimonials.jsx';
 export { default as CtaBand } from './CtaBand.jsx';
 export { default as FeatureCards } from './FeatureCards.jsx';

@@ -1,7 +1,7 @@
 const BASE_URL = import.meta.env.BASE_URL || '/';
 
 /**
- * Resolves a public asset path ("assets/vdesk-logo.svg") against the deployment base path.
+ * Resolves a public asset path ("assets/vdesk-logo.png") against the deployment base path.
  * Absolute URLs (https://, data:) are returned unchanged.
  */
 export function asset(path) {

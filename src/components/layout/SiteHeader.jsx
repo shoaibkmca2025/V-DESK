@@ -57,7 +57,7 @@ export default function SiteHeader({ page }) {
     <header className="site-header" id="siteHeader">
       <div className="container header-container">
         <NavTarget target={isHome ? { href: '#top' } : { to: '/' }} className="header-logo" aria-label="V-DESK Home">
-          <img src={asset('assets/vdesk-logo.svg')} alt="V-DESK Workspace & Consulting LLP" className="header-logo__full-img" />
+          <img src={asset('assets/vdesk-logo-compact.png')} alt="V-DESK Workspace & Consulting LLP" className="header-logo__full-img" />
         </NavTarget>
         <nav className="header-nav" id="desktopNav" aria-label="Main Navigation">
           <ul className="header-nav__list">

@@ -26,7 +26,7 @@ export default function QuoteProposalModal() {
         <div className="proposal-document" id="proposalDocContent">
           <div className="proposal-header">
             <div className="proposal-brand">
-              <img src={asset('assets/vdesk-logo.svg')} alt="V-DESK" style={{ height: '38px' }} />
+              <img src={asset('assets/vdesk-logo-compact.png')} alt="V-DESK" style={{ height: '38px' }} />
               <div className="proposal-legal">V-DESK Workspace & Consulting LLP • LLPIN: AAY-9842</div>
             </div>
             <div className="proposal-meta-card">

@@ -48,7 +48,7 @@ export default function NotFoundPage() {
     >
       <Link to="/" style={{ display: 'inline-block', marginBottom: '24px' }}>
         <img
-          src={asset('assets/vdesk-logo.svg')}
+          src={asset('assets/vdesk-logo-compact-white.png')}
           alt="V-DESK"
           style={{ height: '48px', filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.3))' }}
         />
