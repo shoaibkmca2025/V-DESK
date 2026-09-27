@@ -111,7 +111,7 @@ export default function PricingPage() {
                     <td>{city.state}</td>
                     <td>{price ? <strong>₹{price.toLocaleString('en-IN')}/mo</strong> : 'On request'}</td>
                     <td style={{ textAlign: 'right' }}>
-                      <Link to={`/locations/${city.slug}/virtual-office`} style={{ color: '#00A896', fontWeight: 700 }}>
+                      <Link to={`/locations/${city.slug}/virtual-office`} style={{ color: 'var(--ui-teal-dark)', fontWeight: 700 }}>
                         View →
                       </Link>
                     </td>

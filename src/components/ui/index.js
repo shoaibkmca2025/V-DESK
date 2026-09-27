@@ -8,5 +8,7 @@ export { default as CityGrid } from './CityGrid.jsx';
 export { default as CityStrip } from './CityStrip.jsx';
 export { default as Testimonials } from './Testimonials.jsx';
 export { default as CtaBand } from './CtaBand.jsx';
+export { default as Comparison } from './Comparison.jsx';
+export { default as AcceptedFor } from './AcceptedFor.jsx';
 export { default as FeatureCards } from './FeatureCards.jsx';
 export { default as StatsRow } from './StatsRow.jsx';

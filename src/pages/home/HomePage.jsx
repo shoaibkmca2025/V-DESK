@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import FaqAccordion from '@/components/page/FaqAccordion.jsx';
-import { Button, CityGrid, CityStrip, CtaBand, FeatureCards, Plans, SearchHero, Section, StatsRow, Steps, Testimonials } from '@/components/ui/index.js';
+import { Button, CityGrid, CityStrip, CtaBand, Plans, SearchHero, Section, Steps, Testimonials } from '@/components/ui/index.js';
 import { FAQ_GROUPS } from '@/data/faqs.js';
 import { GUIDES } from '@/data/guides.js';
 import { asset } from '@/lib/assets.js';
@@ -134,7 +134,7 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
-        <div className="ui-grid ui-grid--3" style={{ marginTop: '22px' }}>
+        <div className="ui-grid ui-grid--3 ui-grid--gap-tight">
           {BUSINESS_SERVICES.map((item) => (
             <Link key={item.title} to={item.to} className="ui-card">
               <div className={item.tone ? `ui-card__icon ui-card__icon--${item.tone}` : 'ui-card__icon'}>
@@ -161,8 +161,8 @@ export default function HomePage() {
 
       <Section id="pricing" tone="white" kicker="Pricing" title="Simple plans, no hidden fees" lead="Virtual office prices for our Nashik centre. Metro cities are shown on each location page.">
         <Plans plans={PLANS} />
-        <p style={{ textAlign: 'center', margin: '24px 0 0', color: '#64748B', fontSize: '0.92rem' }}>
-          Billed annually • 100% tax deductible • <Link to="/pricing" style={{ color: '#00A896', fontWeight: 700 }}>Compare all plans and savings →</Link>
+        <p className="ui-note">
+          Billed annually • 100% tax deductible • <Link to="/pricing">Compare all plans and savings →</Link>
         </p>
       </Section>
 
@@ -175,12 +175,26 @@ export default function HomePage() {
         </div>
       </Section>
 
-      <Section id="why" tone="navy" kicker="Why V-DESK" title="Built so you don’t have to worry about compliance">
-        <StatsRow stats={[['10,000+', 'Businesses served'], ['100%', 'Document approval guarantee'], ['24 hrs', 'Document delivery'], ['4.9★', 'Client rating']]} />
-      </Section>
-
-      <Section tone="white">
-        <FeatureCards items={WHY} columns={4} />
+      <Section id="why" tone="navy" kicker="Why V-DESK" title="Built so you don’t have to worry about compliance" lead="Ten thousand businesses have used a V-DESK address to register, file and grow.">
+        <div className="ui-stat-row">
+          {[['10,000+', 'Businesses served'], ['100%', 'Document approval guarantee'], ['24 hrs', 'Document delivery'], ['4.9★', 'Client rating']].map(([value, label]) => (
+            <div key={label}>
+              <strong>{value}</strong>
+              <span>{label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="ui-grid ui-grid--2">
+          {WHY.map((item, index) => (
+            <div key={item.title} className="ui-card ui-card--dark">
+              <div className={index % 2 ? 'ui-card__icon ui-card__icon--gold' : 'ui-card__icon'}>
+                <i className={`ph-bold ${item.icon}`} />
+              </div>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </div>
+          ))}
+        </div>
       </Section>
 
       <Section id="testimonials" kicker="Reviews" title="What our clients say">
@@ -191,10 +205,11 @@ export default function HomePage() {
         <div className="ui-grid ui-grid--3">
           {GUIDES.slice(0, 3).map((guide) => (
             <Link key={guide.slug} to={`/resources/${guide.slug}`} className="ui-card">
-              <span className="ui-kicker" style={{ margin: 0 }}>
+              <span className="ui-card__meta">
                 {guide.category} • {guide.readTime} min read
               </span>
               <h3>{guide.title}</h3>
+              <p>{guide.excerpt}</p>
               <span className="ui-card__link">
                 Read guide <i className="ph-bold ph-arrow-right" />
               </span>
@@ -205,10 +220,8 @@ export default function HomePage() {
 
       <Section id="faq" kicker="FAQ" title="Common questions">
         <FaqAccordion items={HOME_FAQS} />
-        <p style={{ textAlign: 'center', margin: '20px 0 0' }}>
-          <Link to="/faqs" style={{ color: '#00A896', fontWeight: 700 }}>
-            See all questions →
-          </Link>
+        <p className="ui-note">
+          <Link to="/faqs">See all questions →</Link>
         </p>
       </Section>
 

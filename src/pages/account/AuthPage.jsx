@@ -103,7 +103,7 @@ export default function AuthPage({ mode }) {
                       <input id="authEmail" name="email" type="email" className="form-control" placeholder="name@company.in" required={!isLogin} />
                     </div>
                     {!isLogin && (
-                      <label style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', fontSize: '0.8rem', color: '#64748B', margin: '4px 0 10px' }}>
+                      <label className="on-dark-note" style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', fontSize: '0.85rem', margin: '4px 0 10px' }}>
                         <input type="checkbox" required style={{ marginTop: '3px' }} />
                         <span>
                           I agree to the <Link to="/legal/terms">Terms of Service</Link> and <Link to="/legal/privacy">Privacy Policy</Link>.
@@ -130,14 +130,14 @@ export default function AuthPage({ mode }) {
                     </button>
                   </form>
                 )}
-                <p style={{ textAlign: 'center', fontSize: '0.84rem', color: '#64748B', margin: '16px 0 0' }}>
+                <p className="on-dark-note" style={{ textAlign: 'center', fontSize: '0.88rem', margin: '16px 0 0' }}>
                   {isLogin ? (
                     <>
-                      New to V-DESK? <Link to="/register" style={{ color: '#C59239', fontWeight: '700' }}>Create an account</Link>
+                      New to V-DESK? <Link to="/register" style={{ color: '#DFB15B', fontWeight: '700' }}>Create an account</Link>
                     </>
                   ) : (
                     <>
-                      Already registered? <Link to="/login" style={{ color: '#C59239', fontWeight: '700' }}>Sign in</Link>
+                      Already registered? <Link to="/login" style={{ color: '#DFB15B', fontWeight: '700' }}>Sign in</Link>
                     </>
                   )}
                 </p>
