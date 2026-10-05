@@ -1,0 +1,10 @@
+# Cloudflare static-asset headers.
+# The service worker and manifest must always be revalidated, otherwise returning
+# visitors keep an old app shell after a deploy. Everything else is content-hashed
+# by Vite and can use Cloudflare's default caching.
+
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/manifest.webmanifest
+  Cache-Control: public, max-age=0, must-revalidate

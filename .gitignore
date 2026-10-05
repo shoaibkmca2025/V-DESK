@@ -7,3 +7,6 @@ dist/
 Thumbs.db
 .chrome_cdp*
 .code-review-graph/
+
+# Cloudflare Wrangler local state
+.wrangler/

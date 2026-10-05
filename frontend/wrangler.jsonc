@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vdesk",
+  "compatibility_date": "2026-10-05",
+  // Static-asset Worker: no server code, Cloudflare serves ./dist from the edge.
+  // `single-page-application` returns index.html for unknown paths so react-router
+  // deep links (/virtual-office, /locations/mumbai, …) survive a refresh.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
