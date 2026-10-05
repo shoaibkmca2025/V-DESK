@@ -11,7 +11,7 @@ Estimates assume 1–2 backend engineers. Durations are working weeks.
 
 **Goal:** a deployable, observable, empty API.
 
-- Repo `server/` per `modules.md` §2; Express 5 app factory; zod-validated env
+- `backend/` folder (repo root) per `modules.md` §2; Express 5 app factory; zod-validated env
 - MongoDB Atlas (dev/staging/prod projects), Redis, S3 bucket with SSE
 - Middleware: request id, pino logger, helmet, CORS allow-list, rate limit, error handler
 - `GET /health` (liveness), `GET /ready` (db + redis ping)

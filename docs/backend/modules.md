@@ -22,18 +22,22 @@ Status: Planning · Owner: Backend team · Source of truth for scope: `docs/vdes
 ## 2. Repository layout
 
 ```
-server/
+backend/
   src/
     app.js                    express app factory (no listen) — testable
     server.js                 bootstrap: db, redis, queues, listen, graceful shutdown
     config/                   env schema (zod-validated), db, redis, storage, payments
     modules/<module>/         one folder per bounded context (below)
+      index.js                the module's public exports (router; later service, events)
       <module>.routes.js      HTTP surface only
+      <module>.validation.js  zod request schemas
       <module>.controller.js  request → service → response
-      <module>.service.js     business rules (pure where possible)
+      <module>.service.js     business rules (no req/res, no Mongoose)
+      <module>.repository.js  all database queries for the module (only file using the model)
       <module>.model.js       mongoose schema(s)
-      <module>.schemas.js     zod request/response schemas
-      <module>.events.js      domain events emitted / consumed
+      <module>.constants.js   statuses, transition tables (when needed)
+      <module>.events.js      domain events emitted / consumed (when needed)
+      <module>.mapper.js      document → API response (when needed)
       <module>.test.js        unit + integration tests
     shared/
       middleware/             auth, rbac, validate, rateLimit, requestId, errorHandler
