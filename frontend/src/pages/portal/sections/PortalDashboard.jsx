@@ -31,8 +31,8 @@ export default function PortalDashboard() {
             </div>
             <h1 style={{ color: '#FFFFFF', fontSize: '1.5rem', margin: '4px 0 2px 0' }}>Welcome, Arjun Mehta</h1>
             <p
+              className="on-dark-note"
               style={{
-                color: '#94A3B8',
                 fontSize: '0.85rem',
                 margin: '0',
                 display: 'flex',

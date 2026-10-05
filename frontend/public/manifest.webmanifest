@@ -11,9 +11,9 @@
   "categories": ["business", "productivity", "utilities"],
   "icons": [
     {
-      "src": "assets/vdesk-emblem.svg",
+      "src": "assets/vdesk-mark.png",
       "sizes": "any",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {

@@ -5,8 +5,9 @@ import { routeForQuery } from '@/features/search/searchEngine.js';
 import { trackSearchEvent } from '@/features/analytics/telemetry.js';
 
 /**
- * Centered hero with one search box (the PRD's universal search), quick-pick chips,
- * a trust row and a faded image carrying a stats card — one message, one action.
+ * Immersive hero: a full-bleed photograph behind a navy scrim, one headline,
+ * one search field and a row of quick picks. The scrim keeps text at AA contrast
+ * over any photo; the stats band uses a translucent control-layer material.
  */
 export default function SearchHero({ badge, title, description, placeholder, chips = [], trust = [], image, stats = [] }) {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ export default function SearchHero({ badge, title, description, placeholder, chi
 
   return (
     <section className="ui-hero" id="top">
+      {image && <img className="ui-hero__photo" src={image} alt="" aria-hidden="true" fetchPriority="high" />}
       <div className="ui-container">
         <div className="ui-hero__inner">
           {badge && (
@@ -63,19 +65,14 @@ export default function SearchHero({ badge, title, description, placeholder, chi
             </div>
           )}
         </div>
-        {image && (
-          <div className="ui-hero__media">
-            <img src={image} alt="" loading="eager" />
-            {stats.length > 0 && (
-              <div className="ui-hero__stats">
-                {stats.map(([value, label]) => (
-                  <div key={label} className="ui-hero__stat">
-                    <strong>{value}</strong>
-                    <span>{label}</span>
-                  </div>
-                ))}
+        {stats.length > 0 && (
+          <div className="ui-hero__stats">
+            {stats.map(([value, label]) => (
+              <div key={label} className="ui-hero__stat">
+                <strong>{value}</strong>
+                <span>{label}</span>
               </div>
-            )}
+            ))}
           </div>
         )}
       </div>

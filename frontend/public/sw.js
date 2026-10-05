@@ -3,7 +3,7 @@
    Registered only in production builds (see src/features/pwa/pwaInstaller.js).
    ========================================================================== */
 
-const CACHE_NAME = 'vdesk-platform-v4.0';
+const CACHE_NAME = 'vdesk-platform-v4.1';
 const SCOPE_URL = new URL(self.registration.scope);
 
 const PRECACHE_ASSETS = [
@@ -12,10 +12,11 @@ const PRECACHE_ASSETS = [
   './assets/icon-192.png',
   './assets/icon-512.png',
   './assets/icon-maskable-512.png',
-  './assets/vdesk-logo.svg',
-  './assets/vdesk-emblem.svg',
-  './assets/vdesk-navbar-logo.png',
-  './assets/vdesk-emblem-dark.png',
+  './assets/vdesk-logo.png',
+  './assets/vdesk-logo-compact.png',
+  './assets/vdesk-logo-compact-white.png',
+  './assets/vdesk-mark.png',
+  './assets/favicon-64.png',
   './assets/vdesk-reception.jpg',
   './assets/vdesk-coworking.jpg',
   './assets/vdesk-boardroom.jpg',

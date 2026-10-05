@@ -18,11 +18,11 @@ export default function MobileDrawer({ page }) {
           <div className="mobile-drawer__brand">
             {isHome ? (
               <a href="#top" className="mobile-drawer__brand-link" onClick={() => closeMobileNav()}>
-                <img src={asset('assets/vdesk-logo.svg')} alt="V-DESK Workspace & Consulting LLP" className="mobile-drawer__full-logo" />
+                <img src={asset('assets/vdesk-logo-compact-white.png')} alt="V-DESK Workspace & Consulting LLP" className="mobile-drawer__full-logo" />
               </a>
             ) : (
               <Link to="/" className="mobile-drawer__brand-link" onClick={() => closeMobileNav()}>
-                <img src={asset('assets/vdesk-logo.svg')} alt="V-DESK Workspace & Consulting LLP" className="mobile-drawer__full-logo" />
+                <img src={asset('assets/vdesk-logo-compact-white.png')} alt="V-DESK Workspace & Consulting LLP" className="mobile-drawer__full-logo" />
               </Link>
             )}
           </div>

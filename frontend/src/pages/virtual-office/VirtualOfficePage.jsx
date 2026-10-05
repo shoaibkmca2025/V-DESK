@@ -1,7 +1,7 @@
 import FaqAccordion from '@/components/page/FaqAccordion.jsx';
 import VirtualOfficeConfigurator from '@/components/sections/VirtualOfficeConfigurator.jsx';
 import DocumentChecklist from '@/components/ui/DocumentChecklist.jsx';
-import { Button, CityGrid, CtaBand, FeatureCards, Plans, Section, SplitHero, Steps } from '@/components/ui/index.js';
+import { AcceptedFor, Button, CityGrid, Comparison, CtaBand, FeatureCards, Plans, Section, SplitHero, Steps } from '@/components/ui/index.js';
 
 const PLANS = [
   {
@@ -87,7 +87,13 @@ export default function VirtualOfficePage() {
         }}
       />
 
-      <Section id="plans" tone="white" kicker="Plans" title="Pick the plan that fits your business" lead="All prices are per month, billed annually. Metro city prices are shown on each city page.">
+      <section className="ui-section ui-section--tight ui-section--white">
+        <div className="ui-container">
+          <AcceptedFor />
+        </div>
+      </section>
+
+      <Section id="plans" tone="tint" kicker="Plans" title="Pick the plan that fits your business" lead="All prices are per month, billed annually. Metro city prices are shown on each city page.">
         <Plans plans={PLANS} />
       </Section>
 
@@ -97,6 +103,20 @@ export default function VirtualOfficePage() {
 
       <Section id="process" tone="white" kicker="How it works" title={<>Three steps, <em>fully online</em></>}>
         <Steps steps={STEPS} />
+      </Section>
+
+      <Section id="compare" tone="tint" kicker="Compare" title={<>Virtual office vs <em>renting an office</em></>} lead="Same legal standing for registration — without the deposit, fit-out and lock-in.">
+        <Comparison
+          rows={[
+            ['Monthly cost', 'From ₹849', '₹60,000 for 1,000 sq.ft'],
+            ['Security deposit', 'None', '6 months rent, locked up'],
+            ['Ready to use', 'Within 24 hours', 'After fit-out and furnishing'],
+            ['Lock-in', 'Annual plan', 'Typically a 3-year lease'],
+            ['GST & MCA documents', 'Included and notarized', 'You arrange them yourself'],
+            ['Officer verification', 'Centre manager handles it', 'Someone must be present'],
+            ['Mail handling', 'Received, logged and photographed', 'Your own staff'],
+          ]}
+        />
       </Section>
 
       <Section id="cities" kicker="Locations" title="Choose your business address city" lead="Tap a city to see the centres and exact prices.">

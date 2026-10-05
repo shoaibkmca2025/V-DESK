@@ -17,7 +17,7 @@ export default function SiteFooter() {
         <div className="ui-footer__grid">
           <div className="ui-footer__brand">
             <Link to="/" className="ui-footer__logo" aria-label="V-DESK Home">
-              <img src={asset('assets/vdesk-logo.svg')} alt="V-DESK Workspace & Consulting LLP" />
+              <img src={asset('assets/vdesk-logo-compact-white.png')} alt="V-DESK Workspace & Consulting LLP" />
             </Link>
             <p>Virtual offices, coworking, meeting rooms and company registration across 10+ Indian cities.</p>
             <ul className="ui-footer__contact">

@@ -34,8 +34,9 @@ src/
     navigation.js          header, mobile drawer and footer link structure
   layouts/SiteLayout.jsx   header + drawer + page + footer + all global modals
   components/
-    ui/                    simple-UI building blocks: Section, Button, SearchHero, SplitHero, Plans, Steps,
-                           CityGrid, FeatureCards, Testimonials, StatsRow, CtaBand, DocumentChecklist
+    ui/                    design-system blocks: Section, Button, SearchHero, SplitHero, Plans, Steps,
+                           CityGrid, CityStrip, FeatureCards, Testimonials, StatsRow, CtaBand,
+                           Comparison, AcceptedFor, DocumentChecklist
     layout/                SiteHeader, MobileDrawer, SiteFooter, docks, banners
     modals/                one component per dialog (quote, booking, KYC, checkout, …)
     sections/              sections shared by several pages (VO configurator, solution finder, KYC docs)
@@ -85,7 +86,11 @@ use `data-action="…"` attributes (see `lib/html.js` → `action()`), dispatche
 
 - **Styles:** `src/styles/*.css`. The partials are imported in cascade order by `src/styles/index.css`;
   add new rules in a new partial at the end or in the relevant existing one — do not reorder imports.
-  `37-simple-ui.css` holds the `.ui-*` component styles and colour tokens (`--ui-navy`, `--ui-gold`, `--ui-teal`, …).
+  `37-simple-ui.css` is the design system: colour tokens (`--ui-navy`, `--ui-gold`, `--ui-teal`, …), an 8pt
+  spacing scale, type ramp, elevation and motion tokens, plus every `.ui-*` component. It follows Apple's
+  Human Interface Guidelines for legibility (17px body, no weights under 400), materials (the header is a
+  translucent control layer over opaque content), motion (short, purposeful, disabled under
+  `prefers-reduced-motion`) and accessibility (WCAG AA contrast, 44px minimum control size, visible focus).
 - **Page layout pattern:** hero with one message → plans/options → what's included → steps → cities → FAQ → CTA.
   Compose new pages from `src/components/ui` rather than one-off inline styles.
 - **Markup:** `src/pages/<page>/sections/*.jsx` for page content, `src/components/` for shared chrome/modals.

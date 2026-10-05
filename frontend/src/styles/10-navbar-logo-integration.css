@@ -19,7 +19,7 @@
 .header-logo__full-img {
   height: 52px !important;
   width: auto !important;
-  max-width: 175px !important;
+  max-width: 200px !important;
   object-fit: contain !important;
   display: block !important;
 }
@@ -34,7 +34,7 @@
 .mobile-drawer__full-logo {
   height: 44px !important;
   width: auto !important;
-  max-width: 150px !important;
+  max-width: 175px !important;
   object-fit: contain !important;
   display: block !important;
 }
@@ -42,7 +42,7 @@
 @media (max-width: 768px) {
   .header-logo__full-img {
     height: 42px !important;
-    max-width: 140px !important;
+    max-width: 165px !important;
   }
 }
 

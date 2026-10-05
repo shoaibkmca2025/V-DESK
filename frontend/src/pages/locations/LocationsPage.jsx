@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import PageHero from '@/components/page/PageHero.jsx';
-import { CityGrid, CtaBand, FeatureCards, Section } from '@/components/ui/index.js';
+import { CityGrid, CityStrip, CtaBand, FeatureCards, Section } from '@/components/ui/index.js';
 import { LOCATIONS } from '@/data/locations.js';
 
 const WHY = [
@@ -32,6 +32,8 @@ export default function LocationsPage() {
           </form>
         }
       />
+
+      <CityStrip limit={0} />
 
       {q && (
         <Section tight title={matches.length ? `${matches.length} centre${matches.length > 1 ? 's' : ''} found` : 'No centres match that search'} lead={matches.length ? undefined : 'Try a city name like Mumbai, Pune or Delhi.'}>
