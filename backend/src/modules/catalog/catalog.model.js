@@ -38,7 +38,7 @@ const centreSchema = new Schema(
   {
     ref: { type: String, required: true, unique: true, index: true }, // e.g. CTR-NSK-001
     cityRef: { type: String, required: true, index: true }, // FK → City.ref
-    city: { type: String, required: true },                // denormalised for query convenience
+    city: { type: String, required: true }, // denormalised for query convenience
     areaName: { type: String, required: true },
     fullName: { type: String, required: true },
     address: { type: String, required: true },

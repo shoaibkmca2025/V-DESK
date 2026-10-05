@@ -17,9 +17,7 @@ export const listWorkspacesQuery = z.object({
   /** Filter by city name (case-insensitive match after normalisation) */
   city: z.string().trim().optional(),
   /** Filter by workspace type */
-  type: z
-    .enum(['Virtual Office', 'Coworking', 'Meeting Rooms', 'Private Office'])
-    .optional(),
+  type: z.enum(['Virtual Office', 'Coworking', 'Meeting Rooms', 'Private Office']).optional(),
   /** Minimum number of seats required */
   capacity: z.coerce.number().int().positive().optional(),
   /** Maximum monthly price in rupees (service converts to paise) */

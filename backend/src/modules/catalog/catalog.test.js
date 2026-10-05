@@ -41,7 +41,7 @@ async function seedCentre(overrides = {}) {
     address: '1 Test Street, Testville – 000001',
     services: ['Virtual Office', 'GST Registration'],
     vo_price_paise: 100000, // ₹1,000
-    cw_price_paise: 50000,  // ₹500
+    cw_price_paise: 50000, // ₹500
     meetingCapacity: '4–8 pax',
     status: 'available',
     flagship: false,
@@ -61,7 +61,7 @@ async function seedWorkspace(overrides = {}) {
     type: 'Coworking',
     capacity: 2,
     price_month_paise: 500000, // ₹5,000
-    price_hour_paise: 20000,   // ₹200
+    price_hour_paise: 20000, // ₹200
     amenities: ['Wi-Fi', 'Power Backup'],
     status: 'available',
     rating: 4.5,
@@ -184,9 +184,16 @@ describe('catalog module', () => {
       await seedCentre();
       // Add a centre in a different city
       await Centre.create({
-        ref: 'CTR-OTH-001', cityRef: 'CITY-OTH', city: 'Othertown', areaName: 'Other',
-        fullName: 'Other Centre', address: 'Other', services: [], status: 'available',
-        active: true, deletedAt: null,
+        ref: 'CTR-OTH-001',
+        cityRef: 'CITY-OTH',
+        city: 'Othertown',
+        areaName: 'Other',
+        fullName: 'Other Centre',
+        address: 'Other',
+        services: [],
+        status: 'available',
+        active: true,
+        deletedAt: null,
       });
 
       const res = await request(app).get('/api/v1/catalog/centres?city=testville');

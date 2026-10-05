@@ -6,20 +6,26 @@
 /** Shape a City document for the API response. */
 export function mapCity(doc) {
   const { _id, __v, deletedAt, ...rest } = doc;
-  void _id; void __v; void deletedAt;
+  void _id;
+  void __v;
+  void deletedAt;
   return rest;
 }
 
 /** Shape a Centre document for the API response. */
 export function mapCentre(doc) {
   const { _id, __v, deletedAt, ...rest } = doc;
-  void _id; void __v; void deletedAt;
+  void _id;
+  void __v;
+  void deletedAt;
   return rest;
 }
 
 /** Shape a Workspace document for the API response. */
 export function mapWorkspace(doc) {
   const { _id, __v, deletedAt, ...rest } = doc;
-  void _id; void __v; void deletedAt;
+  void _id;
+  void __v;
+  void deletedAt;
   return rest;
 }
