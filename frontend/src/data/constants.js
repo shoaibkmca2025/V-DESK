@@ -1,11 +1,14 @@
-/** Every status a lead can hold in the CRM (table dropdown order). */
-export const LEAD_STATUSES = ['NEW', 'CONTACTED', 'QUALIFIED', 'PROPOSAL_SENT', 'FOLLOW_UP', 'CONVERTED', 'LOST', 'PROPOSAL', 'WON'];
+/**
+ * Every status a lead can hold (PRD §42), in admin table dropdown order. Same pipeline as the backend
+ * (docs/backend/modules.md §3.5) — change both together.
+ */
+export const LEAD_STATUSES = ['NEW', 'CONTACTED', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'WON', 'LOST'];
 
-/** Statuses offered in the admin lead table dropdown. */
-export const LEAD_TABLE_STATUSES = ['NEW', 'CONTACTED', 'QUALIFIED', 'PROPOSAL_SENT', 'FOLLOW_UP', 'CONVERTED', 'LOST'];
+/** Statuses saved by earlier builds, renamed when leads are read from localStorage. */
+export const LEGACY_LEAD_STATUSES = { PROPOSAL_SENT: 'PROPOSAL', FOLLOW_UP: 'CONTACTED', CONVERTED: 'WON' };
 
-/** Kanban pipeline stages (PRD §42). Clicking a card advances it to the next stage. */
-export const PIPELINE_STAGES = ['NEW', 'CONTACTED', 'QUALIFIED', 'PROPOSAL', 'WON'];
+/** Kanban pipeline stages: every status except LOST. Clicking a card advances it to the next stage. */
+export const PIPELINE_STAGES = ['NEW', 'CONTACTED', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'WON'];
 
 export const BOOKING_STATES = ['available', 'hold', 'payment_pending', 'confirmed', 'checked_in', 'completed', 'cancelled'];
 

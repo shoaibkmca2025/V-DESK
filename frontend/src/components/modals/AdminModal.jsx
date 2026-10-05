@@ -52,7 +52,7 @@ export default function AdminModal() {
             <option value="all">All Statuses</option>
             <option value="NEW">New Inquiries</option>
             <option value="QUALIFIED">Qualified</option>
-            <option value="CONVERTED">Converted</option>
+            <option value="WON">Converted</option>
             <option value="LOST">Lost</option>
           </select>{' '}
           <button className="btn btn--outline btn--sm" onClick={() => exportLeadsToCSV()}>

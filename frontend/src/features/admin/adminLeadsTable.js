@@ -1,9 +1,9 @@
-import { LEAD_TABLE_STATUSES } from '@/data/constants.js';
+import { LEAD_STATUSES } from '@/data/constants.js';
 import { getLeads } from '@/features/crm/leadStore.js';
 import { changeAction, escapeHtml } from '@/lib/html.js';
 
 function statusOptions(lead) {
-  return LEAD_TABLE_STATUSES.map(
+  return LEAD_STATUSES.map(
     (s) => `<option value="${s}" ${lead.status === s ? 'selected' : ''}>${s.replace(/_/g, ' ')}</option>`,
   ).join('');
 }
@@ -21,7 +21,7 @@ export function renderAdminLeads() {
   setText('totalLeadsMetric', leads.length);
   setText('newLeadsMetric', leads.filter((l) => l.status === 'NEW').length);
   setText('qualifiedLeadsMetric', leads.filter((l) => l.status === 'QUALIFIED').length);
-  setText('convertedLeadsMetric', leads.filter((l) => l.status === 'CONVERTED').length);
+  setText('convertedLeadsMetric', leads.filter((l) => l.status === 'WON').length);
 
   const rows = leads
     .map(
@@ -51,10 +51,10 @@ export function renderAdminLeads() {
 
 export function filterAdminLeads() {
   const search = (document.getElementById('adminSearchInput')?.value || '').toLowerCase();
-  const status = document.getElementById('adminStatusFilter')?.value || 'ALL';
+  const status = document.getElementById('adminStatusFilter')?.value || 'all';
   let leads = getLeads();
 
-  if (status !== 'ALL') leads = leads.filter((l) => l.status === status);
+  if (status !== 'all') leads = leads.filter((l) => l.status === status);
   if (search) {
     leads = leads.filter(
       (l) =>

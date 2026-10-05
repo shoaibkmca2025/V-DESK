@@ -41,7 +41,6 @@ export function seedSampleLeads() {
   const names = ['Vikram Desai', 'Ananya Shah', 'Arjun Mehta', 'Kavita Nair', 'Nikhil Kumar'];
   const cities = ['Mumbai', 'Nashik', 'Delhi', 'Bangalore', 'Pune'];
   const services = ['Virtual Office', 'GST Registration', 'Company Registration', 'Coworking', 'Private Office'];
-  const statuses = ['NEW', 'CONTACTED', 'QUALIFIED', 'PROPOSAL_SENT', 'CONVERTED'];
   const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
   const name = pick(names);
@@ -55,7 +54,7 @@ export function seedSampleLeads() {
       company: 'Demo Corp',
       source: 'Admin — Seeded Sample',
     },
-    { status: pick(statuses) },
+    { status: pick(PIPELINE_STAGES) },
   );
   renderAdminLeads();
   showToast(`Sample lead "${name}" added.`);

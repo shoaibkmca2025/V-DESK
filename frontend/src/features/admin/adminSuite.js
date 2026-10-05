@@ -121,7 +121,7 @@ export function switchAdminTab(tab) {
   } else if (tab === 'pipeline') {
     body.innerHTML = `
       <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
-        <h4 style="margin: 0; color: #fff;">Pipeline Stages: NEW → CONTACTED → QUALIFIED → PROPOSAL → WON</h4>
+        <h4 style="margin: 0; color: #fff;">Pipeline Stages: ${PIPELINE_STAGES.join(' → ')}</h4>
         <button class="btn btn--outline btn--sm" ${action('exportLeadsToCSV')}><i class="ph-bold ph-download-simple"></i> Export CSV</button>
       </div>
 

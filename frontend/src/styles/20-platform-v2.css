@@ -1700,12 +1700,19 @@
   color: #10B981;
 }
 
-/* Kanban Pipeline */
+/* Kanban Pipeline — one column per PIPELINE_STAGES entry (src/data/constants.js) */
 .admin-pipeline-kanban {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 14px;
   min-height: 420px;
+}
+
+/* Six columns get too narrow on tablets and small laptops: two rows of three */
+@media (max-width: 1200px) {
+  .admin-pipeline-kanban {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .kanban-col {
@@ -1764,6 +1771,8 @@
 .kanban-card-top {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
   margin-bottom: 4px;
 }
 
@@ -1772,6 +1781,8 @@
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .lead-score-pill.high {
