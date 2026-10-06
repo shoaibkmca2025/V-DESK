@@ -255,6 +255,26 @@ describe('catalog module', () => {
       expect(res.body.data).toHaveLength(1);
     });
 
+    it('matches city case-insensitively', async () => {
+      await seedCity();
+      await seedCentre();
+      await seedWorkspace();
+      const res = await request(app).get('/api/v1/catalog/workspaces?city=testVILLE');
+      expect(res.status).toBe(200);
+      expect(res.body.data).toHaveLength(1);
+    });
+
+    it('matches the whole city name, not a prefix or pattern', async () => {
+      await seedCity();
+      await seedCentre();
+      await seedWorkspace();
+      for (const city of ['Test', '.*', 'Testville.*']) {
+        const res = await request(app).get('/api/v1/catalog/workspaces').query({ city });
+        expect(res.status).toBe(200);
+        expect(res.body.data).toHaveLength(0);
+      }
+    });
+
     it('filters by type', async () => {
       await seedCity();
       await seedCentre();
