@@ -3,8 +3,9 @@
 REST API for the V-DESK platform: **Node.js 22 + Express 5 + MongoDB (Mongoose)**, the M-E-N of MERN
 (the React frontend is in `../frontend`).
 
-**Status: foundation only.** The server, config, database connection, error handling, logging, tests and the
-folder/layer structure are in place. All 13 modules are empty skeletons waiting for their code.
+**Status: foundation + first modules.** The server, config, database connection, error handling, logging, tests and the
+folder/layer structure are in place. `catalog` (public read API) and `crm` (leads + pipeline) are implemented; the
+other 11 modules are empty skeletons waiting for their code.
 
 ## Quick start
 
@@ -111,10 +112,11 @@ Add these when a module needs them:
 
 ## Environment variables
 
-| Name           | Default                           | Purpose                                                 |
-| -------------- | --------------------------------- | ------------------------------------------------------- |
-| `NODE_ENV`     | `development`                     | `development` / `test` / `production`                   |
-| `PORT`         | `5000`                            | HTTP port                                               |
-| `MONGODB_URI`  | `mongodb://127.0.0.1:27017/vdesk` | MongoDB connection string (Atlas in staging/production) |
-| `CORS_ORIGINS` | `http://localhost:5173`           | comma-separated frontend URLs allowed to call the API   |
-| `LOG_LEVEL`    | `info`                            | `fatal` … `trace`, or `silent`                          |
+| Name            | Default                           | Purpose                                                                             |
+| --------------- | --------------------------------- | ----------------------------------------------------------------------------------- |
+| `NODE_ENV`      | `development`                     | `development` / `test` / `production`                                               |
+| `PORT`          | `5000`                            | HTTP port                                                                           |
+| `MONGODB_URI`   | `mongodb://127.0.0.1:27017/vdesk` | MongoDB connection string (Atlas in staging/production)                             |
+| `CORS_ORIGINS`  | `http://localhost:5173`           | comma-separated frontend URLs allowed to call the API                               |
+| `LOG_LEVEL`     | `info`                            | `fatal` … `trace`, or `silent`                                                      |
+| `ADMIN_API_KEY` | _(unset)_                         | temporary staff key (`x-admin-key` header), ≥ 16 chars; unset → staff endpoints 503 |

@@ -19,6 +19,11 @@ const schema = z.object({
         .filter(Boolean),
     ),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
+  /**
+   * Shared secret for staff endpoints, sent as `x-admin-key` (docs/backend/memory.md §3). Temporary until
+   * identity ships JWT + RBAC. Unset → staff endpoints answer 503, so a missing key never means "open".
+   */
+  ADMIN_API_KEY: z.preprocess((value) => (value === '' ? undefined : value), z.string().min(16).optional()),
 });
 
 const parsed = schema.safeParse(process.env);
