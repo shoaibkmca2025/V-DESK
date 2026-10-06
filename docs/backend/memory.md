@@ -76,3 +76,9 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
 ## 8. Session log
 
 - **2026-09-15** — Static site → React/Vite restructure completed and verified (22 page/viewport diffs, ≤0.14 % pixels). Express/Mongo backend prototype built (12 integration tests passing) then removed on owner request; this plan captures it for when the backend phase starts.
+- **2026-10-06** — `crm` leads module built. Decisions not covered by the plan: client `id` is stored/returned as `ref`;
+  public `POST /leads` returns only `{ ref, createdAt }` so replaying a known ref cannot read another visitor's
+  details; pipeline allows one step forward or `LOST` from open stages (`WON`/`LOST` final) — the admin board's
+  "click to advance" wraps WON → NEW and its status dropdown sets any status, so both need adjusting at switch-over;
+  score keeps the client's "+15 only while QUALIFIED" behaviour; staff notes go to `lead_activities`, the visitor's
+  message stays in `notes`. Rate limiting/CAPTCHA deferred until shared middleware exists.

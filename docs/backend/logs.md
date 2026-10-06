@@ -94,4 +94,5 @@ Channels: PagerDuty (P1), Slack `#vdesk-ops` (all), weekly digest email.
 
 | Date | Version | Change | Author |
 |---|---|---|---|
+| 2026-10-06 | 0.1.0 | `crm` module: public `POST /leads` (idempotent on client ref), staff list/get/patch/stats behind temporary `x-admin-key`, pipeline transition table, lead scoring, `lead_activities` timeline. Logs `lead.created` / `lead.status_changed` (refs only). No rate limit/CAPTCHA yet. | — |
 | 2026-09-15 | plan v1 | Backend plan authored (`modules.md`, `phases.md`, `rules.md`, `logs.md`, `memory.md`). Frontend restructured to React + Vite; backend deferred. | — |
