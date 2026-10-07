@@ -82,3 +82,16 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
   "click to advance" wraps WON → NEW and its status dropdown sets any status, so both need adjusting at switch-over;
   score keeps the client's "+15 only while QUALIFIED" behaviour; staff notes go to `lead_activities`, the visitor's
   message stays in `notes`. Rate limiting/CAPTCHA deferred until shared middleware exists.
+- **2026-10-07** — `search` module built (public `GET /search`, `/suggest`, `/popular`; staff synonyms list, redirect
+  and config CRUD behind `x-admin-key`). Decisions (owner-approved): **no MongoDB text index in Phase 1** — search
+  reads centres/workspaces/cities through catalog's public service and filters/ranks in memory (catalog is ~20 rows;
+  Atlas Search in Phase 4); business services are a search-owned `search_services` collection seeded from
+  `frontend/src/data/services.js` (`startingPrice` → `starting_price_paise`, other fields unchanged); synonyms are
+  GET-only and seeded empty; `search_config` holds keyed entries (`promotedCentres`, `popularSearches`) instead of a
+  separate `popular_searches` collection, seeded with the client /search page chips; centres in results get the
+  client's fixed capacity 10 but `rating`/`reviews` are `null` instead of the client's invented 4.9 / 160+n (frontend
+  must handle null at switch-over). Implementation choices: intent parsing is a line-for-line port of the client
+  (quirks kept); result prices are `price_month_paise` while the `maxPrice` filter stays in rupees (as catalog);
+  no `maxPrice` = no price cap (the two client screens default to 15 000 and 75 000 and will send their own); results
+  use catalog `ref`s where the client used `id`; redirects match the exact normalised query before synonyms and only
+  accept site-relative targets; zero results relax capacity → type → city (never price).
