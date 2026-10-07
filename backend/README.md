@@ -4,8 +4,8 @@ REST API for the V-DESK platform: **Node.js 22 + Express 5 + MongoDB (Mongoose)*
 (the React frontend is in `../frontend`).
 
 **Status: foundation + first modules.** The server, config, database connection, error handling, logging, tests and the
-folder/layer structure are in place. `catalog` (public read API) and `crm` (leads + pipeline) are implemented; the
-other 11 modules are empty skeletons waiting for their code.
+folder/layer structure are in place. `catalog` (public read API), `search` (universal search + admin config) and
+`crm` (leads + pipeline) are implemented; the other 10 modules are empty skeletons waiting for their code.
 
 ## Quick start
 
