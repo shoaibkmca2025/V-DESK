@@ -47,11 +47,12 @@ export async function findCentreByRef(ref) {
 
 /**
  * Returns workspaces filtered by optional city, type, minimum capacity, and max monthly price (paise).
+ * City is an exact, case-insensitive match on the name ('mumbai' finds 'Mumbai').
  * Sorted by price_month_paise ascending.
  */
 export async function findWorkspaces({ city, type, capacity, maxPricePaise } = {}) {
   const filter = { active: true, deletedAt: null };
-  if (city) filter.city = city;
+  if (city) filter.city = new RegExp(`^${escapeRegex(city)}$`, 'i');
   if (type) filter.type = type;
   if (capacity) filter.capacity = { $gte: capacity };
   if (maxPricePaise != null) filter.price_month_paise = { $lte: maxPricePaise };
@@ -61,4 +62,8 @@ export async function findWorkspaces({ city, type, capacity, maxPricePaise } = {
 /** Returns a single workspace by its ref. */
 export async function findWorkspaceByRef(ref) {
   return Workspace.findOne({ ref, active: true, deletedAt: null }).lean();
+}
+
+function escapeRegex(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

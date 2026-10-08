@@ -1,0 +1,933 @@
+{
+  "clientName": "Thunder Client",
+  "collectionName": "V-DESK API",
+  "collectionId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+  "dateExported": "2026-10-06T10:34:29.790Z",
+  "version": "1.2",
+  "folders": [
+    {
+      "_id": "ef07de6a-8d89-4f96-a64b-2b281d1cbc1b",
+      "name": "0. Health",
+      "containerId": "",
+      "created": "2026-10-06T10:34:29.790Z",
+      "sortNum": 20000
+    },
+    {
+      "_id": "b43b55ca-295a-4c95-830e-c54b767e5844",
+      "name": "1. Catalog (public)",
+      "containerId": "",
+      "created": "2026-10-06T10:34:29.790Z",
+      "sortNum": 30000
+    },
+    {
+      "_id": "23fffcd0-338c-4a32-a0c8-89310670cd92",
+      "name": "2. Leads - public",
+      "containerId": "",
+      "created": "2026-10-06T10:34:29.790Z",
+      "sortNum": 40000
+    },
+    {
+      "_id": "8ef6ea8c-b102-4cb1-a11c-a56bcbcd66a3",
+      "name": "3. Leads - staff (x-admin-key)",
+      "containerId": "",
+      "created": "2026-10-06T10:34:29.790Z",
+      "sortNum": 50000
+    },
+    {
+      "_id": "07f6bddd-d849-4c86-8baf-c48ca55b6d61",
+      "name": "4. Error cases",
+      "containerId": "",
+      "created": "2026-10-06T10:34:29.790Z",
+      "sortNum": 60000
+    }
+  ],
+  "requests": [
+    {
+      "_id": "943c8564-4180-4eac-b16b-ef3922e9db6a",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "ef07de6a-8d89-4f96-a64b-2b281d1cbc1b",
+      "name": "Health (liveness)",
+      "url": "{{baseUrl}}/health",
+      "method": "GET",
+      "sortNum": 20000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "e9b169d5-f98d-4f3c-9fd3-02defbc45932",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "ef07de6a-8d89-4f96-a64b-2b281d1cbc1b",
+      "name": "Ready (DB connected)",
+      "url": "{{baseUrl}}/ready",
+      "method": "GET",
+      "sortNum": 30000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "5e8525f3-33d7-4436-8a86-40608efe423a",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "b43b55ca-295a-4c95-830e-c54b767e5844",
+      "name": "Catalog bundle (cities + centres + workspaces)",
+      "url": "{{baseUrl}}/api/v1/catalog",
+      "method": "GET",
+      "sortNum": 40000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "18555ded-8780-44de-b236-5c24e34b082d",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "b43b55ca-295a-4c95-830e-c54b767e5844",
+      "name": "List cities",
+      "url": "{{baseUrl}}/api/v1/catalog/cities",
+      "method": "GET",
+      "sortNum": 50000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "9bed33c9-bd4e-4cd9-b5a1-f34834613b44",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "b43b55ca-295a-4c95-830e-c54b767e5844",
+      "name": "Get city by slug",
+      "url": "{{baseUrl}}/api/v1/catalog/cities/mumbai",
+      "method": "GET",
+      "sortNum": 60000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "7d53ade7-812b-4fd4-8a83-eea0ef1a0314",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "b43b55ca-295a-4c95-830e-c54b767e5844",
+      "name": "List centres",
+      "url": "{{baseUrl}}/api/v1/catalog/centres",
+      "method": "GET",
+      "sortNum": 70000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "bbae8704-ecbc-450c-a8e7-4e09c4c726b9",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "b43b55ca-295a-4c95-830e-c54b767e5844",
+      "name": "List centres by city slug",
+      "url": "{{baseUrl}}/api/v1/catalog/centres?city=mumbai",
+      "method": "GET",
+      "sortNum": 80000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [],
+      "params": [
+        {
+          "name": "city",
+          "value": "mumbai",
+          "isPath": false
+        }
+      ],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "6b71c42b-5527-4df6-a5aa-e2a7ddf7b6d3",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "b43b55ca-295a-4c95-830e-c54b767e5844",
+      "name": "Get centre by ref",
+      "url": "{{baseUrl}}/api/v1/catalog/centres/CTR-MUM-001",
+      "method": "GET",
+      "sortNum": 90000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "13c33503-34cd-466f-825b-52178be3ec4c",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "b43b55ca-295a-4c95-830e-c54b767e5844",
+      "name": "List workspaces",
+      "url": "{{baseUrl}}/api/v1/catalog/workspaces",
+      "method": "GET",
+      "sortNum": 100000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "bc9c132f-8be4-45bd-b21c-a435a2dc9d0b",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "b43b55ca-295a-4c95-830e-c54b767e5844",
+      "name": "List workspaces (filtered)",
+      "url": "{{baseUrl}}/api/v1/catalog/workspaces?city=Mumbai&type=Private%20Office&capacity=4&maxPrice=50000",
+      "method": "GET",
+      "sortNum": 110000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [],
+      "params": [
+        {
+          "name": "city",
+          "value": "Mumbai",
+          "isPath": false
+        },
+        {
+          "name": "type",
+          "value": "Private Office",
+          "isPath": false
+        },
+        {
+          "name": "capacity",
+          "value": "4",
+          "isPath": false
+        },
+        {
+          "name": "maxPrice",
+          "value": "50000",
+          "isPath": false
+        }
+      ],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "a142c046-f2e2-4371-8265-ac6f17627f98",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "b43b55ca-295a-4c95-830e-c54b767e5844",
+      "name": "Get workspace by ref",
+      "url": "{{baseUrl}}/api/v1/catalog/workspaces/WS-MUM-001",
+      "method": "GET",
+      "sortNum": 120000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "2686df95-da91-4caf-9183-e4242237f069",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "23fffcd0-338c-4a32-a0c8-89310670cd92",
+      "name": "Create lead (full form, fixed ref)",
+      "url": "{{baseUrl}}/api/v1/leads",
+      "method": "POST",
+      "sortNum": 130000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"ref\": \"{{leadRef}}\",\n  \"name\": \"Rahul Sharma\",\n  \"mobile\": \"+91 98765 43210\",\n  \"email\": \"rahul@acmecorp.in\",\n  \"city\": \"Mumbai\",\n  \"service\": \"Virtual Office\",\n  \"company\": \"Acme Corp Pvt Ltd\",\n  \"notes\": \"Needs GST registration address in BKC\",\n  \"source\": \"Website - Contact Form\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "201"
+        }
+      ]
+    },
+    {
+      "_id": "dd91300d-8e47-4412-9ff8-8cc21051255f",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "23fffcd0-338c-4a32-a0c8-89310670cd92",
+      "name": "Create lead (minimal, server ref)",
+      "url": "{{baseUrl}}/api/v1/leads",
+      "method": "POST",
+      "sortNum": 140000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Priya Patel\",\n  \"email\": \"priya@gmail.com\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "201"
+        }
+      ]
+    },
+    {
+      "_id": "0cda2089-99e0-4f53-9c49-088a60dc64fe",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "8ef6ea8c-b102-4cb1-a11c-a56bcbcd66a3",
+      "name": "List leads",
+      "url": "{{baseUrl}}/api/v1/leads?limit=25",
+      "method": "GET",
+      "sortNum": 150000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        }
+      ],
+      "params": [
+        {
+          "name": "limit",
+          "value": "25",
+          "isPath": false
+        }
+      ],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "dddcd135-cf7d-4009-ac9e-ba6a8bdd00d4",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "8ef6ea8c-b102-4cb1-a11c-a56bcbcd66a3",
+      "name": "List leads (filtered)",
+      "url": "{{baseUrl}}/api/v1/leads?status=NEW&city=Mumbai&q=rahul&limit=10",
+      "method": "GET",
+      "sortNum": 160000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        }
+      ],
+      "params": [
+        {
+          "name": "status",
+          "value": "NEW",
+          "isPath": false
+        },
+        {
+          "name": "city",
+          "value": "Mumbai",
+          "isPath": false
+        },
+        {
+          "name": "q",
+          "value": "rahul",
+          "isPath": false
+        },
+        {
+          "name": "limit",
+          "value": "10",
+          "isPath": false
+        }
+      ],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "055036ff-535d-4b71-b10f-ea5b93f909f4",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "8ef6ea8c-b102-4cb1-a11c-a56bcbcd66a3",
+      "name": "Lead stats",
+      "url": "{{baseUrl}}/api/v1/leads/stats",
+      "method": "GET",
+      "sortNum": 170000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "ca9a5360-569a-4b90-bfd2-df4cfcd5ae05",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "8ef6ea8c-b102-4cb1-a11c-a56bcbcd66a3",
+      "name": "Get lead + timeline",
+      "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
+      "method": "GET",
+      "sortNum": 180000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "750c894e-a801-4586-8e03-78a55d507287",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "8ef6ea8c-b102-4cb1-a11c-a56bcbcd66a3",
+      "name": "Move to CONTACTED + assign + note",
+      "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
+      "method": "PATCH",
+      "sortNum": 190000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"status\": \"CONTACTED\",\n  \"assignedTo\": \"Anita (Sales)\",\n  \"note\": \"Called, interested in BKC\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "03435829-bde9-4324-845a-2e9a2c1b7d72",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "8ef6ea8c-b102-4cb1-a11c-a56bcbcd66a3",
+      "name": "Move to QUALIFIED",
+      "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
+      "method": "PATCH",
+      "sortNum": 200000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"status\": \"QUALIFIED\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "63fa6bba-450d-407e-99c1-01a71c13a55d",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "8ef6ea8c-b102-4cb1-a11c-a56bcbcd66a3",
+      "name": "Move to PROPOSAL",
+      "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
+      "method": "PATCH",
+      "sortNum": 210000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"status\": \"PROPOSAL\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "c435b302-66c7-470b-b11a-f5c18d4da2b2",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "8ef6ea8c-b102-4cb1-a11c-a56bcbcd66a3",
+      "name": "Move to NEGOTIATION",
+      "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
+      "method": "PATCH",
+      "sortNum": 220000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"status\": \"NEGOTIATION\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "2d0a9d46-bf1c-4f74-93e6-b2ca1ce01665",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "8ef6ea8c-b102-4cb1-a11c-a56bcbcd66a3",
+      "name": "Move to WON",
+      "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
+      "method": "PATCH",
+      "sortNum": 230000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"status\": \"WON\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "62ba63ea-a37e-4cc0-9991-bee874111495",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "8ef6ea8c-b102-4cb1-a11c-a56bcbcd66a3",
+      "name": "Add note only",
+      "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
+      "method": "PATCH",
+      "sortNum": 240000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"note\": \"Agreement signed, onboarding next week\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "b4b22f70-6fa2-4611-bc58-cbebb4f3724b",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "8ef6ea8c-b102-4cb1-a11c-a56bcbcd66a3",
+      "name": "Unassign",
+      "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
+      "method": "PATCH",
+      "sortNum": 250000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"assignedTo\": null\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "8d227323-5613-4945-bbb8-67a55a2af743",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "07f6bddd-d849-4c86-8baf-c48ca55b6d61",
+      "name": "400 - invalid lead body",
+      "url": "{{baseUrl}}/api/v1/leads",
+      "method": "POST",
+      "sortNum": 260000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"\",\n  \"mobile\": \"12345\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "400"
+        }
+      ]
+    },
+    {
+      "_id": "99482814-35fd-4cac-b700-0a6e1c3e577e",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "07f6bddd-d849-4c86-8baf-c48ca55b6d61",
+      "name": "401 - staff call without key",
+      "url": "{{baseUrl}}/api/v1/leads",
+      "method": "GET",
+      "sortNum": 270000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "401"
+        }
+      ]
+    },
+    {
+      "_id": "3017d458-ab0b-41a1-98af-a50f6aa0571e",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "07f6bddd-d849-4c86-8baf-c48ca55b6d61",
+      "name": "400 - empty PATCH",
+      "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
+      "method": "PATCH",
+      "sortNum": 280000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "400"
+        }
+      ]
+    },
+    {
+      "_id": "1c13eee2-8a47-4f6a-b4f1-f804bd16e8fd",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "07f6bddd-d849-4c86-8baf-c48ca55b6d61",
+      "name": "409 - illegal status move (run after WON)",
+      "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
+      "method": "PATCH",
+      "sortNum": 290000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"status\": \"LOST\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "409"
+        }
+      ]
+    },
+    {
+      "_id": "45506128-894e-40df-a584-2d6422db3d21",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "07f6bddd-d849-4c86-8baf-c48ca55b6d61",
+      "name": "404 - unknown lead",
+      "url": "{{baseUrl}}/api/v1/leads/VD-NOPE-9999",
+      "method": "GET",
+      "sortNum": 300000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "404"
+        }
+      ]
+    },
+    {
+      "_id": "fa0cd2bc-c968-485e-b42a-a58692c89b6e",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "07f6bddd-d849-4c86-8baf-c48ca55b6d61",
+      "name": "404 - unknown workspace",
+      "url": "{{baseUrl}}/api/v1/catalog/workspaces/WS-NOPE",
+      "method": "GET",
+      "sortNum": 310000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "404"
+        }
+      ]
+    },
+    {
+      "_id": "5d3743e7-fcb6-4cc1-b5fc-bd62e6019d83",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "07f6bddd-d849-4c86-8baf-c48ca55b6d61",
+      "name": "404 - unknown route",
+      "url": "{{baseUrl}}/api/v1/bookings",
+      "method": "GET",
+      "sortNum": 320000,
+      "created": "2026-10-06T10:34:29.790Z",
+      "modified": "2026-10-06T10:34:29.790Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "404"
+        }
+      ]
+    }
+  ],
+  "ref": "03ea5305-67a"
+}

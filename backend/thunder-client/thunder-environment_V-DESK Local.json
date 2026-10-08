@@ -1,0 +1,21 @@
+{
+  "clientName": "Thunder Client",
+  "environmentName": "V-DESK Local",
+  "dateExported": "2026-10-06T10:34:29.790Z",
+  "version": "1.1",
+  "folder": "",
+  "data": [
+    {
+      "name": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "name": "adminKey",
+      "value": "vdesk-local-admin-key-123"
+    },
+    {
+      "name": "leadRef",
+      "value": "VD-TEST-0001"
+    }
+  ]
+}

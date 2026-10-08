@@ -23,6 +23,17 @@ npm run format           # prettier
 Requires Node 22.12+ (Node 22 LTS recommended). Check it's up: `GET /health` → `{ "data": { "status": "ok" } }`,
 `GET /ready` → also confirms the database connection.
 
+### Manual testing (Thunder Client)
+
+`thunder-client/` holds a collection (every implemented endpoint plus error cases) and a `V-DESK Local` environment.
+Import both in Thunder Client, then:
+
+1. Set `ADMIN_API_KEY=vdesk-local-admin-key-123` in `.env` (local only — the environment's `adminKey` uses it).
+2. Seed the catalog: `node --env-file-if-exists=.env scripts/seed-catalog.js` (against `npm run dev`; the
+   `dev:memory` database can't be seeded, so the catalog stays empty there).
+3. Run the lead requests in order — status moves one step at a time and `WON`/`LOST` are final. To replay the
+   pipeline, change `leadRef` in the environment (e.g. `VD-TEST-0002`).
+
 ## Folder structure
 
 ```
@@ -40,7 +51,8 @@ backend/
 │   │   ├── events/          domain events between modules (to be added)
 │   │   └── jobs/            background jobs with BullMQ + Redis (to be added)
 │   └── integrations/        Razorpay, S3, email, WhatsApp, SMS wrappers (to be added)
-├── scripts/                 dev-memory.js; later seed + migrations
+├── scripts/                 dev-memory.js, seed-catalog.js; later migrations
+├── thunder-client/          Thunder Client collection + local environment for manual API testing
 └── test/                    db.js (in-memory MongoDB helper), app.test.js (platform tests)
 ```
 
