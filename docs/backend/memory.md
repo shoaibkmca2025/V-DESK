@@ -95,3 +95,31 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
   no `maxPrice` = no price cap (the two client screens default to 15 000 and 75 000 and will send their own); results
   use catalog `ref`s where the client used `id`; redirects match the exact normalised query before synonyms and only
   accept site-relative targets; zero results relax capacity → type → city (never price).
+- **2026-10-08** — `identity`, `analytics` and `pricing` built. Decisions not covered by the plan:
+  - **identity:** staff only (customer OTP stays Phase 2 / open question); no public `/register` — staff are created
+    by a SUPER_ADMIN (`/auth/users`) or `scripts/create-admin.js`. MFA is mandatory for *every* staff role (rules.md
+    §19 says "admin accounts"; all staff can see customer data). Sign-in is two-step: password → 5-min MFA token →
+    TOTP code; TOTP is RFC 6238 on `node:crypto`, secrets AES-256-GCM sealed with a separate `MFA_ENCRYPTION_KEY`
+    and stored on the user (no `mfa_secrets` collection). Access JWT 15 min (HS256, `jose`), refresh 7 days, rotating,
+    family revoked on reuse after a 10 s grace (parallel tabs). One lockout counter for passwords and codes (5 → 15
+    min). Every request reloads the user so disable/demote is immediate. Permissions map lives in
+    `identity.constants.js`; `requireStaff(permission)` now guards crm and search staff routes and still accepts
+    `x-admin-key` (full access) until the admin console signs in — remove it then.
+  - **refresh cookie:** `SameSite=Strict` (rules.md §19) means the site and API must be on the same registrable
+    domain (e.g. `vdesk.in` + `api.vdesk.in`); a `*.pages.dev` site calling another domain would never send it.
+  - **rate limiting:** shared in-memory per-IP limiter (off under `NODE_ENV=test`) on sign-in, refresh, `POST /leads`,
+    analytics ingest and pricing writes. Needs `TRUST_PROXY` behind Cloudflare, and Redis once there is more than one
+    API instance. Per-phone/email limits and CAPTCHA still pending for `/leads`.
+  - **analytics:** regular collection, not time-series (unique dedupe key needed for safe retries); 13-month TTL; KPIs
+    and funnel aggregated on read, no `kpi_daily` yet; funnel counts events (no client session id). PII stripped and
+    masked server-side. Lead and revenue KPIs stay with crm / orders, not client-reported events.
+  - **pricing:** money in paise, rates in basis points; percentages rounded half-up to the paisa on their own line, so
+    figures can differ from the client's whole-rupee rounding by < ₹1 — the client shows API figures after
+    switch-over. Defaults in code mirror the frontend (drift test reads `frontend/src`); staff overrides replace a
+    whole rule key. Products: virtual office (annual 20 % applies to the whole subtotal incl. incorporation, as the
+    client does), meeting rooms (by room format name, not catalog workspace), enterprise desks, wizard bundle
+    (treated as GST-inclusive because the wizard says "All-Inclusive" — **confirm with the owner**). The
+    lease-vs-V-DESK ROI calculator stays client-side (an estimate, not a price). Quotes: server-generated unguessable
+    `VDQ-` refs (the client's `VDQ-YYYY-NNNN` is guessable and the link shows name + company), `Idempotency-Key`
+    required, line items embedded and frozen, 14-day validity with expiry read-time (no job yet), customer may
+    VIEW/ACCEPT/REJECT via the link. PDF deferred until the job queue exists.

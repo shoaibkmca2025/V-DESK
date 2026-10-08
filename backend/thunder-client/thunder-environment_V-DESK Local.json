@@ -1,7 +1,7 @@
 {
   "clientName": "Thunder Client",
   "environmentName": "V-DESK Local",
-  "dateExported": "2026-10-06T10:34:29.790Z",
+  "dateExported": "2026-10-08T12:42:26.649Z",
   "version": "1.1",
   "folder": "",
   "data": [
@@ -16,6 +16,30 @@
     {
       "name": "leadRef",
       "value": "VD-TEST-0001"
+    },
+    {
+      "name": "staffEmail",
+      "value": "owner@vdesk.in"
+    },
+    {
+      "name": "staffPassword",
+      "value": "a-long-local-password"
+    },
+    {
+      "name": "mfaToken",
+      "value": ""
+    },
+    {
+      "name": "totpSecret",
+      "value": ""
+    },
+    {
+      "name": "accessToken",
+      "value": ""
+    },
+    {
+      "name": "quoteRef",
+      "value": ""
     }
   ]
 }

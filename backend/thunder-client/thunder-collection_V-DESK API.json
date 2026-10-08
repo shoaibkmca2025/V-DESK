@@ -2,43 +2,64 @@
   "clientName": "Thunder Client",
   "collectionName": "V-DESK API",
   "collectionId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
-  "dateExported": "2026-10-06T10:34:29.790Z",
+  "dateExported": "2026-10-08T12:42:26.649Z",
   "version": "1.2",
   "folders": [
     {
       "_id": "ef07de6a-8d89-4f96-a64b-2b281d1cbc1b",
       "name": "0. Health",
       "containerId": "",
-      "created": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
       "sortNum": 20000
     },
     {
       "_id": "b43b55ca-295a-4c95-830e-c54b767e5844",
       "name": "1. Catalog (public)",
       "containerId": "",
-      "created": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
       "sortNum": 30000
     },
     {
       "_id": "23fffcd0-338c-4a32-a0c8-89310670cd92",
       "name": "2. Leads - public",
       "containerId": "",
-      "created": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
       "sortNum": 40000
     },
     {
       "_id": "8ef6ea8c-b102-4cb1-a11c-a56bcbcd66a3",
       "name": "3. Leads - staff (x-admin-key)",
       "containerId": "",
-      "created": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
       "sortNum": 50000
     },
     {
       "_id": "07f6bddd-d849-4c86-8baf-c48ca55b6d61",
       "name": "4. Error cases",
       "containerId": "",
-      "created": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
       "sortNum": 60000
+    },
+    {
+      "_id": "41ff5785-a6e3-43de-8ecf-5842c80a2987",
+      "name": "5. Auth (staff sign-in)",
+      "containerId": "",
+      "created": "2026-10-08T12:42:26.649Z",
+      "sortNum": 70000
+    },
+    {
+      "_id": "ca74606a-1c51-4ccd-9ebe-c6c8c1f492a5",
+      "name": "6. Analytics",
+      "containerId": "",
+      "created": "2026-10-08T12:42:26.649Z",
+      "sortNum": 80000
+    },
+    {
+      "_id": "c1ace33a-46e5-4828-85e3-e6ee5faf11f8",
+      "name": "7. Pricing & quotes",
+      "containerId": "",
+      "created": "2026-10-08T12:42:26.649Z",
+      "sortNum": 90000
     }
   ],
   "requests": [
@@ -50,8 +71,8 @@
       "url": "{{baseUrl}}/health",
       "method": "GET",
       "sortNum": 20000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -71,8 +92,8 @@
       "url": "{{baseUrl}}/ready",
       "method": "GET",
       "sortNum": 30000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -92,8 +113,8 @@
       "url": "{{baseUrl}}/api/v1/catalog",
       "method": "GET",
       "sortNum": 40000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -113,8 +134,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/cities",
       "method": "GET",
       "sortNum": 50000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -134,8 +155,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/cities/mumbai",
       "method": "GET",
       "sortNum": 60000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -155,8 +176,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/centres",
       "method": "GET",
       "sortNum": 70000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -176,8 +197,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/centres?city=mumbai",
       "method": "GET",
       "sortNum": 80000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [],
       "params": [
         {
@@ -203,8 +224,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/centres/CTR-MUM-001",
       "method": "GET",
       "sortNum": 90000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -224,8 +245,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/workspaces",
       "method": "GET",
       "sortNum": 100000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -245,8 +266,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/workspaces?city=Mumbai&type=Private%20Office&capacity=4&maxPrice=50000",
       "method": "GET",
       "sortNum": 110000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [],
       "params": [
         {
@@ -287,8 +308,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/workspaces/WS-MUM-001",
       "method": "GET",
       "sortNum": 120000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -308,8 +329,8 @@
       "url": "{{baseUrl}}/api/v1/leads",
       "method": "POST",
       "sortNum": 130000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -339,8 +360,8 @@
       "url": "{{baseUrl}}/api/v1/leads",
       "method": "POST",
       "sortNum": 140000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -370,8 +391,8 @@
       "url": "{{baseUrl}}/api/v1/leads?limit=25",
       "method": "GET",
       "sortNum": 150000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -402,8 +423,8 @@
       "url": "{{baseUrl}}/api/v1/leads?status=NEW&city=Mumbai&q=rahul&limit=10",
       "method": "GET",
       "sortNum": 160000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -449,8 +470,8 @@
       "url": "{{baseUrl}}/api/v1/leads/stats",
       "method": "GET",
       "sortNum": 170000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -475,8 +496,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "GET",
       "sortNum": 180000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -501,8 +522,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 190000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -536,8 +557,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 200000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -571,8 +592,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 210000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -606,8 +627,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 220000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -641,8 +662,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 230000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -676,8 +697,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 240000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -711,8 +732,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 250000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -746,8 +767,8 @@
       "url": "{{baseUrl}}/api/v1/leads",
       "method": "POST",
       "sortNum": 260000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -777,8 +798,8 @@
       "url": "{{baseUrl}}/api/v1/leads",
       "method": "GET",
       "sortNum": 270000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -798,8 +819,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 280000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -833,8 +854,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 290000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -868,8 +889,8 @@
       "url": "{{baseUrl}}/api/v1/leads/VD-NOPE-9999",
       "method": "GET",
       "sortNum": 300000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -894,8 +915,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/workspaces/WS-NOPE",
       "method": "GET",
       "sortNum": 310000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -915,8 +936,8 @@
       "url": "{{baseUrl}}/api/v1/bookings",
       "method": "GET",
       "sortNum": 320000,
-      "created": "2026-10-06T10:34:29.790Z",
-      "modified": "2026-10-06T10:34:29.790Z",
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -927,7 +948,842 @@
           "value": "404"
         }
       ]
+    },
+    {
+      "_id": "28161a90-661d-41bf-b185-c81ef64ea093",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "41ff5785-a6e3-43de-8ecf-5842c80a2987",
+      "name": "1. Create super admin (x-admin-key, once)",
+      "url": "{{baseUrl}}/api/v1/auth/users",
+      "method": "POST",
+      "sortNum": 330000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"{{staffEmail}}\",\n  \"name\": \"Local Owner\",\n  \"role\": \"SUPER_ADMIN\",\n  \"password\": \"{{staffPassword}}\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "201"
+        }
+      ]
+    },
+    {
+      "_id": "64cc8c40-504a-4ab2-8880-86a28465d5fc",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "41ff5785-a6e3-43de-8ecf-5842c80a2987",
+      "name": "2. Login → copy mfaToken to env",
+      "url": "{{baseUrl}}/api/v1/auth/login",
+      "method": "POST",
+      "sortNum": 340000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"{{staffEmail}}\",\n  \"password\": \"{{staffPassword}}\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "cd9a4656-fcc7-4762-9e9d-cc9a8d01037a",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "41ff5785-a6e3-43de-8ecf-5842c80a2987",
+      "name": "3. MFA enroll (first time) → copy secret to env totpSecret",
+      "url": "{{baseUrl}}/api/v1/auth/mfa/enroll",
+      "method": "POST",
+      "sortNum": 350000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"mfaToken\": \"{{mfaToken}}\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "dea57ba7-2f0a-4f44-a591-bf2127e3f765",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "41ff5785-a6e3-43de-8ecf-5842c80a2987",
+      "name": "4. MFA verify (code from npm run totp) → copy accessToken",
+      "url": "{{baseUrl}}/api/v1/auth/mfa/verify",
+      "method": "POST",
+      "sortNum": 360000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"mfaToken\": \"{{mfaToken}}\",\n  \"code\": \"000000\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "e40caa28-d034-4e9f-860e-cee28a2e566c",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "41ff5785-a6e3-43de-8ecf-5842c80a2987",
+      "name": "Me",
+      "url": "{{baseUrl}}/api/v1/auth/me",
+      "method": "GET",
+      "sortNum": 370000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{accessToken}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "ac3fce3f-2298-460b-b6b9-8a7bc8ec9a41",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "41ff5785-a6e3-43de-8ecf-5842c80a2987",
+      "name": "Refresh session (uses the vd_rt cookie)",
+      "url": "{{baseUrl}}/api/v1/auth/refresh",
+      "method": "POST",
+      "sortNum": 380000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "f5160c40-d2c3-4fb9-b9f2-319ee3437757",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "41ff5785-a6e3-43de-8ecf-5842c80a2987",
+      "name": "List staff users",
+      "url": "{{baseUrl}}/api/v1/auth/users?limit=25",
+      "method": "GET",
+      "sortNum": 390000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{accessToken}}"
+        }
+      ],
+      "params": [
+        {
+          "name": "limit",
+          "value": "25",
+          "isPath": false
+        }
+      ],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "0887ebed-17ba-4c40-98b2-6c952d7e9688",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "41ff5785-a6e3-43de-8ecf-5842c80a2987",
+      "name": "Create sales exec",
+      "url": "{{baseUrl}}/api/v1/auth/users",
+      "method": "POST",
+      "sortNum": 400000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{accessToken}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"sales@vdesk.in\",\n  \"name\": \"Sales Exec\",\n  \"role\": \"SALES_EXEC\",\n  \"password\": \"another-long-password\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "201"
+        }
+      ]
+    },
+    {
+      "_id": "67cd5e38-3a83-4975-b516-299fe39a4e90",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "41ff5785-a6e3-43de-8ecf-5842c80a2987",
+      "name": "Leads with Bearer token",
+      "url": "{{baseUrl}}/api/v1/leads?limit=10",
+      "method": "GET",
+      "sortNum": 410000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{accessToken}}"
+        }
+      ],
+      "params": [
+        {
+          "name": "limit",
+          "value": "10",
+          "isPath": false
+        }
+      ],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "3a926722-45ed-4c72-9c63-3b79037e60f4",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "41ff5785-a6e3-43de-8ecf-5842c80a2987",
+      "name": "401 - me without token",
+      "url": "{{baseUrl}}/api/v1/auth/me",
+      "method": "GET",
+      "sortNum": 420000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "401"
+        }
+      ]
+    },
+    {
+      "_id": "57eaea4a-2d3d-4abd-abf1-d7f43255c8a0",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "41ff5785-a6e3-43de-8ecf-5842c80a2987",
+      "name": "Logout",
+      "url": "{{baseUrl}}/api/v1/auth/logout",
+      "method": "POST",
+      "sortNum": 430000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "204"
+        }
+      ]
+    },
+    {
+      "_id": "ec5ede24-86fe-4a01-a92a-74a9750f6195",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "ca74606a-1c51-4ccd-9ebe-c6c8c1f492a5",
+      "name": "Ingest events (public)",
+      "url": "{{baseUrl}}/api/v1/analytics/events",
+      "method": "POST",
+      "sortNum": 440000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"events\": [\n    {\n      \"id\": \"EVT-local-001\",\n      \"type\": \"search_submitted\",\n      \"data\": {\n        \"query\": \"coworking in pune\"\n      },\n      \"device\": \"Desktop\"\n    },\n    {\n      \"id\": \"EVT-local-002\",\n      \"type\": \"search_no_results\",\n      \"data\": {\n        \"query\": \"office on the moon\"\n      },\n      \"device\": \"Mobile\"\n    },\n    {\n      \"id\": \"EVT-local-003\",\n      \"type\": \"quote_started\",\n      \"data\": {\n        \"quoteId\": \"VDQ-2026-1234\"\n      },\n      \"device\": \"Desktop\"\n    }\n  ]\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "202"
+        }
+      ]
+    },
+    {
+      "_id": "72acc238-ae1c-4afb-bee0-92672d05c745",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "ca74606a-1c51-4ccd-9ebe-c6c8c1f492a5",
+      "name": "Event stream (staff)",
+      "url": "{{baseUrl}}/api/v1/analytics/events?limit=20",
+      "method": "GET",
+      "sortNum": 450000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        }
+      ],
+      "params": [
+        {
+          "name": "limit",
+          "value": "20",
+          "isPath": false
+        }
+      ],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "6bb8c45d-57b8-4b20-803c-153b60713a82",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "ca74606a-1c51-4ccd-9ebe-c6c8c1f492a5",
+      "name": "KPIs (staff)",
+      "url": "{{baseUrl}}/api/v1/analytics/kpis?range=7d",
+      "method": "GET",
+      "sortNum": 460000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        }
+      ],
+      "params": [
+        {
+          "name": "range",
+          "value": "7d",
+          "isPath": false
+        }
+      ],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "10f7ee16-6949-4a26-a077-5674c3f45c40",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "ca74606a-1c51-4ccd-9ebe-c6c8c1f492a5",
+      "name": "Funnel (staff)",
+      "url": "{{baseUrl}}/api/v1/analytics/funnel?range=7d",
+      "method": "GET",
+      "sortNum": 470000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        }
+      ],
+      "params": [
+        {
+          "name": "range",
+          "value": "7d",
+          "isPath": false
+        }
+      ],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "745c303c-6dbd-40dc-8d3f-e1b8b5c66997",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "c1ace33a-46e5-4828-85e3-e6ee5faf11f8",
+      "name": "Preview - virtual office",
+      "url": "{{baseUrl}}/api/v1/pricing/quote-preview",
+      "method": "POST",
+      "sortNum": 480000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"product\": \"virtual_office\",\n  \"centreRef\": \"CTR-NSK-001\",\n  \"tenure\": \"annual\",\n  \"purpose\": \"GST Registration\",\n  \"addons\": {\n    \"gst\": true,\n    \"mail\": true,\n    \"meetingCredits\": false,\n    \"incorporation\": false\n  }\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "2ce03b14-9a8d-4957-a8c0-8c91678e7d3c",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "c1ace33a-46e5-4828-85e3-e6ee5faf11f8",
+      "name": "Preview - meeting room",
+      "url": "{{baseUrl}}/api/v1/pricing/quote-preview",
+      "method": "POST",
+      "sortNum": 490000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"product\": \"meeting_room\",\n  \"room\": \"Conference Room\",\n  \"hours\": 4\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "56c56049-6065-4720-bdd8-f60171f4eba7",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "c1ace33a-46e5-4828-85e3-e6ee5faf11f8",
+      "name": "Preview - enterprise desks",
+      "url": "{{baseUrl}}/api/v1/pricing/quote-preview",
+      "method": "POST",
+      "sortNum": 500000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"product\": \"enterprise_desks\",\n  \"desks\": 50,\n  \"months\": 12\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "50c5809b-7343-4bcf-ad2f-5e1bd77b2e79",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "c1ace33a-46e5-4828-85e3-e6ee5faf11f8",
+      "name": "Preview - wizard bundle",
+      "url": "{{baseUrl}}/api/v1/pricing/quote-preview",
+      "method": "POST",
+      "sortNum": 510000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"product\": \"bundle\",\n  \"services\": [\n    \"virtual-office\",\n    \"gst-registration\",\n    \"company-incorporation\"\n  ]\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "6dfb5eaa-b0ff-452e-bcd0-1657ca7bacd5",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "c1ace33a-46e5-4828-85e3-e6ee5faf11f8",
+      "name": "Create quote → copy ref to env quoteRef",
+      "url": "{{baseUrl}}/api/v1/pricing/quotes",
+      "method": "POST",
+      "sortNum": 520000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Idempotency-Key",
+          "value": "{{#guid}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Priya Kulkarni\",\n  \"company\": \"Zenith D2C Brands Pvt Ltd\",\n  \"item\": {\n    \"product\": \"virtual_office\",\n    \"centreRef\": \"CTR-MUM-001\",\n    \"tenure\": \"annual\",\n    \"addons\": {\n      \"gst\": true,\n      \"mail\": true\n    }\n  }\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "201"
+        }
+      ]
+    },
+    {
+      "_id": "6ff49a01-e079-4d5e-a8c1-0d7963b85aed",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "c1ace33a-46e5-4828-85e3-e6ee5faf11f8",
+      "name": "Get quote (share link)",
+      "url": "{{baseUrl}}/api/v1/pricing/quotes/{{quoteRef}}",
+      "method": "GET",
+      "sortNum": 530000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "1bc259f7-7921-4491-8b3a-51e6edc2ae7b",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "c1ace33a-46e5-4828-85e3-e6ee5faf11f8",
+      "name": "Mark viewed",
+      "url": "{{baseUrl}}/api/v1/pricing/quotes/{{quoteRef}}/status",
+      "method": "PATCH",
+      "sortNum": 540000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"status\": \"VIEWED\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "6e839e76-2f50-4174-9dff-857ead40f799",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "c1ace33a-46e5-4828-85e3-e6ee5faf11f8",
+      "name": "Accept",
+      "url": "{{baseUrl}}/api/v1/pricing/quotes/{{quoteRef}}/status",
+      "method": "PATCH",
+      "sortNum": 550000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"status\": \"ACCEPTED\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "b8b9b264-d784-472d-8f34-71134d162205",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "c1ace33a-46e5-4828-85e3-e6ee5faf11f8",
+      "name": "List quotes (staff)",
+      "url": "{{baseUrl}}/api/v1/pricing/quotes?limit=25",
+      "method": "GET",
+      "sortNum": 560000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        }
+      ],
+      "params": [
+        {
+          "name": "limit",
+          "value": "25",
+          "isPath": false
+        }
+      ],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "ec3b0a1c-87c7-4ad8-9412-bdf328b88fef",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "c1ace33a-46e5-4828-85e3-e6ee5faf11f8",
+      "name": "Pricing rules (staff)",
+      "url": "{{baseUrl}}/api/v1/pricing/rules",
+      "method": "GET",
+      "sortNum": 570000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "eebaff22-6bf1-47d7-95d9-2615274976bc",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "c1ace33a-46e5-4828-85e3-e6ee5faf11f8",
+      "name": "Override GST rate (staff)",
+      "url": "{{baseUrl}}/api/v1/pricing/rules/tax",
+      "method": "PUT",
+      "sortNum": 580000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"value\": {\n    \"gst_bp\": 1800\n  }\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "641aa0ee-e6d8-4489-bf0d-d89e043ad5e7",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "c1ace33a-46e5-4828-85e3-e6ee5faf11f8",
+      "name": "Reset GST rate to default (staff)",
+      "url": "{{baseUrl}}/api/v1/pricing/rules/tax",
+      "method": "DELETE",
+      "sortNum": 590000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "317a8e4c-0686-4c17-8e1d-ff3b05869719",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "c1ace33a-46e5-4828-85e3-e6ee5faf11f8",
+      "name": "400 - quote without Idempotency-Key",
+      "url": "{{baseUrl}}/api/v1/pricing/quotes",
+      "method": "POST",
+      "sortNum": 600000,
+      "created": "2026-10-08T12:42:26.649Z",
+      "modified": "2026-10-08T12:42:26.649Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"No Key\",\n  \"item\": {\n    \"product\": \"meeting_room\",\n    \"room\": \"Boardroom\",\n    \"hours\": 2\n  }\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "400"
+        }
+      ]
     }
   ],
-  "ref": "03ea5305-67a"
+  "ref": "581454b5-b2c"
 }

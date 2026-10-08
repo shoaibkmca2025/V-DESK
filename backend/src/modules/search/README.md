@@ -26,7 +26,8 @@ settings behind it (PRD §20).
 | `PATCH`  | `/admin/config/:key`    | staff  | `{ value }`; unknown → `404 CONFIG_NOT_FOUND`                      |
 | `DELETE` | `/admin/config/:key`    | staff  | Soft delete → 204                                                  |
 
-**Staff access** is the same temporary `x-admin-key` as CRM (see `crm/README.md`), replaced by JWT + RBAC with identity.
+**Staff access:** a Bearer token with `search:manage` (OPS_ADMIN, CONTENT, SUPER_ADMIN — see `identity/README.md`),
+or the temporary `x-admin-key` during the switch-over (see `crm/README.md`).
 
 ### `GET /` response
 

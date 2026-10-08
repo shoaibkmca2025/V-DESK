@@ -17,8 +17,13 @@ Leads from every website form and the sales pipeline (NEW → CONTACTED → QUAL
 | `GET`   | `/:ref`  | staff  | One lead plus its `activities` timeline                                                        |
 | `PATCH` | `/:ref`  | staff  | Any of `{ status, assignedTo (null unassigns), note }`                                         |
 
-**Staff access** is temporary: send `x-admin-key: <ADMIN_API_KEY>`. Missing/wrong key → `401 ADMIN_KEY_INVALID`;
-key not configured on the server → `503 ADMIN_AUTH_NOT_CONFIGURED`. Replaced by JWT + RBAC when `identity` ships.
+**Staff access:** `Authorization: Bearer <access token>` from `/auth` with `leads:read` (GET) or `leads:write` (PATCH)
+— see `identity/README.md`; the timeline records the user's ref as `actor`. During the switch-over a request without
+`Authorization` may send `x-admin-key: <ADMIN_API_KEY>` instead (full access; missing/wrong key →
+`401 ADMIN_KEY_INVALID`, not configured → `503 ADMIN_AUTH_NOT_CONFIGURED`).
+
+**Rate limit:** `POST /` allows 10 submissions per minute per IP (`429 RATE_LIMITED`); per-contact limits and CAPTCHA
+are still to come.
 
 **Lead fields** match the client lead object: `name` (required), `mobile` and/or `email` (at least one), `city`,
 `service`, `company`, `notes` (visitor's message), `source`. The client's `id` is the `ref` (`VD-…`); sending it makes

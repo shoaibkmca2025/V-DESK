@@ -4,8 +4,9 @@ REST API for the V-DESK platform: **Node.js 22 + Express 5 + MongoDB (Mongoose)*
 (the React frontend is in `../frontend`).
 
 **Status: foundation + first modules.** The server, config, database connection, error handling, logging, tests and the
-folder/layer structure are in place. `catalog` (public read API), `search` (universal search + admin config) and
-`crm` (leads + pipeline) are implemented; the other 10 modules are empty skeletons waiting for their code.
+folder/layer structure are in place. Implemented: `catalog` (public read API), `search` (universal search + admin
+config), `crm` (leads + pipeline), `identity` (staff sign-in with MFA, roles), `analytics` (telemetry, KPIs, funnel)
+and `pricing` (quote preview, quotes, pricing rules). The other 7 modules are empty skeletons waiting for their code.
 
 ## Quick start
 
@@ -18,6 +19,7 @@ npm run dev:memory       # same, with a throwaway in-memory MongoDB (no install 
 npm test                 # vitest + supertest + in-memory MongoDB
 npm run lint             # eslint
 npm run format           # prettier
+npm run totp -- <secret> # current sign-in code for a test account's MFA secret (instead of a phone app)
 ```
 
 Requires Node 22.12+ (Node 22 LTS recommended). Check it's up: `GET /health` → `{ "data": { "status": "ok" } }`,
@@ -28,11 +30,16 @@ Requires Node 22.12+ (Node 22 LTS recommended). Check it's up: `GET /health` →
 `thunder-client/` holds a collection (every implemented endpoint plus error cases) and a `V-DESK Local` environment.
 Import both in Thunder Client, then:
 
-1. Set `ADMIN_API_KEY=vdesk-local-admin-key-123` in `.env` (local only — the environment's `adminKey` uses it).
+1. In `.env` set `ADMIN_API_KEY=vdesk-local-admin-key-123` (the environment's `adminKey`) and any two 32+ character
+   values for `JWT_SECRET` and `MFA_ENCRYPTION_KEY` (local only).
 2. Seed the catalog: `node --env-file-if-exists=.env scripts/seed-catalog.js` (against `npm run dev`; the
    `dev:memory` database can't be seeded, so the catalog stays empty there).
 3. Run the lead requests in order — status moves one step at a time and `WON`/`LOST` are final. To replay the
    pipeline, change `leadRef` in the environment (e.g. `VD-TEST-0002`).
+4. Staff sign-in (folder `5. Auth`): create the super admin → login → copy `mfaToken` into the environment → enroll →
+   copy `secret` into `totpSecret` → `npm run totp -- <secret>` → paste the code into "MFA verify" within 30 s → copy
+   `accessToken` into the environment. Requests in later folders use `Bearer {{accessToken}}` (valid 15 minutes).
+5. Quotes: "Create quote" needs a fresh `Idempotency-Key` for each new quote; copy the returned `ref` into `quoteRef`.
 
 ## Folder structure
 
@@ -45,13 +52,13 @@ backend/
 │   ├── config/              env.js (validated settings), db.js (MongoDB connection)
 │   ├── modules/             one folder per business feature (13), see table below
 │   ├── shared/
-│   │   ├── middleware/      requestId, httpLogger, validate, errorHandler
+│   │   ├── middleware/      requestId, httpLogger, validate, errorHandler, rateLimit, requireAdminKey
 │   │   ├── errors/          AppError + helpers (badRequest, notFound, conflict, …)
-│   │   ├── lib/             logger (pino); shared helpers go here
+│   │   ├── lib/             logger (pino), pagination (cursors), refs; shared helpers go here
 │   │   ├── events/          domain events between modules (to be added)
 │   │   └── jobs/            background jobs with BullMQ + Redis (to be added)
 │   └── integrations/        Razorpay, S3, email, WhatsApp, SMS wrappers (to be added)
-├── scripts/                 dev-memory.js, seed-catalog.js; later migrations
+├── scripts/                 dev-memory, seed-catalog, seed-search, create-admin, totp; later migrations
 ├── thunder-client/          Thunder Client collection + local environment for manual API testing
 └── test/                    db.js (in-memory MongoDB helper), app.test.js (platform tests)
 ```
@@ -124,11 +131,14 @@ Add these when a module needs them:
 
 ## Environment variables
 
-| Name            | Default                           | Purpose                                                                             |
-| --------------- | --------------------------------- | ----------------------------------------------------------------------------------- |
-| `NODE_ENV`      | `development`                     | `development` / `test` / `production`                                               |
-| `PORT`          | `5000`                            | HTTP port                                                                           |
-| `MONGODB_URI`   | `mongodb://127.0.0.1:27017/vdesk` | MongoDB connection string (Atlas in staging/production)                             |
-| `CORS_ORIGINS`  | `http://localhost:5173`           | comma-separated frontend URLs allowed to call the API                               |
-| `LOG_LEVEL`     | `info`                            | `fatal` … `trace`, or `silent`                                                      |
-| `ADMIN_API_KEY` | _(unset)_                         | temporary staff key (`x-admin-key` header), ≥ 16 chars; unset → staff endpoints 503 |
+| Name                 | Default                           | Purpose                                                                              |
+| -------------------- | --------------------------------- | ------------------------------------------------------------------------------------ |
+| `NODE_ENV`           | `development`                     | `development` / `test` / `production`                                                |
+| `PORT`               | `5000`                            | HTTP port                                                                            |
+| `MONGODB_URI`        | `mongodb://127.0.0.1:27017/vdesk` | MongoDB connection string (Atlas in staging/production)                              |
+| `CORS_ORIGINS`       | `http://localhost:5173`           | comma-separated frontend URLs allowed to call the API                                |
+| `LOG_LEVEL`          | `info`                            | `fatal` … `trace`, or `silent`                                                       |
+| `ADMIN_API_KEY`      | _(unset)_                         | temporary staff key (`x-admin-key` header), ≥ 16 chars; unset → staff endpoints 503  |
+| `JWT_SECRET`         | _(unset)_                         | signs staff access tokens, ≥ 32 chars; unset → `/auth` answers 503                   |
+| `MFA_ENCRYPTION_KEY` | _(unset)_                         | encrypts staff TOTP secrets at rest, ≥ 32 chars; keep it separate from `JWT_SECRET`  |
+| `TRUST_PROXY`        | `0`                               | proxies in front of the API (e.g. `1` behind Cloudflare) so rate limits see real IPs |
