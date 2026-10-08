@@ -56,8 +56,10 @@ Pricing engine, quotes and the rules behind them (PRD §41, §55). Integer paise
 | `enterprise_desks` | ₹7,999 × desks × months; −5 / 15 / 25 / 35 % from 1 / 50 / 100 / 200 desks; +18 % GST                                              |
 | `bundle`           | sum of fixed service prices; −15 % from 3 services; **GST included** (the wizard says "All-Inclusive")                             |
 
-- **Rounding:** a percentage is rounded half-up to the paisa, only on the line it produces. The client rounds discount and
-  GST to whole rupees, so its figures can be up to ₹1 different (e.g. ₹21,501 vs ₹21,500.54). After switch-over the
+- **Rounding (ADR-007):** paise-exact. Discount and GST are kept exact (`shared/lib/money.js`) and only the total is
+  rounded (half-up, once). The lines are allocated from that total: discount = subtotal − rounded net, GST = total −
+  taxable (for the GST-inclusive bundle, taxable = total ÷ 1.18), so they always add up. The client rounds discount and
+  GST to whole rupees per step, so its figures can be up to ₹1 different (e.g. ₹21,501 vs ₹21,500.54). After switch-over the
   client shows the API's figures.
 - **Defaults** (`DEFAULT_PRICING_RULES`) are today's frontend numbers. `pricing.engine.test.js` reads
   `frontend/src` and fails if they drift apart — change both, or override in the DB.

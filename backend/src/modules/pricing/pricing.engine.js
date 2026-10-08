@@ -2,17 +2,15 @@
  * Pricing engine — pure functions from (product input, rules, catalog data) to a priced breakdown.
  * No database, no request: the service loads rules and the centre, then calls `priceItem`.
  *
- * PRD §55: base + location adjustment + add-ons − discount + GST 18 %. All amounts integer paise;
- * a percentage of an amount is rounded half-up to the paisa, and only on the line it produces.
- * The client rounds discount and GST to whole rupees, so its figures can differ from these by under ₹1.
+ * PRD §55: base + location adjustment + add-ons − discount + GST 18 %. All amounts integer paise, rates basis
+ * points. Paise-exact (ADR-007, docs/backend/memory.md): the discount and GST are kept exact (shared/lib/money.js)
+ * and the only rounding is the final total; the discount / taxable / GST lines are then allocated from that total
+ * so they always add up to it. The client rounds discount and GST to whole rupees per step, so its figures can
+ * differ from these by under ₹1.
  */
 import { badRequest, conflict } from '../../shared/errors/AppError.js';
+import { exactBps, roundToPaise, toExact } from '../../shared/lib/money.js';
 import { BASIS_POINTS } from './pricing.constants.js';
-
-/** `bp` basis points of `amount` paise, rounded half-up to the paisa. */
-export function percentOf(amount, bp) {
-  return Math.round((amount * bp) / BASIS_POINTS);
-}
 
 const line = (code, label, quantity, unitPaise) => ({
   code,
@@ -22,20 +20,36 @@ const line = (code, label, quantity, unitPaise) => ({
   amount_paise: unitPaise * quantity,
 });
 
-/** Shared tail: subtotal → discount → GST on top (or, for tax-inclusive prices, GST carved out of the total). */
+/**
+ * The taxable value inside a GST-inclusive total, rounded half-up: total × 10 000 / (10 000 + rate). It is an
+ * allocation of the already-rounded total, not a step towards it.
+ */
+function taxableWithin(totalPaise, gstBp) {
+  return roundToPaise((toExact(totalPaise) * BigInt(BASIS_POINTS)) / BigInt(BASIS_POINTS + gstBp));
+}
+
+/**
+ * Shared tail: subtotal → discount → GST on top (or, for tax-inclusive prices, GST carved out of the total).
+ * Exact until the total, which is rounded once (ADR-007). Lines are then allocated from it: discount =
+ * subtotal − rounded net, and GST = total − taxable, so subtotal − discount + GST (or taxable + GST) = total exactly.
+ */
 function summarise({ lines, discountBp = 0, discountLabel = null, gstBp, taxInclusive = false }) {
   const subtotal = lines.reduce((sum, l) => sum + l.amount_paise, 0);
-  const discount = percentOf(subtotal, discountBp);
-  const net = subtotal - discount;
-  const gst = taxInclusive ? net - Math.round((net * BASIS_POINTS) / (BASIS_POINTS + gstBp)) : percentOf(net, gstBp);
+  const exactNet = toExact(subtotal) - exactBps(toExact(subtotal), discountBp);
+  const total = roundToPaise(taxInclusive ? exactNet : exactNet + exactBps(exactNet, gstBp));
+
+  const net = taxInclusive ? total : roundToPaise(exactNet);
+  const discount = subtotal - net;
+  const taxable = taxInclusive ? taxableWithin(total, gstBp) : net;
+  const gst = total - taxable;
   return {
     currency: 'INR',
     lines,
     subtotal_paise: subtotal,
     discount: discount > 0 ? { label: discountLabel, rate_bp: discountBp, amount_paise: discount } : null,
-    taxable_paise: taxInclusive ? net - gst : net,
+    taxable_paise: taxable,
     gst: { rate_bp: gstBp, amount_paise: gst, inclusive: taxInclusive },
-    total_paise: taxInclusive ? net : net + gst,
+    total_paise: total,
   };
 }
 
@@ -122,7 +136,10 @@ export function priceEnterpriseDesks({ desks, months }, rules, gstBp) {
     label: `Enterprise Bulk (${desks} Desks)`,
     tenure: `${months} Month${months === 1 ? '' : 's'}`,
     // What one desk costs per month after the rebate, for the "/ seat / mo" figure.
-    rate_month_paise: rules.desk_month_paise - percentOf(rules.desk_month_paise, tier?.discount_bp ?? 0),
+    // A figure of its own (not part of the total), so it gets its own single rounding.
+    rate_month_paise: roundToPaise(
+      toExact(rules.desk_month_paise) - exactBps(toExact(rules.desk_month_paise), tier?.discount_bp ?? 0),
+    ),
     ...priced,
   };
 }

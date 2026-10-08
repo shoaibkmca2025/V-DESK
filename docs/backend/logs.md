@@ -94,6 +94,7 @@ Channels: PagerDuty (P1), Slack `#vdesk-ops` (all), weekly digest email.
 
 | Date | Version | Change | Author |
 |---|---|---|---|
+| 2026-10-08 | 0.1.0 | `pricing` rounding aligned with ADR-007: discount and GST kept exact (`shared/lib/money.js`), one rounding at the total, lines allocated from it. No change for whole-rupee prices; ±1 paisa possible on odd-paise overrides. Stored quotes unaffected. | — |
 | 2026-10-08 | 0.1.0 | `pricing` module: public `POST /pricing/quote-preview` (virtual office, meeting room, enterprise desks, bundle — paise + basis points), `POST /pricing/quotes` (Idempotency-Key, frozen breakdown, 14-day validity), share-link `GET /quotes/:ref` + `PATCH /quotes/:ref/status`; staff quote list and rule overrides (`/rules`). Logs `quote.*` / `pricing.rule_*` with refs, product types and totals only. | — |
 | 2026-10-08 | 0.1.0 | `analytics` module: public `POST /analytics/events` (batch ≤ 50, sendBeacon text/plain, dedupe, server-side PII stripping, 13-month TTL); staff `GET /events`, `/kpis`, `/funnel`. Individual events are not logged. | — |
 | 2026-10-08 | 0.1.0 | `identity` module: staff sign-in with mandatory TOTP MFA, 15-min JWT + rotating refresh cookie, lockout, staff user management, permission map; crm/search staff routes accept Bearer tokens (x-admin-key kept for the switch-over). Shared per-IP `rateLimit` (sign-in, refresh, `POST /leads`, analytics, pricing). Logs `auth.*` / `user.*` with user refs only. New env: `JWT_SECRET`, `MFA_ENCRYPTION_KEY`, `TRUST_PROXY`. | — |

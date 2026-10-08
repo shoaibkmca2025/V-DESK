@@ -22,6 +22,7 @@ starting any backend work; append to it whenever a decision is made. Newest entr
 | ADR-004 | 2026-09-15 | Money stored as integer paise; GST computed at final line | Avoid float drift on invoices | planned |
 | ADR-005 | 2026-09-15 | Domain events via transactional outbox, not direct queue publish | Payment/booking events must never be lost | planned |
 | ADR-006 | 2026-09-15 | API field names mirror existing `src/features/*` objects | Switch-over is transport-only; no client data-model rewrite | planned |
+| ADR-007 | 2026-10-08 | Pricing is paise-exact: intermediate amounts (discounts, GST) are kept exact and rounded **once, at the final total**; the API does **not** copy the client's per-step rupee rounding | Owner-approved; rules.md §13 and invoice reconciliation to the paisa. Totals can differ from today's client by under ₹1 (e.g. Nashik annual VO + GST + mail: client ₹21,501, API ₹21,500.54); the frontend shows API totals at switch-over | active |
 
 ## 3. Frontend integration points (what the backend must satisfy)
 
@@ -113,7 +114,8 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
   - **analytics:** regular collection, not time-series (unique dedupe key needed for safe retries); 13-month TTL; KPIs
     and funnel aggregated on read, no `kpi_daily` yet; funnel counts events (no client session id). PII stripped and
     masked server-side. Lead and revenue KPIs stay with crm / orders, not client-reported events.
-  - **pricing:** money in paise, rates in basis points; percentages rounded half-up to the paisa on their own line, so
+  - **pricing:** money in paise, rates in basis points; paise-exact per ADR-007 (discount and GST kept exact via
+    `shared/lib/money.js`, one half-up rounding at the total, lines allocated from it so they reconcile), so
     figures can differ from the client's whole-rupee rounding by < ₹1 — the client shows API figures after
     switch-over. Defaults in code mirror the frontend (drift test reads `frontend/src`); staff overrides replace a
     whole rule key. Products: virtual office (annual 20 % applies to the whole subtotal incl. incorporation, as the
@@ -123,3 +125,9 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
     `VDQ-` refs (the client's `VDQ-YYYY-NNNN` is guessable and the link shows name + company), `Idempotency-Key`
     required, line items embedded and frozen, 14-day validity with expiry read-time (no job yet), customer may
     VIEW/ACCEPT/REJECT via the link. PDF deferred until the job queue exists.
+- **2026-10-08 (integration)** — a parallel local pricing build (`backup/pricing-quote-preview`, rule-per-document
+  model, VO only) was superseded by the more complete remote module; only `shared/lib/money.js` (+ tests) and ADR-007 were
+  kept. The remote engine originally rounded discount and GST on their own lines; `summarise()` now follows ADR-007:
+  exact net and GST, one rounding at the total; discount = subtotal − rounded net, GST = total − taxable (GST-inclusive
+  bundle: taxable carved out of the rounded total). Totals for today's whole-rupee prices are unchanged; odd-paise
+  rule overrides can differ from per-line rounding by ±1 paisa. Quotes already stored keep their frozen breakdown.
