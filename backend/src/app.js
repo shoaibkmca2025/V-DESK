@@ -10,6 +10,7 @@ import { requestId } from './shared/middleware/requestId.js';
 /** Builds the Express app without starting it, so tests can drive it with supertest. */
 export function createApp() {
   const app = express();
+  if (env.TRUST_PROXY > 0) app.set('trust proxy', env.TRUST_PROXY);
 
   app.use(requestId);
   app.use(httpLogger);

@@ -3,8 +3,8 @@
  * Each route = path + middleware (validate, auth) + one controller function. No logic here.
  */
 import { Router } from 'express';
-import { requireAdminKey } from '../../shared/middleware/requireAdminKey.js';
 import { validate } from '../../shared/middleware/validate.js';
+import { requireStaff } from '../identity/index.js';
 import * as controller from './search.controller.js';
 import {
   configKeyParams,
@@ -25,9 +25,9 @@ searchRouter.get('/', validate({ query: searchQuery }), controller.search);
 searchRouter.get('/suggest', validate({ query: suggestQuery }), controller.suggest);
 searchRouter.get('/popular', controller.popular);
 
-// ── Staff (x-admin-key until identity ships JWT + RBAC) ──
+// ── Staff (Bearer token with search:manage, or x-admin-key during the switch-over) ──
 const admin = Router();
-admin.use(requireAdminKey);
+admin.use(requireStaff('search:manage'));
 
 admin.get('/synonyms', controller.listSynonyms);
 
