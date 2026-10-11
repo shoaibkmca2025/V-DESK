@@ -695,3 +695,68 @@ describe('idempotency while the original is in flight (review F5)', () => {
     await expect(hold({}, 'doomed')).rejects.toMatchObject({ code: 'SLOT_UNAVAILABLE' });
   });
 });
+
+// ── Crash after the booking insert, before its slots (accepted limitation) ─────────────
+
+/**
+ * Simulates the process dying while a hold reserves its hours: the slot insert fails after `inserted` hours and the
+ * rollback dies too, leaving a HELD booking (holding the Idempotency-Key) with incomplete slots.
+ */
+async function crashMidHold(key, inserted, overrides) {
+  const realInsert = BookingSlot.insertMany.bind(BookingSlot);
+  vi.spyOn(BookingSlot, 'insertMany').mockImplementationOnce(async (docs) => {
+    if (inserted > 0) await realInsert(docs.slice(0, inserted));
+    throw new Error('process crashed');
+  });
+  vi.spyOn(BookingSlot, 'deleteMany').mockRejectedValueOnce(new Error('process crashed'));
+  await expect(hold(overrides, key)).rejects.toThrow('process crashed');
+  vi.restoreAllMocks();
+  return Booking.findOne({ idempotencyKey: key }).lean();
+}
+
+describe('a hold whose process died before reserving its hours', () => {
+  it('answers IDEMPOTENCY_KEY_IN_PROGRESS with the worst-case wait until it lapses, then replays EXPIRED for good', async () => {
+    const stuck = await crashMidHold('stuck-key', 1);
+    expect(stuck.status).toBe('HELD');
+    expect(await BookingSlot.countDocuments({ bookingRef: stuck.ref })).toBe(1);
+
+    for (const at of [later(1), later(HOLD_SECONDS - 1)]) {
+      await expect(hold({}, 'stuck-key', at)).rejects.toMatchObject({
+        status: 409,
+        code: 'IDEMPOTENCY_KEY_IN_PROGRESS',
+        details: { expiresAt: later(HOLD_SECONDS) },
+      });
+    }
+    for (const at of [later(HOLD_SECONDS), later(86_400)]) {
+      const replay = await hold({}, 'stuck-key', at);
+      expect(replay).toMatchObject({ created: false, booking: { ref: stuck.ref, status: 'EXPIRED' } });
+    }
+    expect(await Booking.countDocuments()).toBe(1);
+  });
+
+  it('blocks only the hours it inserted, and only until it lapses; a new key never duplicates it', async () => {
+    const stuck = await crashMidHold('stuck-key', 1); // holds 14:00, not 15:00
+    const retry = { customer: { name: 'Priya Kulkarni', mobile: '9876543210' } };
+    expect(await takenAt(TOMORROW, later(1))).toEqual(['14:00']);
+    await expect(hold(retry, 'fresh-key', later(1))).rejects.toMatchObject({ code: 'SLOT_UNAVAILABLE' });
+
+    const fresh = await hold(retry, 'fresh-key', later(HOLD_SECONDS));
+    expect(fresh.created).toBe(true);
+    expect(await assertConsistent(stuck.ref)).toBe('EXPIRED');
+    expect(await assertConsistent(fresh.booking.ref)).toBe('HELD');
+    expect(await Booking.countDocuments({ status: 'HELD' })).toBe(1);
+  });
+
+  it('blocks nothing when it died before inserting any hour', async () => {
+    const stuck = await crashMidHold('stuck-key', 0);
+    expect(await takenAt(TOMORROW, later(1))).toEqual([]);
+    const fresh = await hold({}, 'fresh-key', later(1));
+    expect(fresh.created).toBe(true);
+    expect(await slotHours(fresh.booking.ref)).toEqual([14, 15]);
+    // The stuck one can never be confirmed into a booking without hours.
+    await expect(service.confirmBooking(stuck.ref, 'USR-OPS', later(2))).rejects.toMatchObject({
+      code: 'SLOT_UNAVAILABLE',
+    });
+    expect(await assertConsistent(stuck.ref)).toBe('CANCELLED');
+  });
+});

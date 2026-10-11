@@ -153,3 +153,10 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
   status change and the slot clean-up cannot block hours forever. A replayed Idempotency-Key whose original is still
   reserving gets `409 IDEMPOTENCY_KEY_IN_PROGRESS` instead of a ref that might be rolled back. Acting on a lapsed hold
   always answers `HOLD_EXPIRED`.
+- **2026-10-11 (review 2)** — accepted limitation, not fixed: if the process dies after saving a hold's booking but
+  before reserving all its hours (and before rollback), replays of that Idempotency-Key get `409
+  IDEMPOTENCY_KEY_IN_PROGRESS` until the hold lapses (≤ 600 s; `details.expiresAt` now says when), then replay as
+  `EXPIRED` permanently. No duplicates are possible and the hours it inserted are blocked only for that window. Early
+  takeover/cleanup was rejected: a crashed request is indistinguishable from a slow one (e.g. a Mongo failover), and
+  taking over risks two writers on one booking's slots or two answers for one key. Revisit if real traffic shows it
+  (e.g. with multi-document transactions on Atlas, which would make the hold atomic and remove the state entirely).

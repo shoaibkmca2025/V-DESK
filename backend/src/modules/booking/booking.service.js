@@ -183,12 +183,18 @@ async function findReplay(idempotencyKey, requestHash) {
  * The answer to a replayed Idempotency-Key. While the original request is still reserving its hours (or died
  * part-way), the hold is not real yet, so the replay is told to retry rather than handed a ref that may be rolled
  * back a moment later.
+ *
+ * A live original finishes in milliseconds; one that crashed leaves this state until the hold's `expiresAt`, after
+ * which the key replays as EXPIRED for good. The replay deliberately does not take over or cancel the stuck hold:
+ * a crashed request can't be told apart from a slow one, and taking over would let two writers race on the same
+ * booking's slots or give one key two answers. `expiresAt` in the details is the worst-case wait.
  */
 async function replayOf(existing, now) {
   if (effectiveStatus(existing, now) === 'HELD' && (await repo.countSlots(existing.ref)) < existing.duration) {
     throw conflict(
       'IDEMPOTENCY_KEY_IN_PROGRESS',
       'A request with this Idempotency-Key is still being processed. Please retry in a moment.',
+      { expiresAt: existing.expiresAt },
     );
   }
   return { booking: mapBooking(existing, now), created: false };

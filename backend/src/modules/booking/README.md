@@ -65,8 +65,16 @@ breakdown (paise, ADR-007), frozen at hold time.
   saves `EXPIRED` and always answers `409 HOLD_EXPIRED`.
 - **Idempotency** (rules.md §10): `Idempotency-Key` is required. Same key + same body → `200` with the original
   booking (no new booking or slots); different body → `409 IDEMPOTENCY_KEY_REUSED`; while the original request is
-  still reserving its hours → `409 IDEMPOTENCY_KEY_IN_PROGRESS` (retry shortly) — a replay is never handed a ref
-  that could still be rolled back. A hold refused for a clash can be retried with the same key.
+  still reserving its hours → `409 IDEMPOTENCY_KEY_IN_PROGRESS` with `details.expiresAt` (retry shortly) — a replay
+  is never handed a ref that could still be rolled back. A hold refused for a clash can be retried with the same key.
+- **A hold whose process died mid-way** (booking saved, hours not all reserved, rollback never ran) is a known,
+  accepted state. Replays of its key answer `409 IDEMPOTENCY_KEY_IN_PROGRESS` until its `expiresAt` (at most
+  600 s after it was created — the value in `details`), then `200` with that booking as `EXPIRED`, for good. Meanwhile
+  it blocks only the hours it had inserted, like any hold, and counts towards the mobile's hold cap; a new key can
+  book any other hours at once and those hours after the lapse; staff cannot confirm it (it lacks hours → cancelled).
+  It is not taken over or cleaned up early because a crashed request can't be told apart from a slow one: taking
+  over would let two writers race on the same booking's slots (one's clash-rollback deleting the other's) or give one
+  key two different answers. A bounded, self-healing wait is the safer trade at this stage.
 - **Abuse limits:** per-IP limits (10 holds/min, 120 availability reads/min, 60 ref reads/min) and at most 3
   unexpired holds per mobile (`429 TOO_MANY_HOLDS`).
 - **Statuses** (`BOOKING_TRANSITIONS`): `HELD → CONFIRMED | CANCELLED | EXPIRED`, `CONFIRMED → CHECKED_IN | CANCELLED`,

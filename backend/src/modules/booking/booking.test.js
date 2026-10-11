@@ -128,6 +128,23 @@ describe('POST /api/v1/bookings/hold', () => {
     expect(await Booking.countDocuments()).toBe(1);
   });
 
+  it('answers a replay of a hold that died mid-way with a retryable 409 and its worst-case wait', async () => {
+    vi.spyOn(BookingSlot, 'insertMany').mockRejectedValueOnce(new Error('process crashed'));
+    vi.spyOn(BookingSlot, 'deleteMany').mockRejectedValueOnce(new Error('process crashed'));
+    expect((await postHold(holdRequest(), 'crash-key')).status).toBe(500);
+    vi.restoreAllMocks();
+
+    const replay = await postHold(holdRequest(), 'crash-key');
+    expect(replay.status).toBe(409);
+    expect(replay.body.error).toMatchObject({
+      code: 'IDEMPOTENCY_KEY_IN_PROGRESS',
+      details: { expiresAt: expect.any(String) },
+    });
+    const stuck = await Booking.findOne({ idempotencyKey: 'crash-key' }).lean();
+    expect(new Date(replay.body.error.details.expiresAt)).toEqual(stuck.expiresAt);
+    expect(JSON.stringify(replay.body)).not.toContain(stuck.ref);
+  });
+
   it('rejects invalid input with VALIDATION_FAILED', async () => {
     for (const bad of [
       { duration: 0 },
