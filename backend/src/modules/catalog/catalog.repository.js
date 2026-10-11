@@ -64,6 +64,80 @@ export async function findWorkspaceByRef(ref) {
   return Workspace.findOne({ ref, active: true, deletedAt: null }).lean();
 }
 
+// ──────────────────────────────────────────────
+// Staff — see inactive records too, never deleted ones
+// ──────────────────────────────────────────────
+
+const DUPLICATE_KEY = 11000;
+const MODELS = { city: City, centre: Centre, workspace: Workspace };
+const notDeleted = { deletedAt: null };
+
+export async function findCitiesForStaff() {
+  return City.find(notDeleted).sort({ name: 1 }).lean();
+}
+
+export async function findCentresForStaff({ cityRef } = {}) {
+  return Centre.find({ ...notDeleted, ...(cityRef && { cityRef }) })
+    .sort({ cityRef: 1, ref: 1 })
+    .lean();
+}
+
+export async function findWorkspacesForStaff({ centreRef } = {}) {
+  return Workspace.find({ ...notDeleted, ...(centreRef && { centreRef }) })
+    .sort({ centreRef: 1, ref: 1 })
+    .lean();
+}
+
+/** Active or not, as long as it isn't deleted. */
+export async function findForStaff(kind, filter) {
+  return MODELS[kind].findOne({ ...filter, ...notDeleted }).lean();
+}
+
+/** Inserts and returns the document, or null when a unique field (ref, slug) is already taken. */
+export async function insertDoc(kind, data) {
+  try {
+    const doc = await MODELS[kind].create(data);
+    return doc.toObject();
+  } catch (err) {
+    if (err.code === DUPLICATE_KEY) return null;
+    throw err;
+  }
+}
+
+export async function updateDoc(kind, ref, set) {
+  return MODELS[kind].findOneAndUpdate({ ref, ...notDeleted }, { $set: set }, { returnDocument: 'after' }).lean();
+}
+
+export async function softDelete(kind, ref, now) {
+  const res = await MODELS[kind].updateOne({ ref, ...notDeleted }, { $set: { deletedAt: now, active: false } });
+  return res.modifiedCount === 1;
+}
+
+export async function countCentresInCity(cityRef) {
+  return Centre.countDocuments({ cityRef, ...notDeleted });
+}
+
+export async function countWorkspacesInCentre(centreRef) {
+  return Workspace.countDocuments({ centreRef, ...notDeleted });
+}
+
+/**
+ * Highest number used after `prefix-` (e.g. CTR-NSK → 2 for CTR-NSK-002), deleted records included, so a
+ * deleted ref is never handed out again. Catalog collections are small, so reading the refs is cheap.
+ */
+export async function highestRefNumber(kind, prefix) {
+  const pattern = new RegExp(`^${escapeRegex(prefix)}-(\\d+)$`);
+  const docs = await MODELS[kind].find({ ref: pattern }).select({ ref: 1 }).lean();
+  return docs.reduce((max, { ref }) => Math.max(max, Number(ref.match(pattern)[1])), 0);
+}
+
+/** Centres and workspaces copy the city name for fast filtering; a rename has to reach them too. */
+export async function renameCityInChildren(cityRef, name) {
+  await Centre.updateMany({ cityRef }, { $set: { city: name } });
+  const centreRefs = await Centre.distinct('ref', { cityRef });
+  await Workspace.updateMany({ centreRef: { $in: centreRefs } }, { $set: { city: name } });
+}
+
 function escapeRegex(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
