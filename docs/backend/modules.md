@@ -104,6 +104,7 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 - **Collections:** `orders`, `payments`, `invoices`, `refunds`
 - **HTTP:** `POST /orders` (from quote/booking), `POST /payments/intent` (creates gateway order), `POST /webhooks/razorpay` (signature-verified, idempotent), `GET /invoices/:no`, `GET /invoices/:no/pdf`
 - **Invoice:** sequential per financial year (`INV-2026-27-000123`), CGST/SGST or IGST by place of supply, GSTIN on record
+- *Built so far: the order foundation only — `POST /orders` (from an ACCEPTED quote or HELD booking, Idempotency-Key, one open order per source), `GET /orders/:ref`, `POST /orders/:ref/cancel`, staff `GET /orders`; collection `orders`. Payments, invoices and refunds are blocked on the open questions in memory.md §6. See `backend/src/modules/orders/README.md`.*
 - **Events:** `payment.succeeded`, `payment.failed`, `invoice.issued`, `refund.processed`
 - **Frontend:** `checkout/checkout.js`, `checkout/taxInvoice.js`
 

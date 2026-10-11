@@ -174,3 +174,16 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
     `TURNSTILE_SECRET_KEY` is set and the website sends tokens**; it fails closed (503) if Cloudflare is down.
   - Still blocked: quote PDF + expiry job (job queue), catalog images (storage), lead → customer conversion
     (customer accounts), GA4 forwarding (owner's GA4 keys).
+- **2026-10-11** — `orders` foundation built; **payments and invoices deliberately not built** — the provider
+  ("Razorpay vs Cashfree, merchant account") and "GSTIN and invoice series format" are still open (§6), no credentials
+  exist, and an invoice follows a payment. Doc conflicts noted, not resolved: modules.md gives the series
+  `INV-2026-27-000123` while §6 says the format is unconfirmed; the frontend invoice shows GSTIN `27AAYFV9842K1Z5` /
+  SAC `997212`, which are treated as unconfirmed like the other placeholders (§5). **No order lifecycle was
+  documented**, so the minimum was used — `PENDING_PAYMENT → PAID | CANCELLED | EXPIRED` — **confirm with the owner**.
+  Other choices to confirm: quotes must be ACCEPTED (the customer accepts on the share link first) and still within
+  `validUntil`; bookings must be HELD; an open booking order expires with the hold and is cancelled by the system if
+  the booking is cancelled, expires or is confirmed by staff (paid offline). Orders store no customer details (the
+  source holds them) and write only to `orders`, so no cross-module compensation exists. One open order per source
+  (partial unique index); a second attempt gets 409 `ORDER_ALREADY_OPEN` with the open order's ref. `orders:read`
+  → OPS_ADMIN, SALES_MANAGER, FINANCE. When payments land, the payment intent must re-check the source (the hold
+  is only 10 min) and booking needs its `PAYMENT_PENDING` state.
