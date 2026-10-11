@@ -131,3 +131,17 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
   exact net and GST, one rounding at the total; discount = subtotal − rounded net, GST = total − taxable (GST-inclusive
   bundle: taxable carved out of the rounded total). Totals for today's whole-rupee prices are unchanged; odd-paise
   rule overrides can differ from per-line rounding by ±1 paisa. Quotes already stored keep their frozen breakdown.
+- **2026-10-11** — gaps filled in finished modules:
+  - **catalog staff endpoints** (`/catalog/admin/*`, new `catalog:manage` → OPS_ADMIN): refs continue the seeded
+    numbering per city/centre code (`CTR-NSK-003`, `WS-MUM-004`) and are never reused (deleted ones count); new city
+    refs are `CITY-<SLUG>` (not a 3-letter code). A centre's city and a workspace's centre are fixed at creation;
+    renaming a city rewrites the copied `city` name on its centres and workspaces. `active:false` = hidden from the
+    public API; DELETE = soft delete, refused while children exist. Image upload waits for the storage integration.
+  - **crm:** CSV export behind a new `leads:export` permission (SALES_MANAGER only — bulk contact data); formula
+    injection guarded, UTF-8 BOM for Excel, each export logged. UTM attribution stored as `attribution.firstTouch /
+    lastTouch` on the lead (no separate `campaigns` collection yet); referrer/landing URLs stored without query
+    strings. Per-contact limit 3 / hour per mobile (last 10 digits) or email — also protects strangers from being
+    spammed once notifications send WhatsApp confirmations. Turnstile CAPTCHA is wired but **off until
+    `TURNSTILE_SECRET_KEY` is set and the website sends tokens**; it fails closed (503) if Cloudflare is down.
+  - Still blocked: quote PDF + expiry job (job queue), catalog images (storage), lead → customer conversion
+    (customer accounts), GA4 forwarding (owner's GA4 keys).

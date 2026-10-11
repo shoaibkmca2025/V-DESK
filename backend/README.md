@@ -131,14 +131,15 @@ Add these when a module needs them:
 
 ## Environment variables
 
-| Name                 | Default                           | Purpose                                                                              |
-| -------------------- | --------------------------------- | ------------------------------------------------------------------------------------ |
-| `NODE_ENV`           | `development`                     | `development` / `test` / `production`                                                |
-| `PORT`               | `5000`                            | HTTP port                                                                            |
-| `MONGODB_URI`        | `mongodb://127.0.0.1:27017/vdesk` | MongoDB connection string (Atlas in staging/production)                              |
-| `CORS_ORIGINS`       | `http://localhost:5173`           | comma-separated frontend URLs allowed to call the API                                |
-| `LOG_LEVEL`          | `info`                            | `fatal` … `trace`, or `silent`                                                       |
-| `ADMIN_API_KEY`      | _(unset)_                         | temporary staff key (`x-admin-key` header), ≥ 16 chars; unset → staff endpoints 503  |
-| `JWT_SECRET`         | _(unset)_                         | signs staff access tokens, ≥ 32 chars; unset → `/auth` answers 503                   |
-| `MFA_ENCRYPTION_KEY` | _(unset)_                         | encrypts staff TOTP secrets at rest, ≥ 32 chars; keep it separate from `JWT_SECRET`  |
-| `TRUST_PROXY`        | `0`                               | proxies in front of the API (e.g. `1` behind Cloudflare) so rate limits see real IPs |
+| Name                   | Default                           | Purpose                                                                                   |
+| ---------------------- | --------------------------------- | ----------------------------------------------------------------------------------------- |
+| `NODE_ENV`             | `development`                     | `development` / `test` / `production`                                                     |
+| `PORT`                 | `5000`                            | HTTP port                                                                                 |
+| `MONGODB_URI`          | `mongodb://127.0.0.1:27017/vdesk` | MongoDB connection string (Atlas in staging/production)                                   |
+| `CORS_ORIGINS`         | `http://localhost:5173`           | comma-separated frontend URLs allowed to call the API                                     |
+| `LOG_LEVEL`            | `info`                            | `fatal` … `trace`, or `silent`                                                            |
+| `ADMIN_API_KEY`        | _(unset)_                         | temporary staff key (`x-admin-key` header), ≥ 16 chars; unset → staff endpoints 503       |
+| `JWT_SECRET`           | _(unset)_                         | signs staff access tokens, ≥ 32 chars; unset → `/auth` answers 503                        |
+| `MFA_ENCRYPTION_KEY`   | _(unset)_                         | encrypts staff TOTP secrets at rest, ≥ 32 chars; keep it separate from `JWT_SECRET`       |
+| `TRUST_PROXY`          | `0`                               | proxies in front of the API (e.g. `1` behind Cloudflare) so rate limits see real IPs      |
+| `TURNSTILE_SECRET_KEY` | _(unset)_                         | Cloudflare Turnstile secret; set → `POST /leads` needs a CAPTCHA token, unset → check off |
