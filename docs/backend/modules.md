@@ -94,9 +94,9 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 - **Frontend:** `crm/leadStore.js`, `leads/leadForms.js`, `admin/*`
 
 ### 3.6 `booking` — meeting rooms & workspaces
-- **Collections:** `bookings`, `availability_slots`, `holds`
-- **State machine (PRD §35):** available → hold (TTL 10 min, Redis lock) → payment_pending → confirmed → checked_in → completed; cancellation: requested → approved → refunded
-- **HTTP:** `GET /availability?workspaceId=&date=`, `POST /bookings/hold`, `POST /bookings/:ref/confirm`, `POST /bookings/:ref/cancel`, `GET /bookings/:ref/pass` (QR)
+- **Collections:** `bookings`, `availability_slots`, `holds` — *built as `bookings` + `booking_slots` (one document per reserved room-hour, unique on centre + room + date + hour; TTL on hold expiry). See `backend/src/modules/booking/README.md`.*
+- **State machine (PRD §35):** available → hold (TTL 10 min, Redis lock) → payment_pending → confirmed → checked_in → completed; cancellation: requested → approved → refunded — *built: HELD → CONFIRMED (staff) → CHECKED_IN → COMPLETED, HELD/CONFIRMED → CANCELLED, HELD → EXPIRED; no Redis (DB unique index); payment_pending and refunds wait for orders*
+- **HTTP:** `GET /availability?workspaceId=&date=`, `POST /bookings/hold`, `POST /bookings/:ref/confirm`, `POST /bookings/:ref/cancel`, `GET /bookings/:ref/pass` (QR) — *built with `?centreRef=&room=&date=` (room format, as pricing), plus `GET /bookings/:ref`, staff `GET /bookings` and `PATCH /bookings/:ref/status`*
 - **Events:** `booking.held`, `booking.hold_expired` (delayed job), `booking.confirmed`, `booking.cancelled`
 - **Frontend:** `meetingRooms/roomBooking.js`
 

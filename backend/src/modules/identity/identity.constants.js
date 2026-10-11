@@ -27,6 +27,8 @@ export const PERMISSIONS = Object.freeze({
   'analytics:read': ['OPS_ADMIN', 'SALES_MANAGER', 'FINANCE'],
   'pricing:manage': ['FINANCE'],
   'quotes:read': ['OPS_ADMIN', 'SALES_MANAGER', 'SALES_EXEC', 'FINANCE'],
+  'bookings:read': ['OPS_ADMIN', 'SALES_MANAGER'],
+  'bookings:write': ['OPS_ADMIN'],
 });
 
 /** Short-lived access token (rules.md §19). */

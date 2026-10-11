@@ -1,4 +1,381 @@
 /**
- * Booking service — business rules. Gets and saves data through booking.repository.js.
- * Never uses `req`/`res` or Mongoose directly, so it can be unit-tested and reused by background jobs.
+ * Booking service — meeting-room availability, 10-minute holds, confirmation, cancellation and passes
+ * (PRD §34–35).
+ *
+ * Rules (docs/backend/rules.md):
+ *  - Rooms are booked by catalog centre + room format name from pricing's `meeting_room` rule, in whole hours
+ *    from 09:00 to 20:00 Asia/Kolkata, never in the past and at most MAX_ADVANCE_DAYS ahead.
+ *  - The price comes from the pricing engine and is frozen on the booking at hold time; the client never sends one.
+ *  - Overlaps are stopped by the unique (centre, room, date, hour) index on booking_slots. A hold inserts its
+ *    booking first (claiming the Idempotency-Key), then its hours in order; if any hour is taken it removes the
+ *    hours it inserted and the booking, and answers 409 SLOT_UNAVAILABLE. This compensating rollback works on any
+ *    MongoDB deployment (the test and local servers are standalone, so multi-document transactions are not
+ *    available); confirmation re-checks that the booking still owns every hour, so a crash mid-hold can never
+ *    produce a confirmed booking without its slots.
+ *  - Holds last HOLD_SECONDS. A lapsed hold reads as EXPIRED at once and its hours are free: they are cleared
+ *    before the next insert on them, and a TTL index removes them in the background.
+ *  - Confirmation is staff-only until the orders module confirms on a verified payment. Nothing here records or
+ *    implies that a payment happened.
+ *  - Status moves follow BOOKING_TRANSITIONS (§5); illegal moves are 409 INVALID_STATUS_TRANSITION.
+ *  - Logs carry booking refs, centre refs, room names and totals — never names, mobiles or emails (§21).
  */
+import { createHash } from 'node:crypto';
+import { AppError, badRequest, conflict, notFound } from '../../shared/errors/AppError.js';
+import { logger } from '../../shared/lib/logger.js';
+import { decodeCursor, toPage } from '../../shared/lib/pagination.js';
+import { generateRef } from '../../shared/lib/refs.js';
+import { getCentre } from '../catalog/index.js';
+import { getEffectiveRules, priceItem } from '../pricing/index.js';
+import {
+  BOOKING_TRANSITIONS,
+  CLOSING_HOUR,
+  HOLD_SECONDS,
+  MAX_ACTIVE_HOLDS_PER_MOBILE,
+  MAX_ADVANCE_DAYS,
+  OPENING_HOUR,
+  PASS_STATUSES,
+} from './booking.constants.js';
+import { effectiveStatus, mapBooking, mapBookingForStaff, mapPass } from './booking.mapper.js';
+import * as repo from './booking.repository.js';
+import { addDays, formatSlot, formatTime, istDate, istInstant } from './booking.time.js';
+
+const log = logger.child({ module: 'booking' });
+
+// ──────────────────────────────────────────────
+// Rooms and schedule
+// ──────────────────────────────────────────────
+
+/** The centre and room format a booking is for; 404 / 409 / 400 when either can't be booked. */
+async function resolveRoom(centreRef, roomName) {
+  const [centre, rules] = await Promise.all([getCentre(centreRef), getEffectiveRules()]);
+  if (!(centre.services ?? []).includes('Meeting Rooms') || centre.status === 'unavailable') {
+    throw conflict('ROOMS_NOT_OFFERED', `Centre ${centre.ref} does not take meeting room bookings`);
+  }
+  const room = rules.meeting_room.rooms.find((r) => r.name.toLowerCase() === roomName.toLowerCase());
+  if (!room) {
+    throw badRequest('UNKNOWN_ROOM', `No meeting room format '${roomName}'`, {
+      rooms: rules.meeting_room.rooms.map((r) => r.name),
+    });
+  }
+  return { centre, room, rules };
+}
+
+/** 400 unless `date` is today (IST) or up to MAX_ADVANCE_DAYS ahead. */
+function assertBookableDate(date, now) {
+  const today = istDate(now);
+  const last = addDays(today, MAX_ADVANCE_DAYS);
+  if (date < today || date > last) {
+    throw badRequest('DATE_OUT_OF_RANGE', `Pick a date from ${today} to ${last}`, { from: today, to: last });
+  }
+}
+
+/** 400 unless [startHour, startHour + duration) lies inside opening hours and starts in the future. */
+function assertBookableSlot(date, startHour, duration, now) {
+  if (startHour < OPENING_HOUR || startHour + duration > CLOSING_HOUR) {
+    throw badRequest(
+      'OUTSIDE_OPENING_HOURS',
+      `Rooms can be booked from ${formatTime(OPENING_HOUR)} to ${formatTime(CLOSING_HOUR)}`,
+      { opensAt: formatTime(OPENING_HOUR), closesAt: formatTime(CLOSING_HOUR) },
+    );
+  }
+  if (istInstant(date, startHour) <= now) {
+    throw badRequest('SLOT_IN_PAST', 'That time has already started. Please pick a later slot.');
+  }
+}
+
+/** '8 Pax' → 8; null when the label has no number (no capacity check then). */
+function seatsOf(room) {
+  const match = /\d+/.exec(room.capacity ?? '');
+  return match ? Number(match[0]) : null;
+}
+
+const hoursOf = (startHour, duration) => Array.from({ length: duration }, (_, i) => startHour + i);
+
+// ──────────────────────────────────────────────
+// Availability
+// ──────────────────────────────────────────────
+
+/** Every one-hour slot of one room on one day, with whether it can still be held. */
+export async function getAvailability({ centreRef, room: roomName, date }, now = new Date()) {
+  assertBookableDate(date, now);
+  const { centre, room } = await resolveRoom(centreRef, roomName);
+  const taken = new Set(await repo.findTakenHours({ centreRef: centre.ref, room: room.name, date }, now));
+
+  const slots = hoursOf(OPENING_HOUR, CLOSING_HOUR - OPENING_HOUR).map((hour) => ({
+    startTime: formatTime(hour),
+    endTime: formatTime(hour + 1),
+    slot: formatSlot(hour, 1),
+    available: !taken.has(hour) && istInstant(date, hour) > now,
+  }));
+  return {
+    centreRef: centre.ref,
+    hub: centre.fullName,
+    room: room.name,
+    roomCapacity: room.capacity,
+    rate_hour_paise: room.hour_paise,
+    date,
+    opensAt: formatTime(OPENING_HOUR),
+    closesAt: formatTime(CLOSING_HOUR),
+    slots,
+  };
+}
+
+// ──────────────────────────────────────────────
+// Holds
+// ──────────────────────────────────────────────
+
+const hashRequest = (body) => createHash('sha256').update(JSON.stringify(body)).digest('hex');
+
+async function findReplay(idempotencyKey, requestHash) {
+  const existing = await repo.findBookingByIdempotencyKey(idempotencyKey);
+  if (existing && existing.requestHash !== requestHash) {
+    throw conflict('IDEMPOTENCY_KEY_REUSED', 'This Idempotency-Key was already used for a different booking');
+  }
+  return existing;
+}
+
+/** Inserts the booking's hours; on any failure releases what went in and removes the booking. */
+async function reserveSlots(booking, now) {
+  const hours = hoursOf(booking.startHour, booking.duration);
+  const key = { centreRef: booking.centreRef, room: booking.room, date: booking.date };
+  let reserved = false;
+  try {
+    await repo.deleteExpiredSlots({ ...key, hours }, now);
+    reserved = await repo.insertSlots(
+      hours.map((hour) => ({ ...key, hour, bookingRef: booking.ref, expiresAt: booking.expiresAt })),
+    );
+  } finally {
+    if (!reserved) {
+      await repo.deleteSlotsForBooking(booking.ref);
+      await repo.deleteBooking(booking.ref);
+    }
+  }
+  if (!reserved) {
+    const taken = new Set(await repo.findTakenHours(key, now));
+    throw conflict('SLOT_UNAVAILABLE', 'Some of those hours were just booked. Please pick another slot.', {
+      taken: hours.filter((hour) => taken.has(hour)).map(formatTime),
+    });
+  }
+}
+
+/**
+ * Holds a room for HOLD_SECONDS at the server-computed price.
+ * @returns {Promise<{ booking: object, created: boolean }>} created=false when the key was replayed
+ */
+export async function holdBooking(body, idempotencyKey, now = new Date()) {
+  if (!idempotencyKey) {
+    throw badRequest(
+      'IDEMPOTENCY_KEY_REQUIRED',
+      'Send an Idempotency-Key header (for example a UUID) with each new booking',
+    );
+  }
+  const requestHash = hashRequest(body);
+  const replay = await findReplay(idempotencyKey, requestHash);
+  if (replay) return { booking: mapBooking(replay, now), created: false };
+
+  const { centreRef, date, startHour, duration, attendees, customer } = body;
+  assertBookableDate(date, now);
+  assertBookableSlot(date, startHour, duration, now);
+  const { centre, room, rules } = await resolveRoom(centreRef, body.room);
+  const seats = seatsOf(room);
+  if (seats !== null && attendees > seats) {
+    throw badRequest('ATTENDEES_EXCEED_CAPACITY', `${room.name} seats up to ${seats} people`, { capacity: seats });
+  }
+  if ((await repo.countActiveHolds(customer.mobile, now)) >= MAX_ACTIVE_HOLDS_PER_MOBILE) {
+    throw new AppError(429, 'TOO_MANY_HOLDS', 'You already have rooms on hold. Complete or cancel them first.');
+  }
+
+  const pricing = priceItem({ product: 'meeting_room', room: room.name, hours: duration }, rules);
+
+  const booking = await repo.insertBooking({
+    ref: generateRef('BK', 8),
+    status: 'HELD',
+    centreRef: centre.ref,
+    hub: centre.fullName,
+    room: room.name,
+    roomCapacity: room.capacity,
+    date,
+    startHour,
+    duration,
+    startsAt: istInstant(date, startHour),
+    endsAt: istInstant(date, startHour + duration),
+    attendees,
+    customer: {
+      name: customer.name,
+      company: customer.company ?? '',
+      mobile: customer.mobile,
+      email: customer.email ?? '',
+    },
+    pricing,
+    expiresAt: new Date(now.getTime() + HOLD_SECONDS * 1000),
+    history: [{ status: 'HELD', at: now, actor: 'public' }],
+    idempotencyKey,
+    requestHash,
+  });
+  if (!booking) {
+    // A concurrent request with the same key won the insert; answer as its replay.
+    const winner = await findReplay(idempotencyKey, requestHash);
+    if (winner) return { booking: mapBooking(winner, now), created: false };
+    throw conflict('BOOKING_CONFLICT', 'Could not hold the room. Please try again.');
+  }
+
+  await reserveSlots(booking, now);
+  log.info(
+    {
+      event: 'booking.held',
+      bookingRef: booking.ref,
+      centreRef: booking.centreRef,
+      room: booking.room,
+      duration,
+      total_paise: pricing.total_paise,
+    },
+    'room held',
+  );
+  return { booking: mapBooking(booking, now), created: true };
+}
+
+// ──────────────────────────────────────────────
+// Reading
+// ──────────────────────────────────────────────
+
+async function findBookingOrThrow(ref) {
+  const booking = await repo.findBookingByRef(ref);
+  if (!booking) throw notFound('BOOKING_NOT_FOUND', `No booking found for ref '${ref}'`);
+  return booking;
+}
+
+export async function getBooking(ref, now = new Date()) {
+  return mapBooking(await findBookingOrThrow(ref), now);
+}
+
+/** The visitor pass — only for a confirmed (or checked-in) booking. */
+export async function getPass(ref) {
+  const booking = await findBookingOrThrow(ref);
+  if (!PASS_STATUSES.includes(booking.status)) {
+    throw conflict('PASS_NOT_AVAILABLE', 'A pass is issued once the booking is confirmed', {
+      status: effectiveStatus(booking),
+    });
+  }
+  return mapPass(booking);
+}
+
+/** Staff list, newest first, with contact details and the status timeline. */
+export async function listBookings({ status, centreRef, date, cursor, limit }, now = new Date()) {
+  const after = cursor ? decodeCursor(cursor) : undefined;
+  const { items, nextCursor } = toPage(await repo.findBookings({ status, centreRef, date, after, limit }), limit);
+  return { bookings: items.map((doc) => mapBookingForStaff(doc, now)), nextCursor };
+}
+
+// ──────────────────────────────────────────────
+// Status changes
+// ──────────────────────────────────────────────
+
+/** Saves EXPIRED on a lapsed hold and frees its hours. Safe to repeat. */
+async function persistExpiry(booking, now) {
+  const expired = await repo.updateBookingStatus(booking.ref, 'HELD', 'EXPIRED', {
+    status: 'EXPIRED',
+    at: now,
+    actor: 'system',
+  });
+  // Once EXPIRED a booking can never be confirmed, so every hour it still holds is garbage.
+  if (expired) {
+    await repo.deleteSlotsForBooking(booking.ref);
+    log.info({ event: 'booking.hold_expired', bookingRef: booking.ref }, 'hold expired');
+  }
+}
+
+function assertTransition(from, to) {
+  const allowed = BOOKING_TRANSITIONS[from] ?? [];
+  if (!allowed.includes(to)) {
+    throw conflict('INVALID_STATUS_TRANSITION', `A booking cannot move from ${from} to ${to}`, { from, to, allowed });
+  }
+}
+
+const bookingChanged = () => conflict('BOOKING_CHANGED', 'This booking was just changed. Please reload and try again.');
+const holdExpired = (booking) =>
+  conflict('HOLD_EXPIRED', 'This hold has expired and the room was released. Please hold it again.', {
+    expiresAt: booking.expiresAt,
+  });
+
+/**
+ * Moves a booking to `to` (CANCELLED, CHECKED_IN or COMPLETED), freeing its hours when cancelled.
+ * Repeating the current status is a no-op; a lapsed hold is saved as EXPIRED and refused.
+ */
+async function changeStatus(booking, to, actor, now) {
+  const current = effectiveStatus(booking, now);
+  if (current === to) return booking;
+  if (current === 'EXPIRED' && booking.status === 'HELD') {
+    await persistExpiry(booking, now);
+    throw holdExpired(booking);
+  }
+  assertTransition(current, to);
+
+  const updated = await repo.updateBookingStatus(
+    booking.ref,
+    current,
+    to,
+    { status: to, at: now, actor },
+    current === 'HELD' ? { unexpiredAt: now } : {},
+  );
+  if (!updated) throw bookingChanged();
+  if (to === 'CANCELLED') await repo.deleteSlotsForBooking(booking.ref);
+  log.info(
+    { event: `booking.${to.toLowerCase()}`, bookingRef: booking.ref, from: current, to, actor },
+    'booking status changed',
+  );
+  return updated;
+}
+
+/** Customer cancellation through the booking ref — holds only; a confirmed booking needs staff. */
+export async function cancelHold(ref, now = new Date()) {
+  const booking = await findBookingOrThrow(ref);
+  const current = effectiveStatus(booking, now);
+  if (current !== 'HELD' && current !== 'CANCELLED' && current !== 'EXPIRED') {
+    throw conflict('CANCELLATION_REQUIRES_STAFF', 'Please contact us to cancel a confirmed booking', {
+      status: current,
+    });
+  }
+  return mapBooking(await changeStatus(booking, 'CANCELLED', 'public', now), now);
+}
+
+/** Staff moves: CHECKED_IN, COMPLETED, CANCELLED (no refund is issued — there are no payments yet). */
+export async function setStatusByStaff(ref, to, actor, now = new Date()) {
+  const booking = await findBookingOrThrow(ref);
+  return mapBookingForStaff(await changeStatus(booking, to, actor, now), now);
+}
+
+/**
+ * Staff confirmation of a hold. The booking is claimed first (HELD → CONFIRMED only while unexpired), so two
+ * confirmations or a confirmation racing a cancellation cannot both win; then its hours are made permanent. If any
+ * hour is no longer the booking's (it lapsed in between, or a crash cut the hold short), the system cancels the
+ * booking and frees what is left — a CONFIRMED booking never exists without all its hours.
+ */
+export async function confirmBooking(ref, actor, now = new Date()) {
+  const booking = await findBookingOrThrow(ref);
+  const current = effectiveStatus(booking, now);
+  if (current === 'CONFIRMED') return mapBookingForStaff(booking, now);
+  if (current === 'EXPIRED' && booking.status === 'HELD') {
+    await persistExpiry(booking, now);
+    throw holdExpired(booking);
+  }
+  assertTransition(current, 'CONFIRMED');
+
+  const updated = await repo.updateBookingStatus(
+    ref,
+    'HELD',
+    'CONFIRMED',
+    { status: 'CONFIRMED', at: now, actor },
+    { unexpiredAt: now },
+  );
+  if (!updated) throw bookingChanged();
+
+  const secured = await repo.makeSlotsPermanent(ref, now);
+  if (secured !== booking.duration) {
+    await repo.updateBookingStatus(ref, 'CONFIRMED', 'CANCELLED', { status: 'CANCELLED', at: now, actor: 'system' });
+    await repo.deleteSlotsForBooking(ref);
+    log.warn({ event: 'booking.slots_missing', bookingRef: ref, secured }, 'hold lost some of its hours; cancelled');
+    throw conflict('SLOT_UNAVAILABLE', 'This hold no longer has all its hours. Please hold the room again.');
+  }
+  log.info({ event: 'booking.confirmed', bookingRef: ref, actor }, 'booking confirmed by staff');
+  return mapBookingForStaff(updated, now);
+}

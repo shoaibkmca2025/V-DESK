@@ -131,3 +131,18 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
   exact net and GST, one rounding at the total; discount = subtotal − rounded net, GST = total − taxable (GST-inclusive
   bundle: taxable carved out of the rounded total). Totals for today's whole-rupee prices are unchanged; odd-paise
   rule overrides can differ from per-line rounding by ±1 paisa. Quotes already stored keep their frozen breakdown.
+- **2026-10-11** — `booking` built (meeting rooms only). Decisions (owner-approved): rooms are booked by catalog
+  `centreRef` + room format name from pricing's `meeting_room` rule (not catalog workspaces); one-hour slots
+  09:00–20:00 Asia/Kolkata; confirmation is staff-only (`bookings:write`) until orders confirms on a verified payment —
+  no payment is recorded or implied; guests book with validated contact details (name + Indian mobile required).
+  Implementation choices: **no Redis / job queue** — overlaps are stopped by a unique index on `booking_slots`
+  (centre, room, date, hour), one document per hour; a hold inserts the booking (claims the Idempotency-Key) then its
+  hours, and on a clash or error deletes what it inserted (compensating rollback; local/test Mongo is standalone, so
+  no transactions). Expiry is read-time plus a TTL index; lapsed hold slots are also deleted before each insert so
+  they never block. Confirm claims the booking (HELD → CONFIRMED while unexpired) before making slots permanent; a
+  hold missing any hour is cancelled by `system`. Customers may cancel only holds; staff cancel confirmed bookings
+  (no refund). The public view and pass carry no guest details (the client's pass shows the host name from its own
+  form state). Bookable window today … +90 days; attendees ≤ the room's seats; ≤ 3 live holds per mobile. Roles:
+  `bookings:read` OPS_ADMIN + SALES_MANAGER, `bookings:write` OPS_ADMIN — SALES_EXEC left out so its permission set
+  is unchanged. Frontend switch-over: send `date` as YYYY-MM-DD and `startTime` HH:00 instead of the slot label,
+  display API totals (₹1,885.64 vs the client's ₹1,885), and use the API ref instead of `BK-` + timestamp.
