@@ -59,7 +59,9 @@ For manual testing, `npm run totp -- <secret>` prints the current code instead o
 | `users:manage`   | —                                               | `/auth/users`                         |
 | `leads:read`     | OPS_ADMIN, SALES_MANAGER, SALES_EXEC            | `GET /leads`, `/leads/stats`, `/:ref` |
 | `leads:write`    | SALES_MANAGER, SALES_EXEC                       | `PATCH /leads/:ref`                   |
+| `leads:export`   | SALES_MANAGER                                   | `GET /leads/export.csv`               |
 | `search:manage`  | OPS_ADMIN, CONTENT                              | `/search/admin/*`                     |
+| `catalog:manage` | OPS_ADMIN                                       | `/catalog/admin/*`                    |
 | `analytics:read` | OPS_ADMIN, SALES_MANAGER, FINANCE               | `GET /analytics/*`                    |
 | `pricing:manage` | FINANCE                                         | `PUT/DELETE /pricing/rules/:key`      |
 | `quotes:read`    | OPS_ADMIN, SALES_MANAGER, SALES_EXEC, FINANCE   | `GET /pricing/quotes`, `/rules`       |

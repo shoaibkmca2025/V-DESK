@@ -4,12 +4,23 @@
  */
 import { Router } from 'express';
 import { validate } from '../../shared/middleware/validate.js';
+import { requireStaff } from '../identity/index.js';
 import * as controller from './catalog.controller.js';
 import {
   centreRefParams,
+  citySlugAdminParams,
   citySlugParams,
+  createCentreBody,
+  createCityBody,
+  createWorkspaceBody,
+  listCentresAdminQuery,
   listCentresQuery,
+  listWorkspacesAdminQuery,
   listWorkspacesQuery,
+  refAdminParams,
+  updateCentreBody,
+  updateCityBody,
+  updateWorkspaceBody,
   workspaceRefParams,
 } from './catalog.validation.js';
 
@@ -30,3 +41,28 @@ catalogRouter.get('/centres/:ref', validate({ params: centreRefParams }), contro
 // ── Workspaces ────────────────────────────────
 catalogRouter.get('/workspaces', validate({ query: listWorkspacesQuery }), controller.listWorkspaces);
 catalogRouter.get('/workspaces/:ref', validate({ params: workspaceRefParams }), controller.getWorkspace);
+
+// ── Staff (catalog:manage) ────────────────────
+const admin = Router();
+admin.use(requireStaff('catalog:manage'));
+
+admin.get('/cities', controller.listCitiesForStaff);
+admin.post('/cities', validate({ body: createCityBody }), controller.createCity);
+admin.patch('/cities/:slug', validate({ params: citySlugAdminParams, body: updateCityBody }), controller.updateCity);
+admin.delete('/cities/:slug', validate({ params: citySlugAdminParams }), controller.deleteCity);
+
+admin.get('/centres', validate({ query: listCentresAdminQuery }), controller.listCentresForStaff);
+admin.post('/centres', validate({ body: createCentreBody }), controller.createCentre);
+admin.patch('/centres/:ref', validate({ params: refAdminParams, body: updateCentreBody }), controller.updateCentre);
+admin.delete('/centres/:ref', validate({ params: refAdminParams }), controller.deleteCentre);
+
+admin.get('/workspaces', validate({ query: listWorkspacesAdminQuery }), controller.listWorkspacesForStaff);
+admin.post('/workspaces', validate({ body: createWorkspaceBody }), controller.createWorkspace);
+admin.patch(
+  '/workspaces/:ref',
+  validate({ params: refAdminParams, body: updateWorkspaceBody }),
+  controller.updateWorkspace,
+);
+admin.delete('/workspaces/:ref', validate({ params: refAdminParams }), controller.deleteWorkspace);
+
+catalogRouter.use('/admin', admin);

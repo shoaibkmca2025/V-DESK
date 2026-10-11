@@ -9,9 +9,18 @@
  *  - Logs carry refs and sources only, never names, phones or emails (§21).
  */
 import { randomInt } from 'node:crypto';
-import { badRequest, conflict, notFound } from '../../shared/errors/AppError.js';
+import { AppError, badRequest, conflict, notFound } from '../../shared/errors/AppError.js';
+import { csvRow } from '../../shared/lib/csv.js';
 import { logger } from '../../shared/lib/logger.js';
-import { FREE_EMAIL_PROVIDERS, LEAD_SCORE_RULES, LEAD_STATUSES, LEAD_TRANSITIONS } from './crm.constants.js';
+import {
+  CONTACT_LIMIT,
+  CONTACT_WINDOW_MS,
+  FREE_EMAIL_PROVIDERS,
+  LEAD_SCORE_RULES,
+  LEAD_STATUSES,
+  LEAD_TRANSITIONS,
+  TOUCH_FIELDS,
+} from './crm.constants.js';
 import { mapActivity, mapLead, mapLeadReceipt } from './crm.mapper.js';
 import * as repo from './crm.repository.js';
 
@@ -50,22 +59,62 @@ export function generateLeadRef() {
   return `VD-${Date.now().toString(36)}${suffix}`.toUpperCase();
 }
 
+/** The last 10 digits, so +91 98765 43210, 919876543210 and 98765-43210 count as one contact. */
+export function mobileKey(mobile) {
+  const digits = (mobile ?? '').replace(/\D/g, '');
+  return digits ? digits.slice(-10) : null;
+}
+
+/**
+ * Keeps the known touch fields; URLs lose their query string and hash (the UTM values arrive as their own fields,
+ * and query strings can carry personal data). Returns null for an empty touch.
+ */
+export function cleanTouch(touch) {
+  if (!touch) return null;
+  const out = {};
+  for (const field of TOUCH_FIELDS) {
+    const value = touch[field];
+    if (value) out[field] = field === 'referrer' || field === 'landingPage' ? value.split(/[?#]/)[0] : value;
+  }
+  if (touch.at) out.at = touch.at;
+  return Object.keys(out).length > 0 ? out : null;
+}
+
 // ──────────────────────────────────────────────
 // Public
 // ──────────────────────────────────────────────
 
+async function assertContactLimit({ mobileDigits, email }, now) {
+  const since = new Date(now.getTime() - CONTACT_WINDOW_MS);
+  if ((await repo.countRecentLeadsByContact({ mobileDigits, email, since })) >= CONTACT_LIMIT) {
+    log.warn({ event: 'lead.contact_limited' }, 'enquiry refused: per-contact limit');
+    throw new AppError(429, 'TOO_MANY_ENQUIRIES', 'We already have your enquiry — our team will contact you shortly.');
+  }
+}
+
 /**
  * Records a website enquiry. Always starts at NEW. If the caller supplied a `ref` that already exists, nothing
  * is written and the original receipt is returned (`created: false`) — the client queues and retries forms.
+ * A new enquiry from a mobile or email that already sent CONTACT_LIMIT within the window is 429.
  * @returns {Promise<{ lead: { ref: string, createdAt: Date }, created: boolean }>}
  */
-export async function createLead(input) {
+export async function createLead(input, now = new Date()) {
   if (input.ref) {
     const existing = await repo.findAnyLeadByRef(input.ref);
     if (existing) return { lead: mapLeadReceipt(existing), created: false };
   }
 
-  const data = { ...input, ref: input.ref ?? generateLeadRef(), status: 'NEW' };
+  const { attribution, ...fields } = input;
+  const mobileDigits = mobileKey(fields.mobile);
+  await assertContactLimit({ mobileDigits, email: fields.email }, now);
+
+  const data = {
+    ...fields,
+    ref: input.ref ?? generateLeadRef(),
+    status: 'NEW',
+    mobileDigits,
+    attribution: { firstTouch: cleanTouch(attribution?.firstTouch), lastTouch: cleanTouch(attribution?.lastTouch) },
+  };
   data.score = computeLeadScore(data);
 
   const doc = await repo.insertLead(data);
@@ -151,6 +200,46 @@ export async function getLeadStats() {
   const bySource = Object.fromEntries(sourceCounts.map(({ _id, count }) => [_id || 'Unknown', count]));
   const total = statusCounts.reduce((sum, { count }) => sum + count, 0);
   return { total, byStatus, bySource };
+}
+
+// ──────────────────────────────────────────────
+// CSV export (leads:export)
+// ──────────────────────────────────────────────
+
+const touchColumns = (key, label) =>
+  ['source', 'medium', 'campaign'].map((field) => [`${label} ${field}`, (l) => l.attribution?.[key]?.[field]]);
+
+/** Column order of the export; values are read from stored lead documents. */
+const EXPORT_COLUMNS = [
+  ['Ref', (l) => l.ref],
+  ['Created at', (l) => l.createdAt],
+  ['Name', (l) => l.name],
+  ['Mobile', (l) => l.mobile],
+  ['Email', (l) => l.email],
+  ['Company', (l) => l.company],
+  ['City', (l) => l.city],
+  ['Service', (l) => l.service],
+  ['Source', (l) => l.source],
+  ['Status', (l) => l.status],
+  ['Score', (l) => l.score],
+  ['Assigned to', (l) => l.assignedTo],
+  ['Message', (l) => l.notes],
+  ...touchColumns('firstTouch', 'First touch'),
+  ...touchColumns('lastTouch', 'Last touch'),
+];
+
+/**
+ * Streams the filtered leads as CSV lines (header first, UTF-8 BOM so Excel reads ₹ and Indian names). Cells are
+ * guarded against spreadsheet formula injection by csv.js. The export is logged with the row count and who ran it.
+ */
+export async function* exportLeadsCsv({ q, ...filters }, actor) {
+  yield `\uFEFF${csvRow(EXPORT_COLUMNS.map(([header]) => header))}`;
+  let rows = 0;
+  for await (const lead of repo.streamLeads({ ...filters, search: q })) {
+    yield csvRow(EXPORT_COLUMNS.map(([, value]) => value(lead)));
+    rows += 1;
+  }
+  log.info({ event: 'leads.exported', rows, filters: Object.keys(filters), actor }, 'leads exported');
 }
 
 // ──────────────────────────────────────────────

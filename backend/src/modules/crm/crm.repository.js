@@ -36,16 +36,8 @@ export async function insertLead(data) {
  * Lists leads newest first. `after` is the decoded cursor `{ createdAt, ref }` of the last item already seen.
  * Fetches `limit + 1` so the service can tell whether another page exists.
  */
-export async function findLeads({ status, city, source, assignedTo, search, after, limit }) {
-  const filter = { ...notDeleted };
-  if (status) filter.status = status;
-  if (city) filter.city = city;
-  if (source) filter.source = source;
-  if (assignedTo) filter.assignedTo = assignedTo;
-  if (search) {
-    const pattern = new RegExp(escapeRegex(search), 'i');
-    filter.$or = [{ name: pattern }, { mobile: pattern }, { email: pattern }, { city: pattern }];
-  }
+export async function findLeads({ after, limit, ...filters }) {
+  const filter = leadFilter(filters);
   if (after) {
     const page = {
       $or: [{ createdAt: { $lt: after.createdAt } }, { createdAt: after.createdAt, ref: { $lt: after.ref } }],
@@ -56,6 +48,33 @@ export async function findLeads({ status, city, source, assignedTo, search, afte
     .sort({ createdAt: -1, ref: -1 })
     .limit(limit + 1)
     .lean();
+}
+
+/** Every lead matching the staff filters, newest first, as a stream — for the CSV export. */
+export function streamLeads(filters) {
+  return Lead.find(leadFilter(filters)).sort({ createdAt: -1, ref: -1 }).lean().cursor();
+}
+
+/** Filters shared by the list and the export. `from` / `to` bound createdAt. */
+function leadFilter({ status, city, source, assignedTo, search, from, to }) {
+  const filter = { ...notDeleted };
+  if (status) filter.status = status;
+  if (city) filter.city = city;
+  if (source) filter.source = source;
+  if (assignedTo) filter.assignedTo = assignedTo;
+  if (search) {
+    const pattern = new RegExp(escapeRegex(search), 'i');
+    filter.$or = [{ name: pattern }, { mobile: pattern }, { email: pattern }, { city: pattern }];
+  }
+  if (from || to) filter.createdAt = { ...(from && { $gte: from }), ...(to && { $lte: to }) };
+  return filter;
+}
+
+/** Leads created since `since` with this mobile (last 10 digits) or email. Deleted ones count too. */
+export async function countRecentLeadsByContact({ mobileDigits, email, since }) {
+  const contact = [mobileDigits && { mobileDigits }, email && { email }].filter(Boolean);
+  if (contact.length === 0) return 0;
+  return Lead.countDocuments({ $or: contact, createdAt: { $gte: since } });
 }
 
 /**

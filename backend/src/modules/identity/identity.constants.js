@@ -23,7 +23,10 @@ export const PERMISSIONS = Object.freeze({
   'users:manage': [],
   'leads:read': ['OPS_ADMIN', 'SALES_MANAGER', 'SALES_EXEC'],
   'leads:write': ['SALES_MANAGER', 'SALES_EXEC'],
+  /** Bulk download of contact details — managers only. */
+  'leads:export': ['SALES_MANAGER'],
   'search:manage': ['OPS_ADMIN', 'CONTENT'],
+  'catalog:manage': ['OPS_ADMIN'],
   'analytics:read': ['OPS_ADMIN', 'SALES_MANAGER', 'FINANCE'],
   'pricing:manage': ['FINANCE'],
   'quotes:read': ['OPS_ADMIN', 'SALES_MANAGER', 'SALES_EXEC', 'FINANCE'],

@@ -3,6 +3,7 @@
  * No business rules and no database access here (rules.md §2, §3).
  * Express 5 propagates async errors automatically — no try/catch needed.
  */
+import * as adminService from './catalog.admin.service.js';
 import * as catalogService from './catalog.service.js';
 
 // ──────────────────────────────────────────────
@@ -66,4 +67,59 @@ export async function getWorkspace(req, res) {
   const { ref } = req.validated.params;
   const data = await catalogService.getWorkspace(ref);
   res.json({ data });
+}
+
+// ──────────────────────────────────────────────
+// Staff (/catalog/admin)
+// ──────────────────────────────────────────────
+
+export async function listCitiesForStaff(_req, res) {
+  res.json({ data: await adminService.listCitiesForStaff() });
+}
+
+export async function createCity(req, res) {
+  res.status(201).json({ data: await adminService.createCity(req.validated.body, req.actor) });
+}
+
+export async function updateCity(req, res) {
+  res.json({ data: await adminService.updateCity(req.validated.params.slug, req.validated.body, req.actor) });
+}
+
+export async function deleteCity(req, res) {
+  await adminService.deleteCity(req.validated.params.slug, req.actor);
+  res.status(204).end();
+}
+
+export async function listCentresForStaff(req, res) {
+  res.json({ data: await adminService.listCentresForStaff(req.validated.query) });
+}
+
+export async function createCentre(req, res) {
+  res.status(201).json({ data: await adminService.createCentre(req.validated.body, req.actor) });
+}
+
+export async function updateCentre(req, res) {
+  res.json({ data: await adminService.updateCentre(req.validated.params.ref, req.validated.body, req.actor) });
+}
+
+export async function deleteCentre(req, res) {
+  await adminService.deleteCentre(req.validated.params.ref, req.actor);
+  res.status(204).end();
+}
+
+export async function listWorkspacesForStaff(req, res) {
+  res.json({ data: await adminService.listWorkspacesForStaff(req.validated.query) });
+}
+
+export async function createWorkspace(req, res) {
+  res.status(201).json({ data: await adminService.createWorkspace(req.validated.body, req.actor) });
+}
+
+export async function updateWorkspace(req, res) {
+  res.json({ data: await adminService.updateWorkspace(req.validated.params.ref, req.validated.body, req.actor) });
+}
+
+export async function deleteWorkspace(req, res) {
+  await adminService.deleteWorkspace(req.validated.params.ref, req.actor);
+  res.status(204).end();
 }

@@ -10,6 +10,7 @@
  *  - All indexes declared here and reviewed alongside the queries that need them (§17)
  */
 import mongoose from 'mongoose';
+import { AVAILABILITY_STATUSES, CITY_TIERS, WORKSPACE_TYPES } from './catalog.constants.js';
 
 const { Schema } = mongoose;
 
@@ -22,7 +23,7 @@ const citySchema = new Schema(
     slug: { type: String, required: true, unique: true, index: true }, // e.g. 'mumbai'
     name: { type: String, required: true },
     state: { type: String, required: true },
-    tier: { type: String, enum: ['Tier-1', 'Tier-2', 'Tier-3'], required: true },
+    tier: { type: String, enum: CITY_TIERS, required: true },
     tagline: { type: String, default: '' },
     localities: [{ type: String }],
     active: { type: Boolean, default: true, index: true },
@@ -48,7 +49,7 @@ const centreSchema = new Schema(
     /** Coworking price per day — integer paise. */
     cw_price_paise: { type: Number, default: null },
     meetingCapacity: { type: String, default: '' },
-    status: { type: String, enum: ['available', 'limited', 'unavailable'], default: 'available', index: true },
+    status: { type: String, enum: AVAILABILITY_STATUSES, default: 'available', index: true },
     flagship: { type: Boolean, default: false },
     active: { type: Boolean, default: true, index: true },
     deletedAt: { type: Date, default: null },
@@ -71,7 +72,7 @@ const workspaceSchema = new Schema(
     name: { type: String, required: true },
     type: {
       type: String,
-      enum: ['Virtual Office', 'Coworking', 'Meeting Rooms', 'Private Office'],
+      enum: WORKSPACE_TYPES,
       required: true,
       index: true,
     },
@@ -81,7 +82,7 @@ const workspaceSchema = new Schema(
     /** Price per hour — integer paise. */
     price_hour_paise: { type: Number, required: true },
     amenities: [{ type: String }],
-    status: { type: String, enum: ['available', 'limited', 'unavailable'], default: 'available', index: true },
+    status: { type: String, enum: AVAILABILITY_STATUSES, default: 'available', index: true },
     rating: { type: Number, min: 0, max: 5, default: null },
     reviews: { type: Number, default: 0 },
     active: { type: Boolean, default: true, index: true },

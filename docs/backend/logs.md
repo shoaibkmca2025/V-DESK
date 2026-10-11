@@ -71,8 +71,6 @@ OpenTelemetry auto-instrumentation (http, express, mongoose, ioredis, bullmq). `
 
 | Alert | Condition | Severity | Page? |
 |---|---|---|---|
-| 2026-10-11 | 0.1.0 | `booking`: `409 IDEMPOTENCY_KEY_IN_PROGRESS` now carries `details.expiresAt` (worst-case wait). Documented the accepted crash-mid-hold state (≤ 600 s, self-healing, no duplicates). | — |
-| 2026-10-11 | 0.1.0 | `booking` fixes: confirmation secures every slot before the booking becomes CONFIRMED; leftover slots of cancelled/expired/lapsed/missing bookings never block an hour; concurrent Idempotency-Key replays get `409 IDEMPOTENCY_KEY_IN_PROGRESS`; lapsed holds always answer `HOLD_EXPIRED`. New log event `booking.slots_missing` (warn) now carries `to` (EXPIRED/CANCELLED). | — |
 | API down | `/ready` failing 2 min | P1 | yes |
 | Error rate | 5xx > 2 % over 5 min | P1 | yes |
 | Payment webhooks failing | `result=error` > 3 in 10 min | P1 | yes |
@@ -96,7 +94,11 @@ Channels: PagerDuty (P1), Slack `#vdesk-ops` (all), weekly digest email.
 
 | Date | Version | Change | Author |
 |---|---|---|---|
+| 2026-10-11 | 0.1.0 | `booking`: `409 IDEMPOTENCY_KEY_IN_PROGRESS` now carries `details.expiresAt` (worst-case wait). Documented the accepted crash-mid-hold state (≤ 600 s, self-healing, no duplicates). | — |
+| 2026-10-11 | 0.1.0 | `booking` fixes: confirmation secures every slot before the booking becomes CONFIRMED; leftover slots of cancelled/expired/lapsed/missing bookings never block an hour; concurrent Idempotency-Key replays get `409 IDEMPOTENCY_KEY_IN_PROGRESS`; lapsed holds always answer `HOLD_EXPIRED`. New log event `booking.slots_missing` (warn) now carries `to` (EXPIRED/CANCELLED). | — |
 | 2026-10-11 | 0.1.0 | `booking` module: public `GET /bookings/availability`, `POST /bookings/hold` (Idempotency-Key, server price frozen, 600 s hold, ≤ 3 live holds per mobile), `GET /bookings/:ref`, `POST /bookings/:ref/cancel`, `GET /bookings/:ref/pass`; staff `GET /bookings`, `POST /bookings/:ref/confirm`, `PATCH /bookings/:ref/status`. Overlaps blocked by a unique index on `booking_slots` (centre, room, date, hour); TTL index clears lapsed hold slots. New permissions `bookings:read` / `bookings:write`. Logs `booking.*` with refs, room and totals only — no guest details. | — |
+| 2026-10-11 | 0.1.0 | `crm`: `GET /leads/export.csv` (`leads:export`, streamed, formula-safe, logged with row count), UTM attribution on leads, per-contact limit (3/h per mobile or email → 429), Turnstile CAPTCHA on `POST /leads` behind `TURNSTILE_SECRET_KEY`. Logs `lead.contact_limited` (no contact details) and `leads.exported`. | — |
+| 2026-10-11 | 0.1.0 | `catalog`: staff CRUD under `/catalog/admin/*` (`catalog:manage`) for cities, centres, workspaces; soft delete, never-reused refs, city rename cascades. Logs `catalog.*_created/_updated/_deleted` with refs, field names and actor. | — |
 | 2026-10-08 | 0.1.0 | `pricing` rounding aligned with ADR-007: discount and GST kept exact (`shared/lib/money.js`), one rounding at the total, lines allocated from it. No change for whole-rupee prices; ±1 paisa possible on odd-paise overrides. Stored quotes unaffected. | — |
 | 2026-10-08 | 0.1.0 | `pricing` module: public `POST /pricing/quote-preview` (virtual office, meeting room, enterprise desks, bundle — paise + basis points), `POST /pricing/quotes` (Idempotency-Key, frozen breakdown, 14-day validity), share-link `GET /quotes/:ref` + `PATCH /quotes/:ref/status`; staff quote list and rule overrides (`/rules`). Logs `quote.*` / `pricing.rule_*` with refs, product types and totals only. | — |
 | 2026-10-08 | 0.1.0 | `analytics` module: public `POST /analytics/events` (batch ≤ 50, sendBeacon text/plain, dedupe, server-side PII stripping, 13-month TTL); staff `GET /events`, `/kpis`, `/funnel`. Individual events are not logged. | — |

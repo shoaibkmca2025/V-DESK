@@ -44,3 +44,23 @@ export const ACTIVITY_TYPES = ['created', 'status_changed', 'assigned', 'note'];
 
 export const LIST_DEFAULT_LIMIT = 25;
 export const LIST_MAX_LIMIT = 100;
+
+/**
+ * Per-contact limit on new enquiries (rules.md §11): the same mobile or email at most CONTACT_LIMIT times per
+ * window. Stops form spam — and, once notifications send confirmations, flooding a stranger's WhatsApp.
+ */
+export const CONTACT_LIMIT = 3;
+export const CONTACT_WINDOW_MS = 60 * 60 * 1000;
+
+/** Marketing touch fields (PRD §60): UTM values, click ids, and where the visit came from / landed. */
+export const TOUCH_FIELDS = [
+  'source',
+  'medium',
+  'campaign',
+  'term',
+  'content',
+  'referrer',
+  'landingPage',
+  'gclid',
+  'fbclid',
+];
