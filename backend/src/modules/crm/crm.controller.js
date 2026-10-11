@@ -2,6 +2,8 @@
  * CRM controller — reads `req.validated`, calls crm.service.js, sends `{ data, meta? }`.
  * No business rules and no database access here. Express 5 forwards async errors — no try/catch needed.
  */
+import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 import * as crmService from './crm.service.js';
 
 /** POST /api/v1/leads — 201 for a new lead, 200 when a known ref is replayed. */
@@ -15,6 +17,17 @@ export async function listLeads(req, res) {
   const query = req.validated.query;
   const { leads, nextCursor } = await crmService.listLeads(query);
   res.json({ data: leads, meta: { limit: query.limit, nextCursor } });
+}
+
+/** GET /api/v1/leads/export.csv — streamed download; contact details, so never cached. */
+export async function exportLeads(req, res) {
+  const date = new Date().toISOString().slice(0, 10);
+  res.set({
+    'Content-Type': 'text/csv; charset=utf-8',
+    'Content-Disposition': `attachment; filename="vdesk-leads-${date}.csv"`,
+    'Cache-Control': 'no-store',
+  });
+  await pipeline(Readable.from(crmService.exportLeadsCsv(req.validated.query, req.actor)), res);
 }
 
 /** GET /api/v1/leads/stats — pipeline totals for the admin dashboard. */

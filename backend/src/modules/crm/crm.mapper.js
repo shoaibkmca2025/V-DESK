@@ -5,10 +5,11 @@
 
 /** Full lead for staff endpoints. */
 export function mapLead(doc) {
-  const { _id, __v, deletedAt, ...rest } = doc;
+  const { _id, __v, deletedAt, mobileDigits, ...rest } = doc;
   void _id;
   void __v;
   void deletedAt;
+  void mobileDigits;
   return rest;
 }
 

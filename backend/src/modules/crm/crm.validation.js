@@ -23,6 +23,20 @@ const leadRef = z
   .toUpperCase()
   .regex(LEAD_REF_PATTERN, 'Lead ref must look like VD-XXXX (letters, digits, dashes)');
 
+/** One marketing touch: UTM values, ad click ids, referrer and landing page, and when it happened. */
+const touch = z.object({
+  source: optionalText(100),
+  medium: optionalText(100),
+  campaign: optionalText(200),
+  term: optionalText(200),
+  content: optionalText(200),
+  referrer: optionalText(500),
+  landingPage: optionalText(500),
+  gclid: optionalText(200),
+  fbclid: optionalText(200),
+  at: z.preprocess(blankToUndefined, z.coerce.date().optional()),
+});
+
 /** Body for POST /api/v1/leads (public website forms). Status is never accepted here — new leads start at NEW. */
 export const createLeadBody = z
   .object({
@@ -47,6 +61,8 @@ export const createLeadBody = z
     company: optionalText(200),
     notes: optionalText(2000),
     source: optionalText(200),
+    /** Marketing attribution (PRD §60): the visit that first brought the contact in, and this visit. */
+    attribution: z.object({ firstTouch: touch.optional(), lastTouch: touch.optional() }).optional(),
   })
   .refine((lead) => lead.mobile || lead.email, {
     message: 'Provide a mobile number or an email address',
@@ -64,6 +80,18 @@ export const listLeadsQuery = z.object({
   cursor: optionalText(500),
   limit: z.coerce.number().int().min(1).max(LIST_MAX_LIMIT).default(LIST_DEFAULT_LIMIT),
 });
+
+/** Query for GET /api/v1/leads/export.csv — the list filters plus a created-at window, no paging. */
+export const exportLeadsQuery = listLeadsQuery
+  .omit({ cursor: true, limit: true })
+  .extend({
+    from: z.preprocess(blankToUndefined, z.coerce.date().optional()),
+    to: z.preprocess(blankToUndefined, z.coerce.date().optional()),
+  })
+  .refine((query) => !query.from || !query.to || query.from <= query.to, {
+    message: '`from` must be on or before `to`',
+    path: ['from'],
+  });
 
 /** Path params for /api/v1/leads/:ref */
 export const leadRefParams = z.object({

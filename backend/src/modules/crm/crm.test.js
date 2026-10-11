@@ -17,16 +17,21 @@ const ADMIN_KEY = 'test-admin-key-0123456789';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const validLead = (overrides = {}) => ({
-  name: 'Priya Kulkarni',
-  mobile: '9820194820',
-  email: 'priya@zenithd2c.com',
-  city: 'Mumbai',
-  service: 'Virtual Office for GST',
-  company: 'Zenith D2C Brands',
-  source: 'Quote Modal — Direct',
-  ...overrides,
-});
+// Each lead gets its own mobile and (corporate) email, so the per-contact limit (3 an hour) never trips by accident.
+let contactSeq = 0;
+const validLead = (overrides = {}) => {
+  contactSeq += 1;
+  return {
+    name: 'Priya Kulkarni',
+    mobile: `98201${String(contactSeq).padStart(5, '0')}`,
+    email: `priya${contactSeq}@zenithd2c.com`,
+    city: 'Mumbai',
+    service: 'Virtual Office for GST',
+    company: 'Zenith D2C Brands',
+    source: 'Quote Modal — Direct',
+    ...overrides,
+  };
+};
 
 const postLead = (body) => request(app).post('/api/v1/leads').send(body);
 const staffGet = (path) => request(app).get(`/api/v1/leads${path}`).set('x-admin-key', ADMIN_KEY);
@@ -143,7 +148,7 @@ describe('crm module', () => {
     });
 
     it('does not reveal stored details when a ref is replayed', async () => {
-      await createLead({ ref: 'VD-SECRET-1' });
+      await createLead({ ref: 'VD-SECRET-1', mobile: '9820194820' });
       const res = await postLead({ ref: 'VD-SECRET-1', name: 'Probe', mobile: '9000000000' });
       expect(res.status).toBe(200);
       expect(JSON.stringify(res.body)).not.toContain('priya');
