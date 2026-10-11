@@ -56,19 +56,25 @@ breakdown (paise, ADR-007), frozen at hold time.
 - **No overlaps:** `booking_slots` has a unique index on (centreRef, room, date, hour). A hold inserts its booking,
   then its hours in order; if an hour is taken it deletes the hours it inserted and the booking and answers
   `409 SLOT_UNAVAILABLE` (with the clashing `taken` hours). Rollback is compensating, not a transaction — the local
-  and test MongoDB are standalone servers — and confirmation re-checks that the booking still owns every hour.
-- **Holds** last 600 s. A lapsed hold reads as `EXPIRED` immediately and stops blocking its hours: they are deleted
-  before the next insert on them, and a TTL index on `booking_slots.expiresAt` cleans the rest. Acting on a lapsed
-  hold (cancel, confirm) saves `EXPIRED`; confirming it → `409 HOLD_EXPIRED`.
+  and test MongoDB are standalone servers.
+- **A slot blocks its hour only while its booking does.** Slots of a lapsed hold, a `CANCELLED` / `EXPIRED`
+  booking or a booking that no longer exists are ignored by availability and deleted before the next insert on
+  those hours (a lapsed hold is saved as `EXPIRED` first). A crash between a status change and the slot clean-up
+  therefore never leaves an hour blocked; a TTL index on `booking_slots.expiresAt` also cleans lapsed hold slots.
+- **Holds** last 600 s and read as `EXPIRED` the moment they lapse. Cancelling, confirming or changing a lapsed hold
+  saves `EXPIRED` and always answers `409 HOLD_EXPIRED`.
 - **Idempotency** (rules.md §10): `Idempotency-Key` is required. Same key + same body → `200` with the original
-  booking (no new booking or slots); different body → `409 IDEMPOTENCY_KEY_REUSED`. A hold refused for a clash can be
-  retried with the same key.
+  booking (no new booking or slots); different body → `409 IDEMPOTENCY_KEY_REUSED`; while the original request is
+  still reserving its hours → `409 IDEMPOTENCY_KEY_IN_PROGRESS` (retry shortly) — a replay is never handed a ref
+  that could still be rolled back. A hold refused for a clash can be retried with the same key.
 - **Abuse limits:** per-IP limits (10 holds/min, 120 availability reads/min, 60 ref reads/min) and at most 3
   unexpired holds per mobile (`429 TOO_MANY_HOLDS`).
 - **Statuses** (`BOOKING_TRANSITIONS`): `HELD → CONFIRMED | CANCELLED | EXPIRED`, `CONFIRMED → CHECKED_IN | CANCELLED`,
   `CHECKED_IN → COMPLETED`. Illegal moves → `409 INVALID_STATUS_TRANSITION`; repeating the current status is a
-  no-op. Confirming claims the booking first (only while the hold is live), then makes its hours permanent; if any
-  hour is missing the system cancels it. Cancelling frees the hours; completed bookings keep them on record.
+  no-op. Confirming makes every hour permanent **first** (only hours whose hold hasn't lapsed), counts them, and
+  only then moves `HELD → CONFIRMED`; if any hour is missing the system ends the hold (`EXPIRED` if it lapsed, else
+  `CANCELLED`). So a `CONFIRMED` booking — and its pass — always has all its hours, and a crash mid-confirmation leaves
+  a `HELD` booking that frees its hours when it lapses. Cancelling frees the hours; completed bookings keep them.
 - **No payment is implied.** Confirmation is a staff action; nothing here records a payment.
 - **Logs** carry booking/centre refs, room, duration, total and staff refs — never guest details.
 

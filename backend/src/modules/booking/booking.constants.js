@@ -22,8 +22,12 @@ export const BOOKING_TRANSITIONS = Object.freeze({
   EXPIRED: [],
 });
 
-/** Statuses whose hours stay reserved. HELD only until `expiresAt`. */
-export const ACTIVE_STATUSES = ['HELD', 'CONFIRMED', 'CHECKED_IN'];
+/**
+ * Statuses whose hours are free again. A slot document only blocks its hour while its booking is in another
+ * status (HELD only until `expiresAt`), so a crash between a status change and the slot clean-up never leaves an
+ * hour blocked.
+ */
+export const RELEASED_STATUSES = ['CANCELLED', 'EXPIRED'];
 
 /** What staff may set through PATCH /:ref/status (confirming has its own endpoint). */
 export const STAFF_STATUS_CHANGES = ['CHECKED_IN', 'COMPLETED', 'CANCELLED'];

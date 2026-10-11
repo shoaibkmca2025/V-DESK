@@ -10,10 +10,15 @@
  *    booking first (claiming the Idempotency-Key), then its hours in order; if any hour is taken it removes the
  *    hours it inserted and the booking, and answers 409 SLOT_UNAVAILABLE. This compensating rollback works on any
  *    MongoDB deployment (the test and local servers are standalone, so multi-document transactions are not
- *    available); confirmation re-checks that the booking still owns every hour, so a crash mid-hold can never
- *    produce a confirmed booking without its slots.
- *  - Holds last HOLD_SECONDS. A lapsed hold reads as EXPIRED at once and its hours are free: they are cleared
- *    before the next insert on them, and a TTL index removes them in the background.
+ *    available).
+ *  - A slot only blocks its hour while its booking does (RELEASED_STATUSES): a lapsed hold, a cancelled or expired
+ *    booking, or a booking that no longer exists frees the hour even if its slot documents are still there. Such
+ *    leftovers are cleared before the next insert on those hours (a lapsed hold is saved as EXPIRED first), and a
+ *    TTL index removes lapsed hold slots in the background — so a crash between two writes never blocks an hour.
+ *  - Holds last HOLD_SECONDS and read as EXPIRED the moment they lapse.
+ *  - Confirmation makes every hour permanent first and only then marks the booking CONFIRMED, so a CONFIRMED
+ *    booking (and its pass) always has all its hours; a crash in between leaves a HELD booking that frees its
+ *    hours when it lapses.
  *  - Confirmation is staff-only until the orders module confirms on a verified payment. Nothing here records or
  *    implies that a payment happened.
  *  - Status moves follow BOOKING_TRANSITIONS (§5); illegal moves are 409 INVALID_STATUS_TRANSITION.
@@ -34,6 +39,7 @@ import {
   MAX_ADVANCE_DAYS,
   OPENING_HOUR,
   PASS_STATUSES,
+  RELEASED_STATUSES,
 } from './booking.constants.js';
 import { effectiveStatus, mapBooking, mapBookingForStaff, mapPass } from './booking.mapper.js';
 import * as repo from './booking.repository.js';
@@ -92,6 +98,45 @@ function seatsOf(room) {
 const hoursOf = (startHour, duration) => Array.from({ length: duration }, (_, i) => startHour + i);
 
 // ──────────────────────────────────────────────
+// Who holds an hour
+// ──────────────────────────────────────────────
+
+/** Whether a booking (null = no longer exists) still keeps its hours at `now`. */
+function blocksHours(booking, now) {
+  if (!booking || RELEASED_STATUSES.includes(booking.status)) return false;
+  return booking.status !== 'HELD' || booking.expiresAt > now;
+}
+
+/**
+ * Slot documents on the given hours (all hours when omitted) of one room and day, split into the hours really
+ * taken and the leftovers of bookings that no longer keep them (bookingRef → booking state, null when gone).
+ */
+async function inspectSlots(key, hours, now) {
+  const slots = await repo.findSlots(key, hours);
+  const refs = [...new Set(slots.map((slot) => slot.bookingRef))];
+  const bookings = new Map((await repo.findBookingStates(refs)).map((b) => [b.ref, b]));
+  const taken = new Set();
+  const leftovers = new Map();
+  for (const slot of slots) {
+    const booking = bookings.get(slot.bookingRef) ?? null;
+    if (blocksHours(booking, now)) taken.add(slot.hour);
+    else leftovers.set(slot.bookingRef, booking);
+  }
+  return { taken, leftovers };
+}
+
+/**
+ * Deletes leftover slots so their hours can be inserted again. A lapsed hold is first saved as EXPIRED — that
+ * status change is what stops a confirmation in flight from winning, so its slots go only if it succeeds.
+ */
+async function clearLeftovers(leftovers, now) {
+  for (const [bookingRef, booking] of leftovers) {
+    if (booking?.status === 'HELD') await persistExpiry(booking, now);
+    else await repo.deleteSlotsForBooking(bookingRef);
+  }
+}
+
+// ──────────────────────────────────────────────
 // Availability
 // ──────────────────────────────────────────────
 
@@ -99,7 +144,7 @@ const hoursOf = (startHour, duration) => Array.from({ length: duration }, (_, i)
 export async function getAvailability({ centreRef, room: roomName, date }, now = new Date()) {
   assertBookableDate(date, now);
   const { centre, room } = await resolveRoom(centreRef, roomName);
-  const taken = new Set(await repo.findTakenHours({ centreRef: centre.ref, room: room.name, date }, now));
+  const { taken } = await inspectSlots({ centreRef: centre.ref, room: room.name, date }, undefined, now);
 
   const slots = hoursOf(OPENING_HOUR, CLOSING_HOUR - OPENING_HOUR).map((hour) => ({
     startTime: formatTime(hour),
@@ -134,13 +179,28 @@ async function findReplay(idempotencyKey, requestHash) {
   return existing;
 }
 
+/**
+ * The answer to a replayed Idempotency-Key. While the original request is still reserving its hours (or died
+ * part-way), the hold is not real yet, so the replay is told to retry rather than handed a ref that may be rolled
+ * back a moment later.
+ */
+async function replayOf(existing, now) {
+  if (effectiveStatus(existing, now) === 'HELD' && (await repo.countSlots(existing.ref)) < existing.duration) {
+    throw conflict(
+      'IDEMPOTENCY_KEY_IN_PROGRESS',
+      'A request with this Idempotency-Key is still being processed. Please retry in a moment.',
+    );
+  }
+  return { booking: mapBooking(existing, now), created: false };
+}
+
 /** Inserts the booking's hours; on any failure releases what went in and removes the booking. */
 async function reserveSlots(booking, now) {
   const hours = hoursOf(booking.startHour, booking.duration);
   const key = { centreRef: booking.centreRef, room: booking.room, date: booking.date };
   let reserved = false;
   try {
-    await repo.deleteExpiredSlots({ ...key, hours }, now);
+    await clearLeftovers((await inspectSlots(key, hours, now)).leftovers, now);
     reserved = await repo.insertSlots(
       hours.map((hour) => ({ ...key, hour, bookingRef: booking.ref, expiresAt: booking.expiresAt })),
     );
@@ -151,7 +211,7 @@ async function reserveSlots(booking, now) {
     }
   }
   if (!reserved) {
-    const taken = new Set(await repo.findTakenHours(key, now));
+    const { taken } = await inspectSlots(key, hours, now);
     throw conflict('SLOT_UNAVAILABLE', 'Some of those hours were just booked. Please pick another slot.', {
       taken: hours.filter((hour) => taken.has(hour)).map(formatTime),
     });
@@ -171,7 +231,7 @@ export async function holdBooking(body, idempotencyKey, now = new Date()) {
   }
   const requestHash = hashRequest(body);
   const replay = await findReplay(idempotencyKey, requestHash);
-  if (replay) return { booking: mapBooking(replay, now), created: false };
+  if (replay) return replayOf(replay, now);
 
   const { centreRef, date, startHour, duration, attendees, customer } = body;
   assertBookableDate(date, now);
@@ -215,7 +275,7 @@ export async function holdBooking(body, idempotencyKey, now = new Date()) {
   if (!booking) {
     // A concurrent request with the same key won the insert; answer as its replay.
     const winner = await findReplay(idempotencyKey, requestHash);
-    if (winner) return { booking: mapBooking(winner, now), created: false };
+    if (winner) return replayOf(winner, now);
     throw conflict('BOOKING_CONFLICT', 'Could not hold the room. Please try again.');
   }
 
@@ -304,8 +364,8 @@ const holdExpired = (booking) =>
 async function changeStatus(booking, to, actor, now) {
   const current = effectiveStatus(booking, now);
   if (current === to) return booking;
-  if (current === 'EXPIRED' && booking.status === 'HELD') {
-    await persistExpiry(booking, now);
+  if (current === 'EXPIRED') {
+    if (booking.status === 'HELD') await persistExpiry(booking, now);
     throw holdExpired(booking);
   }
   assertTransition(current, to);
@@ -344,38 +404,49 @@ export async function setStatusByStaff(ref, to, actor, now = new Date()) {
   return mapBookingForStaff(await changeStatus(booking, to, actor, now), now);
 }
 
+/** After losing a race on a confirmation: fine if someone else confirmed it, otherwise say what happened. */
+async function afterConfirmRace(ref, now) {
+  const fresh = await findBookingOrThrow(ref);
+  if (fresh.status !== 'HELD' && blocksHours(fresh, now)) return mapBookingForStaff(fresh, now);
+  if (effectiveStatus(fresh, now) === 'EXPIRED') throw holdExpired(fresh);
+  throw bookingChanged();
+}
+
 /**
- * Staff confirmation of a hold. The booking is claimed first (HELD → CONFIRMED only while unexpired), so two
- * confirmations or a confirmation racing a cancellation cannot both win; then its hours are made permanent. If any
- * hour is no longer the booking's (it lapsed in between, or a crash cut the hold short), the system cancels the
- * booking and frees what is left — a CONFIRMED booking never exists without all its hours.
+ * Staff confirmation of a hold, in this order:
+ *  1. make every hour permanent (only those whose hold hasn't lapsed — a lapsed slot may be someone else's now);
+ *  2. count the permanent hours; if any is missing, end the hold (EXPIRED if it lapsed, else CANCELLED by system)
+ *     and free what is left — unless someone else changed it first;
+ *  3. only then HELD → CONFIRMED.
+ * Nothing turns a permanent slot back into an expiring one, and a booking's slots are only deleted after it has
+ * left HELD / CONFIRMED. So once step 2 has counted every hour, step 3 either wins with all hours in place or loses
+ * to the cancellation / expiry that frees them: a CONFIRMED booking — and its pass — never lacks an hour.
  */
 export async function confirmBooking(ref, actor, now = new Date()) {
   const booking = await findBookingOrThrow(ref);
   const current = effectiveStatus(booking, now);
   if (current === 'CONFIRMED') return mapBookingForStaff(booking, now);
-  if (current === 'EXPIRED' && booking.status === 'HELD') {
-    await persistExpiry(booking, now);
+  if (current === 'EXPIRED') {
+    if (booking.status === 'HELD') await persistExpiry(booking, now);
     throw holdExpired(booking);
   }
   assertTransition(current, 'CONFIRMED');
 
-  const updated = await repo.updateBookingStatus(
-    ref,
-    'HELD',
-    'CONFIRMED',
-    { status: 'CONFIRMED', at: now, actor },
-    { unexpiredAt: now },
-  );
-  if (!updated) throw bookingChanged();
-
-  const secured = await repo.makeSlotsPermanent(ref, now);
+  await repo.makeSlotsPermanent(ref, now);
+  const secured = await repo.countSlots(ref, { permanentOnly: true });
   if (secured !== booking.duration) {
-    await repo.updateBookingStatus(ref, 'CONFIRMED', 'CANCELLED', { status: 'CANCELLED', at: now, actor: 'system' });
+    const lapsed = booking.expiresAt <= now;
+    const to = lapsed ? 'EXPIRED' : 'CANCELLED';
+    const ended = await repo.updateBookingStatus(ref, 'HELD', to, { status: to, at: now, actor: 'system' });
+    if (!ended) return afterConfirmRace(ref, now);
     await repo.deleteSlotsForBooking(ref);
-    log.warn({ event: 'booking.slots_missing', bookingRef: ref, secured }, 'hold lost some of its hours; cancelled');
+    log.warn({ event: 'booking.slots_missing', bookingRef: ref, secured, to }, 'hold lost some of its hours');
+    if (lapsed) throw holdExpired(booking);
     throw conflict('SLOT_UNAVAILABLE', 'This hold no longer has all its hours. Please hold the room again.');
   }
+
+  const updated = await repo.updateBookingStatus(ref, 'HELD', 'CONFIRMED', { status: 'CONFIRMED', at: now, actor });
+  if (!updated) return afterConfirmRace(ref, now);
   log.info({ event: 'booking.confirmed', bookingRef: ref, actor }, 'booking confirmed by staff');
   return mapBookingForStaff(updated, now);
 }

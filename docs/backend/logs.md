@@ -71,6 +71,7 @@ OpenTelemetry auto-instrumentation (http, express, mongoose, ioredis, bullmq). `
 
 | Alert | Condition | Severity | Page? |
 |---|---|---|---|
+| 2026-10-11 | 0.1.0 | `booking` fixes: confirmation secures every slot before the booking becomes CONFIRMED; leftover slots of cancelled/expired/lapsed/missing bookings never block an hour; concurrent Idempotency-Key replays get `409 IDEMPOTENCY_KEY_IN_PROGRESS`; lapsed holds always answer `HOLD_EXPIRED`. New log event `booking.slots_missing` (warn) now carries `to` (EXPIRED/CANCELLED). | — |
 | API down | `/ready` failing 2 min | P1 | yes |
 | Error rate | 5xx > 2 % over 5 min | P1 | yes |
 | Payment webhooks failing | `result=error` > 3 in 10 min | P1 | yes |

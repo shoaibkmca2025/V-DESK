@@ -72,18 +72,23 @@ export async function updateBookingStatus(ref, from, to, entry, { unexpiredAt } 
 // Slots (one document per reserved room-hour)
 // ──────────────────────────────────────────────
 
-/** Reserved hours of one room on one day that are still in force at `now`. */
-export async function findTakenHours({ centreRef, room, date }, now) {
-  const docs = await BookingSlot.find(
-    { centreRef, room, date, $or: [{ expiresAt: null }, { expiresAt: { $gt: now } }] },
-    { hour: 1, _id: 0 },
+/** Slot documents of one room on one day, optionally only on the given hours. */
+export async function findSlots({ centreRef, room, date }, hours) {
+  return BookingSlot.find(
+    { centreRef, room, date, ...(hours && { hour: { $in: hours } }) },
+    { hour: 1, bookingRef: 1, expiresAt: 1, _id: 0 },
   ).lean();
-  return docs.map((doc) => doc.hour);
 }
 
-/** Deletes lapsed hold slots on the given hours, so they can be taken before the TTL monitor gets to them. */
-export async function deleteExpiredSlots({ centreRef, room, date, hours }, now) {
-  await BookingSlot.deleteMany({ centreRef, room, date, hour: { $in: hours }, expiresAt: { $ne: null, $lte: now } });
+/** Status and hold expiry of the given bookings (missing refs are simply absent). */
+export async function findBookingStates(refs) {
+  if (refs.length === 0) return [];
+  return Booking.find({ ref: { $in: refs }, ...notDeleted }, { ref: 1, status: 1, expiresAt: 1, _id: 0 }).lean();
+}
+
+/** How many hours a booking holds — all of them, or only the permanent (confirmed) ones. */
+export async function countSlots(bookingRef, { permanentOnly = false } = {}) {
+  return BookingSlot.countDocuments({ bookingRef, ...(permanentOnly && { expiresAt: null }) });
 }
 
 /**
@@ -107,10 +112,9 @@ export async function deleteSlotsForBooking(bookingRef) {
 }
 
 /**
- * Makes a hold's hours permanent, but only those whose hold hasn't lapsed at `now`. Returns how many were made
- * permanent; fewer than the booking's duration means the hold lost some hours.
+ * Makes a hold's hours permanent, but only those whose hold hasn't lapsed at `now` — a lapsed slot may already
+ * be someone else's to take. Callers count the permanent slots afterwards rather than trusting this count.
  */
 export async function makeSlotsPermanent(bookingRef, now) {
-  const res = await BookingSlot.updateMany({ bookingRef, expiresAt: { $gt: now } }, { $set: { expiresAt: null } });
-  return res.modifiedCount;
+  await BookingSlot.updateMany({ bookingRef, expiresAt: { $gt: now } }, { $set: { expiresAt: null } });
 }

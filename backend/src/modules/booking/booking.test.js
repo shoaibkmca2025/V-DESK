@@ -215,6 +215,57 @@ describe('public booking ref', () => {
     });
     expect(JSON.stringify(pass.body)).not.toContain(CUSTOMER.name);
   });
+
+  it('public responses carry exactly the documented fields — no PII, _id, __v or idempotency data', async () => {
+    const PUBLIC_FIELDS = [
+      'attendees',
+      'centreRef',
+      'createdAt',
+      'date',
+      'duration',
+      'endTime',
+      'endsAt',
+      'expiresAt',
+      'hub',
+      'pricing',
+      'ref',
+      'room',
+      'roomCapacity',
+      'slot',
+      'startTime',
+      'startsAt',
+      'status',
+      'updatedAt',
+    ];
+    const held = await postHold(holdRequest(), 'privacy-key');
+    const { ref } = held.body.data;
+    const replay = await postHold(holdRequest(), 'privacy-key');
+    const view = await request(app).get(`/api/v1/bookings/${ref}`);
+    const cancelled = await request(app).post(`/api/v1/bookings/${await heldRef({ startTime: '09:00' })}/cancel`);
+    for (const res of [held, replay, view, cancelled]) expect(Object.keys(res.body.data).sort()).toEqual(PUBLIC_FIELDS);
+
+    await request(app).post(`/api/v1/bookings/${ref}/confirm`).set(adminKey);
+    const pass = await request(app).get(`/api/v1/bookings/${ref}/pass`);
+    expect(Object.keys(pass.body.data).sort()).toEqual(
+      ['attendees', 'date', 'endsAt', 'hub', 'qr', 'ref', 'room', 'slot', 'startsAt', 'status'].sort(),
+    );
+
+    const stored = await Booking.findOne({ ref }).lean();
+    for (const res of [held, replay, view, cancelled, pass]) {
+      const raw = JSON.stringify(res.body);
+      for (const secret of [
+        CUSTOMER.name,
+        CUSTOMER.mobile,
+        CUSTOMER.email,
+        CUSTOMER.company,
+        'privacy-key',
+        stored.requestHash,
+        String(stored._id),
+      ]) {
+        expect(raw).not.toContain(secret);
+      }
+    }
+  });
 });
 
 describe('staff routes', () => {

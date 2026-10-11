@@ -146,3 +146,10 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
   `bookings:read` OPS_ADMIN + SALES_MANAGER, `bookings:write` OPS_ADMIN — SALES_EXEC left out so its permission set
   is unchanged. Frontend switch-over: send `date` as YYYY-MM-DD and `startTime` HH:00 instead of the slot label,
   display API totals (₹1,885.64 vs the client's ₹1,885), and use the API ref instead of `BK-` + timestamp.
+- **2026-10-11 (review)** — booking correctness fixes before push: confirmation now makes slots permanent *before*
+  `HELD → CONFIRMED` (it used to flip the status first, so a crash in between left a CONFIRMED booking whose slots
+  then expired — a double-booking risk — and a pass could be issued for a booking without secured hours). A slot
+  now blocks its hour only while its booking is live (not CANCELLED/EXPIRED/lapsed/missing), so a crash between a
+  status change and the slot clean-up cannot block hours forever. A replayed Idempotency-Key whose original is still
+  reserving gets `409 IDEMPOTENCY_KEY_IN_PROGRESS` instead of a ref that might be rolled back. Acting on a lapsed hold
+  always answers `HOLD_EXPIRED`.
