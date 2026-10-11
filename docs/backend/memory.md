@@ -187,3 +187,15 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
   (partial unique index); a second attempt gets 409 `ORDER_ALREADY_OPEN` with the open order's ref. `orders:read`
   → OPS_ADMIN, SALES_MANAGER, FINANCE. When payments land, the payment intent must re-check the source (the hold
   is only 10 min) and booking needs its `PAYMENT_PENDING` state.
+- **2026-10-11** — `notifications` v1 foundation built; **nothing is sent yet**. Blocked, not worked around:
+  (1) no provider — email "Resend / SES" undecided, no WhatsApp BSP, no credentials, and sender numbers/emails
+  are placeholders (§5), so only the provider contract + a fake exist; (2) no event bus/outbox (ADR-005) — crm
+  does **not** call `notify()` directly, because rules.md §4 requires events for cross-module side effects, so the
+  Phase 1 lead confirmation and sales alert wait for the event bus; (3) no job queue — `processDueNotifications()`
+  exists for a worker but nothing schedules it. Choices: the log doubles as a durable queue (Mongo, lease-based
+  claims, 60 s lease, claim token), retries 1/5/30 min with max 4 attempts, unknown provider errors count as
+  transient, ACCEPTED (not DELIVERED) is the success state, templates are plain text only, rendered content is
+  cleared once final, staff see masked recipients and no content. Crash between provider acceptance and recording
+  → retried with the same provider idempotency key (at-least-once for providers without one). Template keys are
+  never reused. Roles: `notifications:manage` OPS_ADMIN + CONTENT, `notifications:read` OPS_ADMIN. The message
+  wording for the lead confirmation / sales alert is not documented — **owner/content to write them as templates**.

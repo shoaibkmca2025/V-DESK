@@ -33,6 +33,9 @@ export const PERMISSIONS = Object.freeze({
   'bookings:read': ['OPS_ADMIN', 'SALES_MANAGER'],
   'bookings:write': ['OPS_ADMIN'],
   'orders:read': ['OPS_ADMIN', 'SALES_MANAGER', 'FINANCE'],
+  /** Message templates (content); the delivery log shows masked recipients only. */
+  'notifications:manage': ['OPS_ADMIN', 'CONTENT'],
+  'notifications:read': ['OPS_ADMIN'],
 });
 
 /** Short-lived access token (rules.md §19). */

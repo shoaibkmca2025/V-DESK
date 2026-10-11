@@ -7,7 +7,8 @@ REST API for the V-DESK platform: **Node.js 22 + Express 5 + MongoDB (Mongoose)*
 folder/layer structure are in place. Implemented: `catalog` (public read API), `search` (universal search + admin
 config), `crm` (leads + pipeline), `identity` (staff sign-in with MFA, roles), `analytics` (telemetry, KPIs, funnel),
 `pricing` (quote preview, quotes, pricing rules), `booking` (meeting-room availability, holds, staff confirmation) and
-`orders` (order foundation — payments and invoices still blocked). The other 5 modules are empty skeletons waiting for
+`orders` (order foundation — payments and invoices still blocked) and `notifications` (templates, queue and sender
+foundation — no real provider, event wiring or scheduler yet). The other 4 modules are empty skeletons waiting for
 their code.
 
 ## Quick start

@@ -127,6 +127,7 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 - Consumes every domain event above and renders templates; SMS restricted to transactional (PRD §50)
 - WhatsApp inbound webhooks attach conversations to leads (PRD §51)
 - **HTTP:** admin template CRUD, `POST /webhooks/whatsapp`
+- *Built (v1 foundation): template CRUD, `notification_log` as a durable queue, `notify()` (idempotent on `dedupeKey`), `processDueNotifications()` (leases, bounded retries), masked staff log; provider contract + fake in `integrations/messaging.js`. Not yet: real providers, event-driven sending (no event bus/outbox), a scheduler (no job queue), the WhatsApp webhook. See `backend/src/modules/notifications/README.md`.*
 
 ### 3.11 `analytics` — telemetry & KPIs
 - **Collections:** `events` (time-series collection), materialised `kpi_daily`
