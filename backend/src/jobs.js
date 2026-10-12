@@ -4,6 +4,7 @@
  */
 import './events.js';
 import { processDueNotifications } from './modules/notifications/index.js';
+import { processSubscriptionLifecycle } from './modules/subscriptions/index.js';
 import { dispatchDueEvents } from './shared/events/bus.js';
 
 /**
@@ -18,6 +19,8 @@ export function buildJobs({ providers = messagingProviders() } = {}) {
   const jobs = [
     // Delivers outbox events to their handlers (shared/events/bus.js).
     { name: 'events.dispatch', everyMs: 1_000, run: () => dispatchDueEvents({ limit: 50 }) },
+    // Renewal reminders (T-30/7/1), grace periods and suspensions (subscriptions.renewal.service.js).
+    { name: 'subscriptions.lifecycle', everyMs: 60_000, run: () => processSubscriptionLifecycle() },
   ];
   if (Object.keys(providers).length > 0) {
     // Sends queued notifications through the configured providers (notifications.service.js).

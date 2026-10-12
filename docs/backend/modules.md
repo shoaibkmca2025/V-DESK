@@ -113,11 +113,13 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 - **Flow (PRD §46–47):** OTP-verified → upload via signed URL → UNDER_REVIEW → APPROVED/REJECTED (reason mandatory) → audit trail
 - **HTTP:** `POST /kyc`, `POST /kyc/:ref/documents/upload-url`, `PATCH /kyc/:ref/documents/:id/review` (compliance), `GET /kyc/:ref`
 - **Events:** `kyc.submitted`, `kyc.approved`, `kyc.rejected`
+- *Built: all four endpoints plus `POST /kyc/:ref/submit` (consent + storage verification → UNDER_REVIEW) and a staff `POST /kyc/:ref/documents/:id/download-url`; DRAFT → UNDER_REVIEW → ACTION_REQUIRED (per-document rejection, re-upload) → APPROVED; append-only `kyc_audit_log`; permissions `kyc:read` / `kyc:review` (COMPLIANCE). **Customer routes answer 503 until identity has customer sign-in (OTP)**; storage is a development/test adapter only (no S3/R2 yet, 503 in production). See `backend/src/modules/kyc/README.md`.*
 - **Frontend:** `kyc/kyc.js`
 
 ### 3.9 `subscriptions` — services, activation, renewals
 - **Collections:** `subscriptions`, `agreements`, `renewals`
 - **Activation rule (North Star, PRD §76):** payment.succeeded ∧ kyc.approved ∧ ops activates → `service.activated`
+- *Built: create from an order + KYC application (ops), activation reading the order (PAID) and KYC (APPROVED, same customer) through their modules, agreements per period (offline signature — no e-sign), renewal quotes + apply a paid order, suspend / reinstate / cancel, worker job `subscriptions.lifecycle` (T-30/7/1 reminders, GRACE, SUSPENDED), all with outbox events and `audit_log`. **Activation cannot succeed yet: orders has no PAID path (payments blocked).** Customer routes 503 until customer sign-in. Grace days are set per subscription (length undocumented). See `backend/src/modules/subscriptions/README.md`.*
 - **Renewal (PRD §49):** reminders at T-30/T-7/T-1, renewal quote, grace period, suspension, cancellation — all cron-driven
 - **HTTP:** `GET /me/subscriptions`, `POST /subscriptions/:ref/renew`, ops `POST /subscriptions/:ref/activate|suspend`
 - **Frontend:** `portal/customerPortal.js`
@@ -142,10 +144,12 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 
 ### 3.13 `enterprise` (P2) — organisations, team bookings, central billing
 - Multi-user orgs, bulk RFPs, custom price books, consolidated invoices, reporting exports
+- *Built: organisations + members with org roles (OWNER/ADMIN/MEMBER, last-owner guard), public bulk RFP (server-priced estimate, crm-style pipeline), team bookings and billed orders attributed by ref (read through booking/orders), versioned price books priced by pricing's engine, billing statement + CSV, organisation report. **Not built:** GST consolidated invoices (blocked with payments), price books in checkout (needs a pricing change). Customer routes 503 until customer sign-in. See `backend/src/modules/enterprise/README.md`.*
 - **Frontend:** `enterprise/enterpriseSuite.js`
 
 ### 3.14 `platform` — cross-cutting
 - request id, structured logging, rate limiting, CAPTCHA (Turnstile), audit log (`audit_log` append-only), health/readiness, OpenAPI, feature flags
+- *Built: `audit_log` in `backend/src/shared/audit` (used by kyc, subscriptions, enterprise); the `GET /audit` endpoint is not built yet.*
 
 ## 4. Domain events (contract)
 
@@ -165,7 +169,9 @@ Published through a transactional **outbox** collection (`domain_events`, writte
 | bookings | booking | orders, subscriptions |
 | orders, payments, invoices | orders | subscriptions, analytics |
 | kyc_applications, documents | kyc | subscriptions |
-| subscriptions, agreements | subscriptions | portal, notifications |
+| subscriptions, agreements, renewals | subscriptions | portal, notifications |
+| organisations, organisation_members, organisation_links, enterprise_rfps, price_books | enterprise | — |
+| audit_log | platform (shared/audit) | SUPER_ADMIN (endpoint not built) |
 | events | analytics | admin |
 
 ## 6. API conventions

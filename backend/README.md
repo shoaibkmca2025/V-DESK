@@ -9,8 +9,12 @@ config), `crm` (leads + pipeline), `identity` (staff sign-in with MFA, roles), `
 `pricing` (quote preview, quotes, pricing rules), `booking` (meeting-room availability, holds, staff confirmation) and
 `orders` (order foundation — payments and invoices still blocked) and `notifications` (templates, queue, sender, and
 the lead confirmation / sales alert via events — no real messaging provider yet) and `cms` (FAQs, testimonials,
-guides, legal pages, trust claims, SEO, sitemap — draft → publish). Platform: background worker,
-transactional event outbox (ADR-008). The other 3 modules are empty skeletons waiting for their code.
+guides, legal pages, trust claims, SEO, sitemap — draft → publish) and `kyc` (applications, signed uploads, compliance
+review — customer routes wait for customer sign-in, storage is a dev/test adapter only), `subscriptions` (activation
+rule, agreements, renewals, reminder/grace/suspension job — activation waits for payments) and `enterprise`
+(organisations, members, RFPs, team bookings, price books, billing statements, reports). Platform: background worker,
+transactional event outbox (ADR-008), append-only audit log (`shared/audit`). Customer-facing routes of kyc,
+subscriptions and enterprise answer 503 until customer sign-in exists.
 
 ## Quick start
 
@@ -74,9 +78,10 @@ backend/
 │   │   ├── middleware/      requestId, httpLogger, validate, errorHandler, rateLimit, requireAdminKey
 │   │   ├── errors/          AppError + helpers (badRequest, notFound, conflict, …)
 │   │   ├── lib/             logger (pino), pagination, refs, money, csv, transactions; shared helpers go here
+│   │   ├── audit/           append-only audit_log (auditEntry / recordAudit)
 │   │   ├── events/          transactional outbox + event bus (publish / subscribe / dispatch)
 │   │   └── jobs/            job runner used by the worker (MongoDB-backed, no Redis — ADR-008)
-│   └── integrations/        turnstile, messaging contract + fake; Razorpay, S3, email, WhatsApp, SMS to come
+│   └── integrations/        turnstile, messaging contract + fake, storage contract + memory adapter; Razorpay, S3, …
 ├── scripts/                 dev-memory, seed-catalog, seed-search, seed-content, create-admin, totp; later migrations
 ├── thunder-client/          Thunder Client collection + local environment for manual API testing
 └── test/                    globalSetup + db.js (shared in-memory replica set), platform tests
@@ -164,3 +169,4 @@ Add these when a module needs them:
 | `TURNSTILE_SECRET_KEY` | _(unset)_                         | Cloudflare Turnstile secret; set → `POST /leads` needs a CAPTCHA token, unset → check off |
 | `SALES_ALERT_EMAIL`    | _(unset)_                         | inbox for new-lead alerts (template `lead.sales_alert`); unset → no alert queued          |
 | `SITE_URL`             | _(unset)_                         | public site address, e.g. `https://vdesk.in`, for `sitemap.xml`; unset → sitemap 503      |
+| `STORAGE_DRIVER`       | _(unset)_                         | `memory` = dev/test KYC storage (no real uploads, ignored in production); unset → 503     |

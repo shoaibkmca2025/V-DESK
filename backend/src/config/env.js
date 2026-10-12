@@ -36,6 +36,12 @@ const schema = z.object({
   SITE_URL: z.preprocess(blankToUndefined, z.string().url().optional()),
   /** Internal inbox for new-lead alerts (template `lead.sales_alert`). Unset → no sales alert is queued. */
   SALES_ALERT_EMAIL: z.preprocess(blankToUndefined, z.string().trim().toLowerCase().email().optional()),
+  /**
+   * Object storage for KYC documents. Only `memory` exists today: an in-process development/test adapter whose URLs
+   * cannot receive real uploads (src/integrations/storage.js). It is ignored in production, where no real provider
+   * exists yet, so KYC uploads answer 503 STORAGE_NOT_CONFIGURED. Unset → the same 503 everywhere.
+   */
+  STORAGE_DRIVER: z.preprocess(blankToUndefined, z.enum(['memory']).optional()),
   /** Proxy hops in front of the API (Cloudflare, load balancer). Needed so rate limits see the visitor's IP. */
   TRUST_PROXY: z.coerce.number().int().min(0).default(0),
 });

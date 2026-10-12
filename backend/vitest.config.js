@@ -14,6 +14,7 @@ export default defineConfig({
       MFA_ENCRYPTION_KEY: 'test-mfa-key-0123456789-0123456789-abcdef',
       SALES_ALERT_EMAIL: 'sales@vdesk.test',
       SITE_URL: 'https://vdesk.test',
+      STORAGE_DRIVER: 'memory',
     },
     // The first run may download the MongoDB binary used by mongodb-memory-server.
     hookTimeout: 120_000,
