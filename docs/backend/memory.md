@@ -18,11 +18,12 @@ starting any backend work; append to it whenever a decision is made. Newest entr
 |---|---|---|---|---|
 | ADR-001 | 2026-09-15 | Frontend restructured from static HTML to React 19 + Vite; **UI pixel-identical**, verified by DOM+screenshot diff | Client approved the design; only code structure was in scope | done |
 | ADR-002 | 2026-09-15 | Backend deferred; site ships frontend-only with localStorage for leads/telemetry | Owner request ("currently only frontend") | active |
-| ADR-003 | 2026-09-15 | Backend stack: Node 22 / Express 5 / MongoDB / Redis / BullMQ / Razorpay / S3 (see `modules.md` §1) | PRD §67 recommends PostgreSQL; MongoDB chosen for document-shaped catalog and team familiarity with MERN. Revisit if reporting needs heavy joins → add warehouse export rather than switching OLTP DB | planned |
+| ADR-003 | 2026-09-15 | Backend stack: Node 22 / Express 5 / MongoDB / Redis / BullMQ / Razorpay / S3 (see `modules.md` §1) | PRD §67 recommends PostgreSQL; MongoDB chosen for document-shaped catalog and team familiarity with MERN. Revisit if reporting needs heavy joins → add warehouse export rather than switching OLTP DB | active — Redis/BullMQ deferred by ADR-008 |
 | ADR-004 | 2026-09-15 | Money stored as integer paise; GST computed at final line | Avoid float drift on invoices | planned |
-| ADR-005 | 2026-09-15 | Domain events via transactional outbox, not direct queue publish | Payment/booking events must never be lost | planned |
+| ADR-005 | 2026-09-15 | Domain events via transactional outbox, not direct queue publish | Payment/booking events must never be lost | done (ADR-008) |
 | ADR-006 | 2026-09-15 | API field names mirror existing `src/features/*` objects | Switch-over is transport-only; no client data-model rewrite | planned |
 | ADR-007 | 2026-10-08 | Pricing is paise-exact: intermediate amounts (discounts, GST) are kept exact and rounded **once, at the final total**; the API does **not** copy the client's per-step rupee rounding | Owner-approved; rules.md §13 and invoice reconciliation to the paisa. Totals can differ from today's client by under ₹1 (e.g. Nashik annual VO + GST + mail: client ₹21,501, API ₹21,500.54); the frontend shows API totals at switch-over | active |
+| ADR-008 | 2026-10-12 | **MongoDB is the queue, the outbox and the job store; no Redis / BullMQ for now.** Outbox = `domain_events` written in the same transaction as the change, delivered by a worker process (`npm run worker`) to idempotent handlers (at least once, 8 attempts, DEAD after). Background queues (notifications) claim items with atomic updates + leases. MongoDB must be a replica set (transactions): production refuses to start otherwise; tests and `dev:memory` run single-node replica sets | One datastore to run, back up and secure; the volumes are small (leads, bookings, messages per day, not per second); the patterns were already in the code (notifications lease queue, booking unique-index slots). **Bring in Redis when any of these happens:** more than one API instance (in-memory rate limits stop being shared), job throughput needs sub-second latency or > ~50 jobs/s, many cron-style jobs need exact scheduling, or a cache is needed for the catalog bundle | active |
 
 ## 3. Frontend integration points (what the backend must satisfy)
 
@@ -199,3 +200,13 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
   → retried with the same provider idempotency key (at-least-once for providers without one). Template keys are
   never reused. Roles: `notifications:manage` OPS_ADMIN + CONTENT, `notifications:read` OPS_ADMIN. The message
   wording for the lead confirmation / sales alert is not documented — **owner/content to write them as templates**.
+- **2026-10-12** — background worker, event outbox and transactions built (ADR-008). Choices: tests share one
+  single-node replica set (vitest `globalSetup`) with a database per test file — this also fixed the local flakiness
+  where 25+ in-memory servers starting at once timed out; `dev:memory` runs a replica set plus the worker in-process;
+  a standalone local `mongod` still works for development with a startup warning (writes and events not atomic),
+  production refuses it. First flow wired: crm saves the lead, its activity and `lead.created` in one transaction;
+  notifications handles it by queuing `lead.confirmation.email` / `lead.confirmation.whatsapp` to the visitor and
+  `lead.sales_alert` to `SALES_ALERT_EMAIL` — **only once staff create those templates** (wording is the owner's), and
+  only with variables the lead actually has (`name`, `ref` always; `service`, `city`, `company` when given). Nothing
+  is sent until a messaging provider is chosen; the worker's sender job is added automatically when one is configured
+  in `src/jobs.js`. Event payloads carry refs only — handlers read details through the owning module's service.

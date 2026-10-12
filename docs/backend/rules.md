@@ -42,7 +42,7 @@ Non-negotiable unless an ADR in `docs/backend/adr/` says otherwise. CI enforces 
 
 ## 5. Reliability
 
-27. Handlers must be idempotent or guarded; jobs must be safe to retry (BullMQ default 3 attempts, exponential backoff).
+27. Handlers must be idempotent or guarded; jobs must be safe to retry. Event handlers run at least once (outbox, up to 8 attempts with backoff — ADR-008); jobs must be safe to run in several worker processes at once.
 28. Long or external work (email, WhatsApp, PDF, gateway calls) never runs inside a request — enqueue it.
 29. Timeouts on every outbound call (default 5 s), circuit-break payment/messaging providers.
 30. Graceful shutdown: stop accepting, drain in-flight, close queues, then DB.

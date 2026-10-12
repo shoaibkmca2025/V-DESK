@@ -7,9 +7,9 @@ REST API for the V-DESK platform: **Node.js 22 + Express 5 + MongoDB (Mongoose)*
 folder/layer structure are in place. Implemented: `catalog` (public read API), `search` (universal search + admin
 config), `crm` (leads + pipeline), `identity` (staff sign-in with MFA, roles), `analytics` (telemetry, KPIs, funnel),
 `pricing` (quote preview, quotes, pricing rules), `booking` (meeting-room availability, holds, staff confirmation) and
-`orders` (order foundation — payments and invoices still blocked) and `notifications` (templates, queue and sender
-foundation — no real provider, event wiring or scheduler yet). The other 4 modules are empty skeletons waiting for
-their code.
+`orders` (order foundation — payments and invoices still blocked) and `notifications` (templates, queue, sender, and
+the lead confirmation / sales alert via events — no real messaging provider yet). Platform: background worker,
+transactional event outbox (ADR-008). The other 4 modules are empty skeletons waiting for their code.
 
 ## Quick start
 
@@ -17,9 +17,10 @@ their code.
 cd backend
 npm install
 cp .env.example .env     # adjust if your MongoDB is not on localhost
-npm run dev              # http://localhost:5000 (restarts on file changes; needs MongoDB running)
-npm run dev:memory       # same, with a throwaway in-memory MongoDB (no install needed, data not saved)
-npm test                 # vitest + supertest + in-memory MongoDB
+npm run dev              # API on http://localhost:5000 (restarts on file changes; needs MongoDB running)
+npm run dev:worker       # background worker, in a second terminal (events, notifications)
+npm run dev:memory       # API + worker in one process on a throwaway in-memory replica set (nothing to install)
+npm test                 # vitest + supertest + one shared in-memory replica set
 npm run lint             # eslint
 npm run format           # prettier
 npm run totp -- <secret> # current sign-in code for a test account's MFA secret (instead of a phone app)
@@ -27,6 +28,18 @@ npm run totp -- <secret> # current sign-in code for a test account's MFA secret 
 
 Requires Node 22.12+ (Node 22 LTS recommended). Check it's up: `GET /health` → `{ "data": { "status": "ok" } }`,
 `GET /ready` → also confirms the database connection.
+
+### Two processes, one replica set (ADR-008)
+
+- **API** (`npm start`) answers requests; **worker** (`npm run worker`) delivers outbox events and sends queued
+  messages. Production runs both — the worker can be scaled to several copies safely. Without a worker, events and
+  messages just wait.
+- **MongoDB must be a replica set** — writes and their events are saved in one transaction. Atlas always is one;
+  production refuses to start on a standalone server. Locally `npm run dev:memory` is one. A plain local `mongod`
+  still works for development, with a startup warning that writes and events aren't atomic. To make it a single-node
+  replica set: add `replication: { replSetName: rs0 }` to `mongod.cfg` (Windows: `C:\Program Files\MongoDB\Server\<v>\bin`),
+  restart the MongoDB service, run `mongosh --eval "rs.initiate()"` once, and use
+  `MONGODB_URI=mongodb://127.0.0.1:27017/vdesk?replicaSet=rs0`.
 
 ### Manual testing (Thunder Client)
 
@@ -50,20 +63,22 @@ Import both in Thunder Client, then:
 backend/
 ├── src/
 │   ├── app.js               Express app: security headers, CORS, JSON, logging, routes, error handler
-│   ├── server.js            starts the app: connects MongoDB, listens, shuts down cleanly
+│   ├── server.js            starts the API: connects MongoDB, listens, shuts down cleanly
+│   ├── worker.js            starts the background worker (jobs.js); events.js registers event handlers
+│   ├── jobs.js              the background jobs (like routes.js for the worker)
 │   ├── routes.js            /health, /ready and where every module is mounted under /api/v1
 │   ├── config/              env.js (validated settings), db.js (MongoDB connection)
 │   ├── modules/             one folder per business feature (13), see table below
 │   ├── shared/
 │   │   ├── middleware/      requestId, httpLogger, validate, errorHandler, rateLimit, requireAdminKey
 │   │   ├── errors/          AppError + helpers (badRequest, notFound, conflict, …)
-│   │   ├── lib/             logger (pino), pagination (cursors), refs; shared helpers go here
-│   │   ├── events/          domain events between modules (to be added)
-│   │   └── jobs/            background jobs with BullMQ + Redis (to be added)
-│   └── integrations/        Razorpay, S3, email, WhatsApp, SMS wrappers (to be added)
+│   │   ├── lib/             logger (pino), pagination, refs, money, csv, transactions; shared helpers go here
+│   │   ├── events/          transactional outbox + event bus (publish / subscribe / dispatch)
+│   │   └── jobs/            job runner used by the worker (MongoDB-backed, no Redis — ADR-008)
+│   └── integrations/        turnstile, messaging contract + fake; Razorpay, S3, email, WhatsApp, SMS to come
 ├── scripts/                 dev-memory, seed-catalog, seed-search, create-admin, totp; later migrations
 ├── thunder-client/          Thunder Client collection + local environment for manual API testing
-└── test/                    db.js (in-memory MongoDB helper), app.test.js (platform tests)
+└── test/                    globalSetup + db.js (shared in-memory replica set), platform tests
 ```
 
 | Module          | Mounted at              | Phase | What it does                            |
@@ -146,3 +161,4 @@ Add these when a module needs them:
 | `MFA_ENCRYPTION_KEY`   | _(unset)_                         | encrypts staff TOTP secrets at rest, ≥ 32 chars; keep it separate from `JWT_SECRET`       |
 | `TRUST_PROXY`          | `0`                               | proxies in front of the API (e.g. `1` behind Cloudflare) so rate limits see real IPs      |
 | `TURNSTILE_SECRET_KEY` | _(unset)_                         | Cloudflare Turnstile secret; set → `POST /leads` needs a CAPTCHA token, unset → check off |
+| `SALES_ALERT_EMAIL`    | _(unset)_                         | inbox for new-lead alerts (template `lead.sales_alert`); unset → no alert queued          |

@@ -11,13 +11,13 @@ Status: Planning · Owner: Backend team · Source of truth for scope: `docs/vdes
 | Database | MongoDB 7 + Mongoose 9 | Document model fits catalog/lead/booking shapes; easy multi-city expansion |
 | Validation | Zod 4 | Single schema per endpoint, reused for OpenAPI generation |
 | Auth | JWT (access 15 min) + rotating refresh token (httpOnly cookie), bcrypt/argon2 | Stateless API, RBAC per PRD §69, admin MFA (TOTP) per §70 |
-| Queue | BullMQ + Redis | Notifications, renewals, hold expiry, webhooks must not block requests |
+| Queue | MongoDB: transactional outbox + lease-claimed queues, run by a worker process (ADR-008; Redis/BullMQ deferred) | Notifications, renewals, hold expiry, webhooks must not block requests |
 | Storage | S3-compatible (AWS S3 / Cloudflare R2) | KYC files with SSE encryption + signed URLs (PRD §70) |
 | Payments | Razorpay (primary) / Cashfree (fallback adapter) | PRD §67 |
 | Search | MongoDB text index (MVP) → Atlas Search / OpenSearch at scale | PRD §21 |
 | Messaging | Email (Resend/SES), WhatsApp Business API, SMS (MSG91) | PRD §50–51 |
 | Observability | pino logs, OpenTelemetry traces, Prometheus metrics, Sentry | see `logs.md` |
-| Infra | Docker, GitHub Actions, MongoDB Atlas, Redis (Upstash/ElastiCache) | reproducible environments |
+| Infra | Docker, GitHub Actions, MongoDB Atlas (replica set — transactions required), Redis only when ADR-008 triggers it | reproducible environments |
 
 ## 2. Repository layout
 
@@ -41,8 +41,8 @@ backend/
       <module>.test.js        unit + integration tests
     shared/
       middleware/             auth, rbac, validate, rateLimit, requestId, errorHandler
-      events/                 in-process event bus + outbox publisher
-      jobs/                   BullMQ queue definitions + workers
+      events/                 outbox (domain_events) + bus: publish / subscribe / dispatch
+      jobs/                   job runner used by src/worker.js (jobs listed in src/jobs.js)
       lib/                    money (paise integers), refs, dates (Asia/Kolkata), pagination
       errors/                 HttpError hierarchy
     integrations/             razorpay, cashfree, whatsapp, email, sms, s3 adapters (interface + impl)
@@ -152,7 +152,7 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 ```
 { id, type, occurredAt, actor: { type: user|system, id }, entity: { type, ref }, payload, version: 1 }
 ```
-Published through a transactional **outbox** collection and relayed to BullMQ so a crash between DB write and publish cannot lose an event.
+Published through a transactional **outbox** collection (`domain_events`, written in the same MongoDB transaction as the change) and delivered to subscribed handlers by the worker process, so a crash between DB write and publish cannot lose an event (ADR-008, `backend/src/shared/events/README.md`).
 
 ## 5. Data ownership matrix
 
