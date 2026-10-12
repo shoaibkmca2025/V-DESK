@@ -184,6 +184,11 @@ async function getConfigValue(key) {
   return entry?.value ?? [];
 }
 
+/** Business services with a landing page (/services/:slug) — for other modules, e.g. the CMS site map. */
+export async function listServices() {
+  return (await repo.findServices()).map(({ slug, name }) => ({ slug, name }));
+}
+
 // ──────────────────────────────────────────────
 // Staff — synonyms (read-only until admin editing is scoped)
 // ──────────────────────────────────────────────

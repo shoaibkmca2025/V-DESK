@@ -36,6 +36,9 @@ export const PERMISSIONS = Object.freeze({
   /** Message templates (content); the delivery log shows masked recipients only. */
   'notifications:manage': ['OPS_ADMIN', 'CONTENT'],
   'notifications:read': ['OPS_ADMIN'],
+  'content:manage': ['OPS_ADMIN', 'CONTENT'],
+  /** Publishing trust claims ("10,000+ businesses") needs evidence and a super admin (memory.md §5, PRD §22). */
+  'content:approve': [],
 });
 
 /** Short-lived access token (rules.md §19). */

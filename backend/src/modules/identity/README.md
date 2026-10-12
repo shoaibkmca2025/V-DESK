@@ -54,17 +54,24 @@ For manual testing, `npm run totp -- <secret>` prints the current code instead o
 
 ## Permissions (`identity.constants.js` → `PERMISSIONS`)
 
-| Permission       | Roles (SUPER_ADMIN always has every permission) | Used by                               |
-| ---------------- | ----------------------------------------------- | ------------------------------------- |
-| `users:manage`   | —                                               | `/auth/users`                         |
-| `leads:read`     | OPS_ADMIN, SALES_MANAGER, SALES_EXEC            | `GET /leads`, `/leads/stats`, `/:ref` |
-| `leads:write`    | SALES_MANAGER, SALES_EXEC                       | `PATCH /leads/:ref`                   |
-| `leads:export`   | SALES_MANAGER                                   | `GET /leads/export.csv`               |
-| `search:manage`  | OPS_ADMIN, CONTENT                              | `/search/admin/*`                     |
-| `catalog:manage` | OPS_ADMIN                                       | `/catalog/admin/*`                    |
-| `analytics:read` | OPS_ADMIN, SALES_MANAGER, FINANCE               | `GET /analytics/*`                    |
-| `pricing:manage` | FINANCE                                         | `PUT/DELETE /pricing/rules/:key`      |
-| `quotes:read`    | OPS_ADMIN, SALES_MANAGER, SALES_EXEC, FINANCE   | `GET /pricing/quotes`, `/rules`       |
+| Permission             | Roles (SUPER_ADMIN always has every permission) | Used by                               |
+| ---------------------- | ----------------------------------------------- | ------------------------------------- |
+| `users:manage`         | —                                               | `/auth/users`                         |
+| `leads:read`           | OPS_ADMIN, SALES_MANAGER, SALES_EXEC            | `GET /leads`, `/leads/stats`, `/:ref` |
+| `leads:write`          | SALES_MANAGER, SALES_EXEC                       | `PATCH /leads/:ref`                   |
+| `leads:export`         | SALES_MANAGER                                   | `GET /leads/export.csv`               |
+| `search:manage`        | OPS_ADMIN, CONTENT                              | `/search/admin/*`                     |
+| `catalog:manage`       | OPS_ADMIN                                       | `/catalog/admin/*`                    |
+| `analytics:read`       | OPS_ADMIN, SALES_MANAGER, FINANCE               | `GET /analytics/*`                    |
+| `pricing:manage`       | FINANCE                                         | `PUT/DELETE /pricing/rules/:key`      |
+| `quotes:read`          | OPS_ADMIN, SALES_MANAGER, SALES_EXEC, FINANCE   | `GET /pricing/quotes`, `/rules`       |
+| `bookings:read`        | OPS_ADMIN, SALES_MANAGER                        | `GET /bookings`                       |
+| `bookings:write`       | OPS_ADMIN                                       | confirm / change booking status       |
+| `orders:read`          | OPS_ADMIN, SALES_MANAGER, FINANCE               | `GET /orders`                         |
+| `notifications:manage` | OPS_ADMIN, CONTENT                              | notification templates                |
+| `notifications:read`   | OPS_ADMIN                                       | delivery log (masked)                 |
+| `content:manage`       | OPS_ADMIN, CONTENT                              | `/content/admin/*`                    |
+| `content:approve`      | — (SUPER_ADMIN only)                            | publishing trust claims               |
 
 **Switch-over:** `requireStaff(p)` also accepts the old `x-admin-key` (full access, actor `admin-key`) when no
 `Authorization` header is sent, so the admin console keeps working until it signs in with JWT. Remove that branch
