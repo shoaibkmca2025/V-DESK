@@ -22,9 +22,9 @@ export async function findAnyLeadByRef(ref) {
 }
 
 /** Inserts a lead and returns it, or returns null when the ref is already taken (a concurrent replay). */
-export async function insertLead(data) {
+export async function insertLead(data, { session } = {}) {
   try {
-    const doc = await Lead.create(data);
+    const [doc] = await Lead.create([data], { session });
     return doc.toObject();
   } catch (err) {
     if (err.code === DUPLICATE_KEY) return null;
@@ -98,9 +98,9 @@ export async function countLeadsBy(field) {
 // Activities
 // ──────────────────────────────────────────────
 
-export async function insertActivities(activities) {
+export async function insertActivities(activities, { session } = {}) {
   if (activities.length === 0) return;
-  await LeadActivity.insertMany(activities);
+  await LeadActivity.insertMany(activities, { session });
 }
 
 /** Timeline for one lead, oldest first. */

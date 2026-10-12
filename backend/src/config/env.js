@@ -32,6 +32,8 @@ const schema = z.object({
   MFA_ENCRYPTION_KEY: z.preprocess(blankToUndefined, z.string().min(32).optional()),
   /** Cloudflare Turnstile secret. Set → public forms need a valid CAPTCHA token; unset → the check is skipped. */
   TURNSTILE_SECRET_KEY: z.preprocess(blankToUndefined, z.string().min(1).optional()),
+  /** Internal inbox for new-lead alerts (template `lead.sales_alert`). Unset → no sales alert is queued. */
+  SALES_ALERT_EMAIL: z.preprocess(blankToUndefined, z.string().trim().toLowerCase().email().optional()),
   /** Proxy hops in front of the API (Cloudflare, load balancer). Needed so rate limits see the visitor's IP. */
   TRUST_PROXY: z.coerce.number().int().min(0).default(0),
 });

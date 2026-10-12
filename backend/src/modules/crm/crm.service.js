@@ -10,8 +10,10 @@
  */
 import { randomInt } from 'node:crypto';
 import { AppError, badRequest, conflict, notFound } from '../../shared/errors/AppError.js';
+import { publish } from '../../shared/events/bus.js';
 import { csvRow } from '../../shared/lib/csv.js';
 import { logger } from '../../shared/lib/logger.js';
+import { withTransaction } from '../../shared/lib/transactions.js';
 import {
   CONTACT_LIMIT,
   CONTACT_WINDOW_MS,
@@ -117,7 +119,7 @@ export async function createLead(input, now = new Date()) {
   };
   data.score = computeLeadScore(data);
 
-  const doc = await repo.insertLead(data);
+  const doc = await insertLeadWithEvent(data);
   if (!doc) {
     // Lost a race with an identical retry; answer as a replay. A clash on a server ref is practically impossible.
     const existing = input.ref && (await repo.findAnyLeadByRef(input.ref));
@@ -125,9 +127,39 @@ export async function createLead(input, now = new Date()) {
     throw conflict('LEAD_REF_CONFLICT', 'Could not allocate a lead reference. Please try again.');
   }
 
-  await repo.insertActivities([{ leadRef: doc.ref, type: 'created', to: 'NEW', actor: 'public' }]);
   log.info({ event: 'lead.created', leadRef: doc.ref, source: doc.source, score: doc.score }, 'lead created');
   return { lead: mapLeadReceipt(doc), created: true };
+}
+
+/** Thrown inside the transaction to abort it when the ref is already taken (a concurrent replay won). */
+class RefTaken extends Error {}
+
+/**
+ * Saves the lead, its "created" activity and the `lead.created` event together (outbox, ADR-005). The event carries
+ * refs only; handlers read the lead through this module's service. Returns null when the ref was taken meanwhile.
+ */
+async function insertLeadWithEvent(data) {
+  try {
+    return await withTransaction(async (session) => {
+      const doc = await repo.insertLead(data, { session });
+      if (!doc) throw new RefTaken();
+      await repo.insertActivities([{ leadRef: doc.ref, type: 'created', to: 'NEW', actor: 'public' }], { session });
+      await publish(
+        {
+          type: 'lead.created',
+          entity: { type: 'lead', ref: doc.ref },
+          actor: { type: 'public' },
+          payload: { source: doc.source || null },
+          occurredAt: doc.createdAt,
+        },
+        { session },
+      );
+      return doc;
+    });
+  } catch (err) {
+    if (err instanceof RefTaken) return null;
+    throw err;
+  }
 }
 
 // ──────────────────────────────────────────────

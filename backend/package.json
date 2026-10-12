@@ -9,8 +9,10 @@
   },
   "scripts": {
     "dev": "node --env-file-if-exists=.env --watch src/server.js",
+    "dev:worker": "node --env-file-if-exists=.env --watch src/worker.js",
     "dev:memory": "node --env-file-if-exists=.env scripts/dev-memory.js",
     "start": "node src/server.js",
+    "worker": "node src/worker.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",

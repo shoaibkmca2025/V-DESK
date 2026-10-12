@@ -1,11 +1,63 @@
-# shared/events
+# events — the transactional outbox
 
-Domain events let modules react to each other without importing each other's code
-(for example: `lead.created` -> notifications sends a WhatsApp confirmation).
+How modules react to each other without calling each other (rules.md §4, ADR-005, ADR-008).
 
-To be added with the first module that needs it:
+```
+crm.service ──(one transaction)──► leads + domain_events
+                                         │  worker: dispatchDueEvents() every second
+                                         ▼
+                      notifications.events.js handlers ──► notify() ──► notification_log ──► provider
+```
 
-- `eventBus.js` - `publish(type, { entity, payload })` / `subscribe(type, handler)`
-- transactional outbox for payment and booking events (ADR-005 in `docs/backend/memory.md`)
+| File              | What                                                                                   |
+| ----------------- | -------------------------------------------------------------------------------------- |
+| `events.model.js` | `domain_events`: the event (modules.md §4 shape) plus its delivery record              |
+| `bus.js`          | `publish(event, { session })`, `subscribe(type, name, handler)`, `dispatchDueEvents()` |
+| `src/events.js`   | imports every module's `<module>.events.js`, so the worker knows all handlers          |
+| `src/jobs.js`     | the worker job that runs `dispatchDueEvents()`                                         |
 
-Event shape: see `docs/backend/modules.md` section 4.
+## Publishing (the module that owns the change)
+
+```js
+import { publish } from '../../shared/events/bus.js';
+import { withTransaction } from '../../shared/lib/transactions.js';
+
+await withTransaction(async (session) => {
+  const lead = await repo.insertLead(data, { session }); // every write in here takes { session }
+  await publish(
+    { type: 'lead.created', entity: { type: 'lead', ref: lead.ref }, actor: { type: 'public' } },
+    { session },
+  );
+});
+```
+
+- The event is saved **if and only if** the change is. Never publish after the transaction, and never call another
+  module or an HTTP API inside it (the driver may re-run the function on a transient error).
+- `type` is `entity.past_tense` (`lead.created`, `booking.confirmed`, `payment.succeeded`).
+- `payload` stays small and **free of personal data** — refs and codes. Handlers fetch details through the owning
+  module's service, so they see current data and the outbox holds no PII.
+
+## Handling (the module that reacts)
+
+In `src/modules/<module>/<module>.events.js`, then add one import line to `src/events.js`:
+
+```js
+subscribe('lead.created', 'notifications.lead_confirmation', async (event) => { … });
+```
+
+- **At least once:** a handler can run again (crash, lease timeout, a sibling handler failing). Make it idempotent —
+  e.g. `notify()` with a `dedupeKey` built from the event's entity.
+- **Throw to retry** (10 s, 1 min, 5 min, 15 min, 1 h, 3 h, 6 h); after 8 attempts the event is `DEAD`. **Return** when
+  the event needs no action or a retry can't help (missing template, record deleted) — log why.
+- Handlers of one event are tracked separately (`handled`), so a retry only re-runs the ones that failed.
+- The handler `name` is what's recorded — renaming it re-runs that handler for undelivered events.
+- No ordering guarantee between events.
+
+## Operations
+
+- `DONE` events are deleted after 30 days (TTL on `expireAt`). `DEAD` events stay, with `lastError: { handler, code }`
+  — find them with `db.domain_events.find({ status: 'DEAD' })`; set `status: 'PENDING', nextAttemptAt: new Date()` to
+  retry after fixing the cause. (A staff endpoint for this can come with the admin console.)
+- Several workers can run at once: each event is claimed with an atomic update and a 60 s lease.
+- Needs a replica set for the transaction (Atlas is one). On a standalone local `mongod` the API still runs, but the
+  write and its event are not atomic — see backend/README.md.

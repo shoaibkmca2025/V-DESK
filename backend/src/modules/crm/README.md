@@ -57,9 +57,15 @@ message, and first/last-touch source/medium/campaign. UTF-8 with BOM (Excel show
 cells a spreadsheet would treat as formulas (`=`, `+`, `-`, `@` …) start with an apostrophe. `Cache-Control:
 no-store`; each export is logged with its row count and who ran it.
 
+## Events (outbox, ADR-008)
+
+`lead.created` — published in the same transaction as the new lead and its activity, with `entity: { type: 'lead',
+ref }` and `payload: { source }` (no contact details; handlers read the lead with `getLead`). Not published for a
+replayed `ref` or a refused enquiry. Handled today by notifications (visitor confirmation, sales alert).
+
 ## Not built yet
 
-`POST /:ref/convert` (needs customer accounts), `lead.*` events via the outbox (they are logged for now), soft delete
-endpoint, audit log.
+`POST /:ref/convert` (needs customer accounts), `lead.status_changed` / `lead.assigned` events (logged for now),
+soft delete endpoint, audit log.
 
 Full spec: [docs/backend/modules.md §3.5](../../../../docs/backend/modules.md). Layer rules: [backend/README.md](../../../README.md).

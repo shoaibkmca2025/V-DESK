@@ -1,15 +1,17 @@
+import { randomUUID } from 'node:crypto';
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { detectTransactionSupport } from '../src/config/db.js';
 
 /**
- * Real MongoDB in memory for integration tests (rules.md rule 32). Use in a test file:
+ * Real MongoDB for integration tests (rules.md rule 32). test/globalSetup.js starts one single-node replica set
+ * for the whole run; every test file connects to its own, freshly named database on it. Use in a test file:
  *   beforeAll(startTestDb); afterEach(clearTestDb); afterAll(stopTestDb);
  */
-let mongo;
-
 export async function startTestDb() {
-  mongo = await MongoMemoryServer.create();
-  await mongoose.connect(mongo.getUri());
+  const uri = process.env.VDESK_TEST_MONGO_URI;
+  if (!uri) throw new Error('VDESK_TEST_MONGO_URI is not set — run tests through vitest (test/globalSetup.js)');
+  await mongoose.connect(uri, { dbName: `test_${randomUUID().slice(0, 12)}` });
+  await detectTransactionSupport();
   // Build declared indexes (e.g. unique refs) before tests rely on them.
   await Promise.all(Object.values(mongoose.models).map((model) => model.init()));
 }
@@ -20,6 +22,6 @@ export async function clearTestDb() {
 }
 
 export async function stopTestDb() {
+  await mongoose.connection.dropDatabase();
   await mongoose.disconnect();
-  await mongo?.stop();
 }

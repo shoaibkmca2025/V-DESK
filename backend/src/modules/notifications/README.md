@@ -1,8 +1,9 @@
 # Notifications module
 
 Templated email, WhatsApp and SMS messages: templates, a durable queue, and a sender with bounded retries.
-**v1 is a foundation: nothing is sent to anyone yet.** No real provider is connected, nothing queues messages
-automatically (no event bus), and nothing runs the sender on a schedule (no job queue). See "Not built / blocked".
+**Nothing is sent to anyone yet: no real provider is connected.** The rest of the path works: a new lead's
+`lead.created` event queues its messages (once staff create the templates), and the worker's sender job starts as soon
+as a provider is configured in `src/jobs.js`. See "Not built / blocked".
 
 - **Mounted at:** `/api/v1/notifications` (staff only)
 - **Build phase:** 1 (v1) · 3 (v2)
@@ -32,9 +33,23 @@ await processDueNotifications({ providers: { email: emailProvider }, limit: 20 }
 Errors (`AppError`, stable codes): `VALIDATION_FAILED`, `TEMPLATE_NOT_FOUND` (404), `TEMPLATE_INACTIVE` (409),
 `INVALID_RECIPIENT` (400), `INVALID_TEMPLATE_VARIABLES` (400), `DEDUPE_KEY_REUSED` (409).
 
-**Calling `notify()` from another module:** cross-module side effects must go through domain events and the outbox
-(rules.md §4, ADR-005), which don't exist yet. Until they do, no module calls `notify()`; the lead confirmation and
-sales alert (phases.md Phase 1) are wired when the event bus lands.
+**Other modules don't call `notify()`** — cross-module side effects go through domain events (rules.md §4,
+ADR-005/008). The owning module publishes an event; `notifications.events.js` subscribes to it and queues the
+message with `notifyIfConfigured()`, which skips (and logs) when the template doesn't exist yet or needs a value the
+event's record doesn't have. See `src/shared/events/README.md`.
+
+## Messages wired to events
+
+| Event          | Template key                 | To                   | Variables available                                         |
+| -------------- | ---------------------------- | -------------------- | ----------------------------------------------------------- |
+| `lead.created` | `lead.confirmation.email`    | the visitor's email  | `name`, `ref` always; `service`, `city`, `company` if given |
+| `lead.created` | `lead.confirmation.whatsapp` | the visitor's mobile | same                                                        |
+| `lead.created` | `lead.sales_alert`           | `SALES_ALERT_EMAIL`  | same, plus `source`, `score`, `mobile`, `email` (if given)  |
+
+Each is queued only after staff create the template (`POST /templates`, wording from the owner) and only for leads
+that have every variable the template uses — so keep confirmation templates to `name` and `ref` unless a lead without
+a city should get no message. Dedupe keys are `lead.created:<ref>:confirmation:<channel>` and
+`lead.created:<ref>:sales_alert`, so a redelivered event never queues twice.
 
 ## Endpoints (relative to the mount path)
 
@@ -103,8 +118,8 @@ sales alert (phases.md Phase 1) are wired when the event bus lands.
 | What                                                    | Waiting for                                                                                                                                                                  |
 | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Real providers (`email.js`, `whatsapp.js`, `sms.js`)    | Vendor decisions (email "Resend / SES"; WhatsApp BSP; SMS MSG91 per the plan), credentials, confirmed sender numbers/addresses (memory.md §5: current ones are placeholders) |
-| Lead confirmation + sales alert actually being sent     | The event bus + outbox (ADR-005) so crm can emit `lead.created`; the message wording (not documented — staff write it as templates); a provider                              |
-| Running `processDueNotifications` on a schedule         | The job queue (BullMQ + Redis, rules.md §28) — not built                                                                                                                     |
+| Lead confirmation + sales alert actually being sent     | The message wording (owner/content — create the three templates above) and a provider. The event and queueing are wired                                                      |
+| Booking / order / payment messages                      | Those modules publishing events (`booking.confirmed`, `payment.succeeded`, …) and their templates                                                                            |
 | Delivery receipts (`DELIVERED`), provider webhooks      | Real providers                                                                                                                                                               |
 | `POST /webhooks/whatsapp` (inbound → lead threading)    | Notifications v2 (phases.md Phase 3) and a WhatsApp provider                                                                                                                 |
 | Templates managed in the CMS, retention job for the log | Phase 3 CMS; a data-retention decision                                                                                                                                       |

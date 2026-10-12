@@ -171,6 +171,31 @@ export async function notify(request, now = new Date()) {
   return { notification: mapReceipt(doc), created: true };
 }
 
+/**
+ * For event handlers: queues a message only if staff have created and switched on `templateKey`, passing exactly
+ * the variables that template declares, picked from `available`. Templates are written by staff later (the wording
+ * is theirs), so "no template yet" is a normal state, not an error.
+ * @param {{ templateKey: string, to: string, available: Record<string, string|number|null|undefined>,
+ *           dedupeKey: string }} request
+ * @returns {Promise<{ notification?: object, created?: boolean, skipped?: string, variable?: string }>}
+ *   `skipped`: 'TEMPLATE_NOT_CONFIGURED' (missing or switched off) or 'VARIABLE_UNAVAILABLE' (the template uses a
+ *   value this event doesn't have, e.g. {{ city }} for a lead that gave none).
+ */
+export async function notifyIfConfigured({ templateKey, to, available, dedupeKey }, now = new Date()) {
+  const template = await repo.findTemplate(templateKey);
+  if (!template || !template.active) return { skipped: 'TEMPLATE_NOT_CONFIGURED' };
+
+  const variables = {};
+  for (const name of template.variables) {
+    const value = available[name];
+    if (value === null || value === undefined || String(value).trim() === '') {
+      return { skipped: 'VARIABLE_UNAVAILABLE', variable: name };
+    }
+    variables[name] = value;
+  }
+  return notify({ templateKey, to, variables, dedupeKey }, now);
+}
+
 // ──────────────────────────────────────────────
 // Sending (background worker)
 // ──────────────────────────────────────────────
