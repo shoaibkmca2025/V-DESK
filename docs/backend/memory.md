@@ -210,3 +210,12 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
   only with variables the lead actually has (`name`, `ref` always; `service`, `city`, `company` when given). Nothing
   is sent until a messaging provider is chosen; the worker's sender job is added automatically when one is configured
   in `src/jobs.js`. Event payloads carry refs only — handlers read details through the owning module's service.
+- **2026-10-12** — `cms` built. Decisions: one `content_entries` collection for all types (faqs, testimonials,
+  guides, legal, trust-claims, seo) with a `draft` and a `published` copy, optimistic versions and an append-only
+  `content_revisions` log, instead of seven collections — they share one workflow. Public shapes equal the
+  frontend data files (FAQ items stay `[question, answer]` pairs). Legal HTML is sanitised server-side with
+  `sanitize-html` (new dependency) because the frontend renders it as HTML. Trust claims need `content:approve`
+  (SUPER_ADMIN) **and** an evidence note to publish; the seed creates the homepage figures as unapproved drafts.
+  `blog_posts` from the plan = the existing resource guides; banners / homepage sections not built (no data source
+  yet). `sitemap.xml` is generated from catalog + search services + published content and needs `SITE_URL` — the
+  site domain is still an owner decision. search gained a read-only `listServices()` export for it.

@@ -2,78 +2,85 @@
   "clientName": "Thunder Client",
   "collectionName": "V-DESK API",
   "collectionId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
-  "dateExported": "2026-10-11T10:29:47.812Z",
+  "dateExported": "2026-10-12T10:08:05.600Z",
   "version": "1.2",
   "folders": [
     {
       "_id": "ef07de6a-8d89-4f96-a64b-2b281d1cbc1b",
       "name": "0. Health",
       "containerId": "",
-      "created": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
       "sortNum": 20000
     },
     {
       "_id": "b43b55ca-295a-4c95-830e-c54b767e5844",
       "name": "1. Catalog (public)",
       "containerId": "",
-      "created": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
       "sortNum": 30000
     },
     {
       "_id": "23fffcd0-338c-4a32-a0c8-89310670cd92",
       "name": "2. Leads - public",
       "containerId": "",
-      "created": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
       "sortNum": 40000
     },
     {
       "_id": "8ef6ea8c-b102-4cb1-a11c-a56bcbcd66a3",
       "name": "3. Leads - staff (x-admin-key)",
       "containerId": "",
-      "created": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
       "sortNum": 50000
     },
     {
       "_id": "07f6bddd-d849-4c86-8baf-c48ca55b6d61",
       "name": "4. Error cases",
       "containerId": "",
-      "created": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
       "sortNum": 60000
     },
     {
       "_id": "41ff5785-a6e3-43de-8ecf-5842c80a2987",
       "name": "5. Auth (staff sign-in)",
       "containerId": "",
-      "created": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
       "sortNum": 70000
     },
     {
       "_id": "ca74606a-1c51-4ccd-9ebe-c6c8c1f492a5",
       "name": "6. Analytics",
       "containerId": "",
-      "created": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
       "sortNum": 80000
     },
     {
       "_id": "c1ace33a-46e5-4828-85e3-e6ee5faf11f8",
       "name": "7. Pricing & quotes",
       "containerId": "",
-      "created": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
       "sortNum": 90000
     },
     {
       "_id": "cc5ce891-da3c-4d42-b799-9cf08f1f677d",
       "name": "8. Catalog - staff (catalog:manage)",
       "containerId": "",
-      "created": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
       "sortNum": 100000
     },
     {
       "_id": "17b08a05-b02a-47a7-a6c4-745b9e721246",
       "name": "9. Leads - export & attribution",
       "containerId": "",
-      "created": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
       "sortNum": 110000
+    },
+    {
+      "_id": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "10. Content (CMS)",
+      "containerId": "",
+      "created": "2026-10-12T10:08:05.600Z",
+      "sortNum": 120000
     }
   ],
   "requests": [
@@ -85,8 +92,8 @@
       "url": "{{baseUrl}}/health",
       "method": "GET",
       "sortNum": 20000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -106,8 +113,8 @@
       "url": "{{baseUrl}}/ready",
       "method": "GET",
       "sortNum": 30000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -127,8 +134,8 @@
       "url": "{{baseUrl}}/api/v1/catalog",
       "method": "GET",
       "sortNum": 40000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -148,8 +155,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/cities",
       "method": "GET",
       "sortNum": 50000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -169,8 +176,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/cities/mumbai",
       "method": "GET",
       "sortNum": 60000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -190,8 +197,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/centres",
       "method": "GET",
       "sortNum": 70000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -211,8 +218,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/centres?city=mumbai",
       "method": "GET",
       "sortNum": 80000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [
         {
@@ -238,8 +245,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/centres/CTR-MUM-001",
       "method": "GET",
       "sortNum": 90000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -259,8 +266,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/workspaces",
       "method": "GET",
       "sortNum": 100000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -280,8 +287,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/workspaces?city=Mumbai&type=Private%20Office&capacity=4&maxPrice=50000",
       "method": "GET",
       "sortNum": 110000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [
         {
@@ -322,8 +329,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/workspaces/WS-MUM-001",
       "method": "GET",
       "sortNum": 120000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -343,8 +350,8 @@
       "url": "{{baseUrl}}/api/v1/leads",
       "method": "POST",
       "sortNum": 130000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -374,8 +381,8 @@
       "url": "{{baseUrl}}/api/v1/leads",
       "method": "POST",
       "sortNum": 140000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -405,8 +412,8 @@
       "url": "{{baseUrl}}/api/v1/leads?limit=25",
       "method": "GET",
       "sortNum": 150000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -437,8 +444,8 @@
       "url": "{{baseUrl}}/api/v1/leads?status=NEW&city=Mumbai&q=rahul&limit=10",
       "method": "GET",
       "sortNum": 160000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -484,8 +491,8 @@
       "url": "{{baseUrl}}/api/v1/leads/stats",
       "method": "GET",
       "sortNum": 170000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -510,8 +517,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "GET",
       "sortNum": 180000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -536,8 +543,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 190000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -571,8 +578,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 200000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -606,8 +613,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 210000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -641,8 +648,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 220000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -676,8 +683,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 230000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -711,8 +718,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 240000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -746,8 +753,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 250000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -781,8 +788,8 @@
       "url": "{{baseUrl}}/api/v1/leads",
       "method": "POST",
       "sortNum": 260000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -812,8 +819,8 @@
       "url": "{{baseUrl}}/api/v1/leads",
       "method": "GET",
       "sortNum": 270000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -833,8 +840,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 280000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -868,8 +875,8 @@
       "url": "{{baseUrl}}/api/v1/leads/{{leadRef}}",
       "method": "PATCH",
       "sortNum": 290000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -903,8 +910,8 @@
       "url": "{{baseUrl}}/api/v1/leads/VD-NOPE-9999",
       "method": "GET",
       "sortNum": 300000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -929,8 +936,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/workspaces/WS-NOPE",
       "method": "GET",
       "sortNum": 310000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -950,8 +957,8 @@
       "url": "{{baseUrl}}/api/v1/bookings",
       "method": "GET",
       "sortNum": 320000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -971,8 +978,8 @@
       "url": "{{baseUrl}}/api/v1/auth/users",
       "method": "POST",
       "sortNum": 330000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -1006,8 +1013,8 @@
       "url": "{{baseUrl}}/api/v1/auth/login",
       "method": "POST",
       "sortNum": 340000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -1037,8 +1044,8 @@
       "url": "{{baseUrl}}/api/v1/auth/mfa/enroll",
       "method": "POST",
       "sortNum": 350000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -1068,8 +1075,8 @@
       "url": "{{baseUrl}}/api/v1/auth/mfa/verify",
       "method": "POST",
       "sortNum": 360000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -1099,8 +1106,8 @@
       "url": "{{baseUrl}}/api/v1/auth/me",
       "method": "GET",
       "sortNum": 370000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Authorization",
@@ -1125,8 +1132,8 @@
       "url": "{{baseUrl}}/api/v1/auth/refresh",
       "method": "POST",
       "sortNum": 380000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -1146,8 +1153,8 @@
       "url": "{{baseUrl}}/api/v1/auth/users?limit=25",
       "method": "GET",
       "sortNum": 390000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Authorization",
@@ -1178,8 +1185,8 @@
       "url": "{{baseUrl}}/api/v1/auth/users",
       "method": "POST",
       "sortNum": 400000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Authorization",
@@ -1213,8 +1220,8 @@
       "url": "{{baseUrl}}/api/v1/leads?limit=10",
       "method": "GET",
       "sortNum": 410000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Authorization",
@@ -1245,8 +1252,8 @@
       "url": "{{baseUrl}}/api/v1/auth/me",
       "method": "GET",
       "sortNum": 420000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -1266,8 +1273,8 @@
       "url": "{{baseUrl}}/api/v1/auth/logout",
       "method": "POST",
       "sortNum": 430000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -1287,8 +1294,8 @@
       "url": "{{baseUrl}}/api/v1/analytics/events",
       "method": "POST",
       "sortNum": 440000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -1318,8 +1325,8 @@
       "url": "{{baseUrl}}/api/v1/analytics/events?limit=20",
       "method": "GET",
       "sortNum": 450000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -1350,8 +1357,8 @@
       "url": "{{baseUrl}}/api/v1/analytics/kpis?range=7d",
       "method": "GET",
       "sortNum": 460000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -1382,8 +1389,8 @@
       "url": "{{baseUrl}}/api/v1/analytics/funnel?range=7d",
       "method": "GET",
       "sortNum": 470000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -1414,8 +1421,8 @@
       "url": "{{baseUrl}}/api/v1/pricing/quote-preview",
       "method": "POST",
       "sortNum": 480000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -1445,8 +1452,8 @@
       "url": "{{baseUrl}}/api/v1/pricing/quote-preview",
       "method": "POST",
       "sortNum": 490000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -1476,8 +1483,8 @@
       "url": "{{baseUrl}}/api/v1/pricing/quote-preview",
       "method": "POST",
       "sortNum": 500000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -1507,8 +1514,8 @@
       "url": "{{baseUrl}}/api/v1/pricing/quote-preview",
       "method": "POST",
       "sortNum": 510000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -1538,8 +1545,8 @@
       "url": "{{baseUrl}}/api/v1/pricing/quotes",
       "method": "POST",
       "sortNum": 520000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Idempotency-Key",
@@ -1573,8 +1580,8 @@
       "url": "{{baseUrl}}/api/v1/pricing/quotes/{{quoteRef}}",
       "method": "GET",
       "sortNum": 530000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -1594,8 +1601,8 @@
       "url": "{{baseUrl}}/api/v1/pricing/quotes/{{quoteRef}}/status",
       "method": "PATCH",
       "sortNum": 540000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -1625,8 +1632,8 @@
       "url": "{{baseUrl}}/api/v1/pricing/quotes/{{quoteRef}}/status",
       "method": "PATCH",
       "sortNum": 550000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -1656,8 +1663,8 @@
       "url": "{{baseUrl}}/api/v1/pricing/quotes?limit=25",
       "method": "GET",
       "sortNum": 560000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -1688,8 +1695,8 @@
       "url": "{{baseUrl}}/api/v1/pricing/rules",
       "method": "GET",
       "sortNum": 570000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -1714,8 +1721,8 @@
       "url": "{{baseUrl}}/api/v1/pricing/rules/tax",
       "method": "PUT",
       "sortNum": 580000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -1749,8 +1756,8 @@
       "url": "{{baseUrl}}/api/v1/pricing/rules/tax",
       "method": "DELETE",
       "sortNum": 590000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -1775,8 +1782,8 @@
       "url": "{{baseUrl}}/api/v1/pricing/quotes",
       "method": "POST",
       "sortNum": 600000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -1806,8 +1813,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/admin/cities",
       "method": "GET",
       "sortNum": 610000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -1832,8 +1839,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/admin/cities",
       "method": "POST",
       "sortNum": 620000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -1867,8 +1874,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/admin/cities/indore",
       "method": "PATCH",
       "sortNum": 630000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -1902,8 +1909,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/admin/centres",
       "method": "POST",
       "sortNum": 640000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -1937,8 +1944,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/admin/centres?city=indore",
       "method": "GET",
       "sortNum": 650000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -1969,8 +1976,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/admin/centres/CTR-INDORE-001",
       "method": "PATCH",
       "sortNum": 660000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -2004,8 +2011,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/admin/centres/CTR-INDORE-001",
       "method": "PATCH",
       "sortNum": 670000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -2039,8 +2046,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/admin/workspaces",
       "method": "POST",
       "sortNum": 680000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -2074,8 +2081,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/admin/workspaces/WS-INDORE-001",
       "method": "PATCH",
       "sortNum": 690000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -2109,8 +2116,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/admin/centres/CTR-INDORE-001",
       "method": "DELETE",
       "sortNum": 700000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -2135,8 +2142,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/admin/workspaces/WS-INDORE-001",
       "method": "DELETE",
       "sortNum": 710000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -2161,8 +2168,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/admin/centres/CTR-INDORE-001",
       "method": "DELETE",
       "sortNum": 720000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -2187,8 +2194,8 @@
       "url": "{{baseUrl}}/api/v1/catalog/admin/cities/indore",
       "method": "DELETE",
       "sortNum": 730000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -2213,8 +2220,8 @@
       "url": "{{baseUrl}}/api/v1/leads",
       "method": "POST",
       "sortNum": 740000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -2244,8 +2251,8 @@
       "url": "{{baseUrl}}/api/v1/leads/export.csv",
       "method": "GET",
       "sortNum": 750000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -2270,8 +2277,8 @@
       "url": "{{baseUrl}}/api/v1/leads/export.csv?status=NEW&city=Pune&from=2026-10-01&to=2026-12-31",
       "method": "GET",
       "sortNum": 760000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "x-admin-key",
@@ -2317,8 +2324,8 @@
       "url": "{{baseUrl}}/api/v1/leads",
       "method": "POST",
       "sortNum": 770000,
-      "created": "2026-10-11T10:29:47.812Z",
-      "modified": "2026-10-11T10:29:47.812Z",
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -2339,7 +2346,510 @@
           "value": "429"
         }
       ]
+    },
+    {
+      "_id": "32724de3-b521-42d5-bb8a-0bd37437f139",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "FAQs (public)",
+      "url": "{{baseUrl}}/api/v1/content/faqs",
+      "method": "GET",
+      "sortNum": 780000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "a85d5eb9-0160-49ad-bdcc-722ac9405390",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "Testimonials (public)",
+      "url": "{{baseUrl}}/api/v1/content/testimonials",
+      "method": "GET",
+      "sortNum": 790000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "a30b3349-f1a3-4d4b-bd93-9bff69be180c",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "Guides by category (public)",
+      "url": "{{baseUrl}}/api/v1/content/guides?category=GST",
+      "method": "GET",
+      "sortNum": 800000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [],
+      "params": [
+        {
+          "name": "category",
+          "value": "GST",
+          "isPath": false
+        }
+      ],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "c4290ba1-9953-4215-81af-045117f913f9",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "One guide (public)",
+      "url": "{{baseUrl}}/api/v1/content/guides/virtual-office-gst-rules-2026",
+      "method": "GET",
+      "sortNum": 810000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "77ab9e26-e452-43d1-816e-16a5653a4ca9",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "Legal page (public)",
+      "url": "{{baseUrl}}/api/v1/content/legal/privacy",
+      "method": "GET",
+      "sortNum": 820000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "d3f8b3fa-d6e9-409a-8299-56292ee23b69",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "Trust claims (public, approved only)",
+      "url": "{{baseUrl}}/api/v1/content/trust-claims",
+      "method": "GET",
+      "sortNum": 830000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "d86fc255-6c1d-4a6d-aae6-e69ad5011725",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "SEO override for a page (public)",
+      "url": "{{baseUrl}}/api/v1/content/seo?path=%2Fvirtual-office",
+      "method": "GET",
+      "sortNum": 840000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [],
+      "params": [
+        {
+          "name": "path",
+          "value": "/virtual-office",
+          "isPath": false
+        }
+      ],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "3b141927-40fd-4ee8-8181-ec176e34d563",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "sitemap.xml (needs SITE_URL)",
+      "url": "{{baseUrl}}/api/v1/content/sitemap.xml",
+      "method": "GET",
+      "sortNum": 850000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "b8e35d1c-bdf5-49a5-b6db-18c8f31b3e6b",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "Staff: list FAQ groups with drafts",
+      "url": "{{baseUrl}}/api/v1/content/admin/faqs",
+      "method": "GET",
+      "sortNum": 860000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "c01bb9d3-cd52-47e0-91ac-7e999d510aef",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "Staff: create FAQ group (draft)",
+      "url": "{{baseUrl}}/api/v1/content/admin/faqs/office-hours",
+      "method": "PUT",
+      "sortNum": 870000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"order\": 10,\n  \"data\": {\n    \"title\": \"Office Hours & Access\",\n    \"icon\": \"ph-clock\",\n    \"items\": [\n      [\n        \"What are the centre timings?\",\n        \"Most centres are open 9 AM to 8 PM, Monday to Saturday.\"\n      ]\n    ]\n  }\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "201"
+        }
+      ]
+    },
+    {
+      "_id": "43e84016-8878-4cce-9c09-54ac82562ea4",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "Staff: publish FAQ group (version 1)",
+      "url": "{{baseUrl}}/api/v1/content/admin/faqs/office-hours/publish",
+      "method": "POST",
+      "sortNum": 880000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"version\": 1\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "2fbf8c6c-d745-4761-93ad-7285ae5c46c2",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "Staff: edit draft (send loaded version)",
+      "url": "{{baseUrl}}/api/v1/content/admin/faqs/office-hours",
+      "method": "PUT",
+      "sortNum": 890000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"version\": 1,\n  \"data\": {\n    \"title\": \"Office Hours & Access\",\n    \"icon\": \"ph-clock\",\n    \"items\": [\n      [\n        \"What are the centre timings?\",\n        \"Most centres are open 9 AM to 9 PM, Monday to Saturday.\"\n      ]\n    ]\n  }\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "da0fddce-9dbc-4315-9db6-6a37f16a2eba",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "Staff: revisions",
+      "url": "{{baseUrl}}/api/v1/content/admin/faqs/office-hours/revisions",
+      "method": "GET",
+      "sortNum": 900000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "5849aee1-b0c9-465b-b516-c48bc9403e08",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "Staff: legal page (HTML is sanitised)",
+      "url": "{{baseUrl}}/api/v1/content/admin/legal/cookies",
+      "method": "PUT",
+      "sortNum": 910000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"data\": {\n    \"title\": \"Cookie Policy\",\n    \"content\": \"<h4>1. Cookies</h4><p>We use essential cookies only.</p><script>alert(1)</script>\",\n    \"lastUpdated\": \"2026-10-12\"\n  }\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "201"
+        }
+      ]
+    },
+    {
+      "_id": "ea7eb9e7-cbe5-4c19-b001-b899aa97315c",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "Staff: trust claim draft",
+      "url": "{{baseUrl}}/api/v1/content/admin/trust-claims/centres-live",
+      "method": "PUT",
+      "sortNum": 920000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"data\": {\n    \"value\": \"15\",\n    \"label\": \"Centres live\",\n    \"evidence\": \"Catalog: 15 active centres on 2026-10-12\"\n  }\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "201"
+        }
+      ]
+    },
+    {
+      "_id": "980de5b8-8925-4c48-9b2c-86242d9b46d8",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "Staff: publish trust claim (super admin only)",
+      "url": "{{baseUrl}}/api/v1/content/admin/trust-claims/centres-live/publish",
+      "method": "POST",
+      "sortNum": 930000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"version\": 1\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ]
+    },
+    {
+      "_id": "f97c3445-1e22-4fca-a485-5d85d56bc245",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "Staff: SEO override for /virtual-office",
+      "url": "{{baseUrl}}/api/v1/content/admin/seo/%2Fvirtual-office",
+      "method": "PUT",
+      "sortNum": 940000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"data\": {\n    \"title\": \"Virtual Office in India for GST | V-DESK\",\n    \"description\": \"GST-ready business address in 10+ cities.\"\n  }\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "201"
+        }
+      ]
+    },
+    {
+      "_id": "73e5ee7a-ab4a-49d0-abe7-4aa6e747fbd2",
+      "colId": "98f703e3-ac27-4ef0-999d-cbe8abae7b6d",
+      "containerId": "82cd4bda-bc95-472f-b119-5253558cd760",
+      "name": "Staff: delete FAQ group",
+      "url": "{{baseUrl}}/api/v1/content/admin/faqs/office-hours",
+      "method": "DELETE",
+      "sortNum": 950000,
+      "created": "2026-10-12T10:08:05.600Z",
+      "modified": "2026-10-12T10:08:05.600Z",
+      "headers": [
+        {
+          "name": "x-admin-key",
+          "value": "{{adminKey}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "204"
+        }
+      ]
     }
   ],
-  "ref": "0c72bb19-75d"
+  "ref": "56281564-580"
 }

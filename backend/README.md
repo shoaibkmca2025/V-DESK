@@ -8,8 +8,9 @@ folder/layer structure are in place. Implemented: `catalog` (public read API), `
 config), `crm` (leads + pipeline), `identity` (staff sign-in with MFA, roles), `analytics` (telemetry, KPIs, funnel),
 `pricing` (quote preview, quotes, pricing rules), `booking` (meeting-room availability, holds, staff confirmation) and
 `orders` (order foundation — payments and invoices still blocked) and `notifications` (templates, queue, sender, and
-the lead confirmation / sales alert via events — no real messaging provider yet). Platform: background worker,
-transactional event outbox (ADR-008). The other 4 modules are empty skeletons waiting for their code.
+the lead confirmation / sales alert via events — no real messaging provider yet) and `cms` (FAQs, testimonials,
+guides, legal pages, trust claims, SEO, sitemap — draft → publish). Platform: background worker,
+transactional event outbox (ADR-008). The other 3 modules are empty skeletons waiting for their code.
 
 ## Quick start
 
@@ -76,7 +77,7 @@ backend/
 │   │   ├── events/          transactional outbox + event bus (publish / subscribe / dispatch)
 │   │   └── jobs/            job runner used by the worker (MongoDB-backed, no Redis — ADR-008)
 │   └── integrations/        turnstile, messaging contract + fake; Razorpay, S3, email, WhatsApp, SMS to come
-├── scripts/                 dev-memory, seed-catalog, seed-search, create-admin, totp; later migrations
+├── scripts/                 dev-memory, seed-catalog, seed-search, seed-content, create-admin, totp; later migrations
 ├── thunder-client/          Thunder Client collection + local environment for manual API testing
 └── test/                    globalSetup + db.js (shared in-memory replica set), platform tests
 ```
@@ -162,3 +163,4 @@ Add these when a module needs them:
 | `TRUST_PROXY`          | `0`                               | proxies in front of the API (e.g. `1` behind Cloudflare) so rate limits see real IPs      |
 | `TURNSTILE_SECRET_KEY` | _(unset)_                         | Cloudflare Turnstile secret; set → `POST /leads` needs a CAPTCHA token, unset → check off |
 | `SALES_ALERT_EMAIL`    | _(unset)_                         | inbox for new-lead alerts (template `lead.sales_alert`); unset → no alert queued          |
+| `SITE_URL`             | _(unset)_                         | public site address, e.g. `https://vdesk.in`, for `sitemap.xml`; unset → sitemap 503      |
