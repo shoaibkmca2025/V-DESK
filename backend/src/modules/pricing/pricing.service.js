@@ -8,16 +8,26 @@
  *  - Creating a quote needs an Idempotency-Key (§10): a replay returns the same quote, and reusing a key
  *    for a different request is 409.
  *  - Status moves follow QUOTE_TRANSITIONS (§5). Open quotes past `validUntil` read as EXPIRED and can no
- *    longer be accepted; the first such attempt persists EXPIRED (there is no expiry job yet).
+ *    longer be accepted; EXPIRED is saved by the first such attempt or by the `pricing.expire_quotes` job.
+ *  - `quote.sent`, `quote.accepted` and `quote.expired` are written to the outbox in the same transaction as the
+ *    change (ADR-005), only when it is saved. Payloads carry refs and product types only.
  *  - Logs carry quote refs, product types and totals — never names or companies (§21).
  */
 import { createHash } from 'node:crypto';
 import { badRequest, conflict, notFound } from '../../shared/errors/AppError.js';
+import { publish } from '../../shared/events/bus.js';
 import { logger } from '../../shared/lib/logger.js';
 import { decodeCursor, toPage } from '../../shared/lib/pagination.js';
 import { generateRef } from '../../shared/lib/refs.js';
+import { withTransaction } from '../../shared/lib/transactions.js';
 import { getCentre } from '../catalog/index.js';
-import { DEFAULT_PRICING_RULES, QUOTE_TRANSITIONS, QUOTE_VALIDITY_DAYS, RULE_KEYS } from './pricing.constants.js';
+import {
+  DEFAULT_PRICING_RULES,
+  OPEN_STATUSES,
+  QUOTE_TRANSITIONS,
+  QUOTE_VALIDITY_DAYS,
+  RULE_KEYS,
+} from './pricing.constants.js';
 import { priceItem } from './pricing.engine.js';
 import { effectiveStatus, mapQuote, mapQuoteForStaff, mapRule } from './pricing.mapper.js';
 import * as repo from './pricing.repository.js';
@@ -103,7 +113,7 @@ export async function createQuote({ name, company, item }, idempotencyKey, now =
   if (replay) return { quote: mapQuote(replay, now), created: false };
 
   const { product: productType, label, tenure, rate_month_paise, ...pricing } = await previewItem(item);
-  const doc = await repo.insertQuote({
+  const doc = await insertQuoteWithEvent({
     ref: generateRef('VDQ', 8),
     status: 'SENT',
     productType,
@@ -131,6 +141,58 @@ export async function createQuote({ name, company, item }, idempotencyKey, now =
   return { quote: mapQuote(doc, now), created: true };
 }
 
+/** Thrown inside the transaction to abort it when the Idempotency-Key was taken by a concurrent request. */
+class KeyTaken extends Error {}
+
+/** Saves the quote and `quote.sent` together; null when the Idempotency-Key was taken meanwhile. */
+async function insertQuoteWithEvent(data) {
+  try {
+    return await withTransaction(async (session) => {
+      const doc = await repo.insertQuote(data, { session });
+      if (!doc) throw new KeyTaken();
+      await publish(
+        {
+          type: 'quote.sent',
+          entity: { type: 'quote', ref: doc.ref },
+          actor: { type: 'public' },
+          payload: { productType: doc.productType },
+        },
+        { session },
+      );
+      return doc;
+    });
+  } catch (err) {
+    if (err instanceof KeyTaken) return null;
+    throw err;
+  }
+}
+
+/** The event announcing a move into each status; other moves (VIEWED, REJECTED) have none (modules.md §3.4). */
+const STATUS_EVENTS = { ACCEPTED: 'quote.accepted', EXPIRED: 'quote.expired' };
+
+/**
+ * Moves a quote from `from` to `to` and records the matching event with it. Moves other than EXPIRED also require
+ * the quote to be valid at `now`. Returns the updated quote, or null — with no event — if it changed meanwhile.
+ */
+async function transitionQuote(ref, from, to, actor, now) {
+  return withTransaction(async (session) => {
+    const validAt = to === 'EXPIRED' ? undefined : now;
+    const updated = await repo.updateQuoteStatus(ref, from, to, { status: to, at: now, actor }, { validAt, session });
+    if (updated && STATUS_EVENTS[to]) {
+      await publish(
+        {
+          type: STATUS_EVENTS[to],
+          entity: { type: 'quote', ref },
+          actor: { type: actor === 'system' ? 'system' : 'public' },
+          payload: { from, productType: updated.productType },
+        },
+        { session },
+      );
+    }
+    return updated;
+  });
+}
+
 async function findQuoteOrThrow(ref) {
   const quote = await repo.findQuoteByRef(ref);
   if (!quote) throw notFound('QUOTE_NOT_FOUND', `No quote found for ref '${ref}'`);
@@ -152,9 +214,7 @@ export async function changeQuoteStatus(ref, to, actor, now = new Date()) {
   if (current === to || (to === 'VIEWED' && current !== 'SENT')) return mapQuote(quote, now);
 
   if (current === 'EXPIRED') {
-    if (quote.status !== 'EXPIRED') {
-      await repo.updateQuoteStatus(ref, quote.status, 'EXPIRED', { status: 'EXPIRED', at: now, actor: 'system' });
-    }
+    if (quote.status !== 'EXPIRED') await transitionQuote(ref, quote.status, 'EXPIRED', 'system', now);
     throw conflict('QUOTE_EXPIRED', 'This quote has expired. Please ask your advisor for a fresh one.', {
       validUntil: quote.validUntil,
     });
@@ -168,7 +228,7 @@ export async function changeQuoteStatus(ref, to, actor, now = new Date()) {
     });
   }
 
-  const updated = await repo.updateQuoteStatus(ref, quote.status, to, { status: to, at: now, actor });
+  const updated = await transitionQuote(ref, quote.status, to, actor, now);
   if (!updated) throw conflict('QUOTE_CHANGED', 'This quote was just changed. Please reload and try again.');
   log.info({ event: `quote.${to.toLowerCase()}`, quoteRef: ref, from: current, to }, 'quote status changed');
   return mapQuote(updated, now);
@@ -179,4 +239,21 @@ export async function listQuotes({ status, cursor, limit }, now = new Date()) {
   const after = cursor ? decodeCursor(cursor) : undefined;
   const { items, nextCursor } = toPage(await repo.findQuotes({ status, after, limit }), limit);
   return { quotes: items.map((doc) => mapQuoteForStaff(doc, now)), nextCursor };
+}
+
+// ──────────────────────────────────────────────
+// Expiry job (worker)
+// ──────────────────────────────────────────────
+
+/**
+ * Saves EXPIRED on open quotes past their validUntil, publishing `quote.expired` for each. Each move is a conditional
+ * update, so several workers — or a customer accepting at the same moment — can never both win.
+ * @returns {Promise<{ expired: number }>}
+ */
+export async function expireLapsedQuotes({ limit = 100, now = new Date() } = {}) {
+  let expired = 0;
+  for (const quote of await repo.findLapsedQuotes(OPEN_STATUSES, now, limit)) {
+    if (await transitionQuote(quote.ref, quote.status, 'EXPIRED', 'system', now)) expired += 1;
+  }
+  return { expired };
 }

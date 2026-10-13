@@ -63,9 +63,13 @@ no-store`; each export is logged with its row count and who ran it.
 ref }` and `payload: { source }` (no contact details; handlers read the lead with `getLead`). Not published for a
 replayed `ref` or a refused enquiry. Handled today by notifications (visitor confirmation, sales alert).
 
+`lead.status_changed` — published by `PATCH /:ref` in the same transaction as the status change and its timeline
+entries, with `payload: { from, to }` and the staff actor. Not published for notes, (un)assignments, repeating the
+current status or a refused move; if the outbox write fails, nothing (status, activities) is saved. No handler yet.
+
 ## Not built yet
 
-`POST /:ref/convert` (needs customer accounts), `lead.status_changed` / `lead.assigned` events (logged for now),
-soft delete endpoint, audit log.
+`POST /:ref/convert` (needs customer accounts), `lead.converted` / `lead.assigned` events, soft delete endpoint,
+audit log.
 
 Full spec: [docs/backend/modules.md §3.5](../../../../docs/backend/modules.md). Layer rules: [backend/README.md](../../../README.md).

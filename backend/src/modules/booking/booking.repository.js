@@ -60,12 +60,20 @@ export async function findBookings({ status, centreRef, date, after, limit }) {
  * Moves a booking to `to` only if it is still in `from` (and, when given, its hold hasn't lapsed) — two people
  * confirming and cancelling at once can't both win. Returns the updated booking, or null if it changed meanwhile.
  */
-export async function updateBookingStatus(ref, from, to, entry, { unexpiredAt } = {}) {
+export async function updateBookingStatus(ref, from, to, entry, { unexpiredAt, session } = {}) {
   return Booking.findOneAndUpdate(
     { ref, status: from, ...notDeleted, ...(unexpiredAt && { expiresAt: { $gt: unexpiredAt } }) },
     { $set: { status: to }, $push: { history: entry } },
-    { returnDocument: 'after' },
+    { returnDocument: 'after', session },
   ).lean();
+}
+
+/** Holds whose time ran out but are still saved as HELD, oldest first — for the expiry job. */
+export async function findLapsedHolds(now, limit) {
+  return Booking.find({ status: 'HELD', expiresAt: { $lte: now }, ...notDeleted }, { ref: 1, status: 1, _id: 0 })
+    .sort({ expiresAt: 1 })
+    .limit(limit)
+    .lean();
 }
 
 // ──────────────────────────────────────────────
@@ -95,9 +103,9 @@ export async function countSlots(bookingRef, { permanentOnly = false } = {}) {
  * Reserves every hour for one booking, in order. Returns true when all were inserted, false when any hour is
  * already taken (unique index) — in that case the caller must release the ones that did go in.
  */
-export async function insertSlots(slots) {
+export async function insertSlots(slots, { session } = {}) {
   try {
-    await BookingSlot.insertMany(slots, { ordered: true });
+    await BookingSlot.insertMany(slots, { ordered: true, session });
     return true;
   } catch (err) {
     if (err.code === DUPLICATE_KEY || err.writeErrors?.some((e) => e.code === DUPLICATE_KEY)) return false;

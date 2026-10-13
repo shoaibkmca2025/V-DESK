@@ -42,9 +42,9 @@ export async function findQuoteByIdempotencyKey(idempotencyKey) {
 }
 
 /** Inserts a quote, or returns null when the Idempotency-Key was taken by a concurrent request. */
-export async function insertQuote(data) {
+export async function insertQuote(data, { session } = {}) {
   try {
-    const doc = await Quote.create(data);
+    const [doc] = await Quote.create([data], { session });
     return doc.toObject();
   } catch (err) {
     if (err.code === DUPLICATE_KEY) return null;
@@ -62,13 +62,25 @@ export async function findQuotes({ status, after, limit }) {
 }
 
 /**
- * Moves a quote to `to` only if it is still in `from` — two people accepting and rejecting at once can't
- * both win. Returns the updated quote, or null if it changed meanwhile.
+ * Moves a quote to `to` only if it is still in `from` (and, when given, still valid at `validAt`) — two people
+ * accepting and rejecting at once can't both win, and a quote can't be accepted the instant it lapses.
+ * Returns the updated quote, or null if it changed meanwhile.
  */
-export async function updateQuoteStatus(ref, from, to, entry) {
+export async function updateQuoteStatus(ref, from, to, entry, { validAt, session } = {}) {
   return Quote.findOneAndUpdate(
-    { ref, status: from, ...notDeleted },
+    { ref, status: from, ...notDeleted, ...(validAt && { validUntil: { $gt: validAt } }) },
     { $set: { status: to }, $push: { history: entry } },
-    { returnDocument: 'after' },
+    { returnDocument: 'after', session },
   ).lean();
+}
+
+/** Open quotes past their validUntil that are not yet saved as EXPIRED, oldest first — for the expiry job. */
+export async function findLapsedQuotes(openStatuses, now, limit) {
+  return Quote.find(
+    { status: { $in: openStatuses }, validUntil: { $lte: now }, ...notDeleted },
+    { ref: 1, status: 1, _id: 0 },
+  )
+    .sort({ validUntil: 1 })
+    .limit(limit)
+    .lean();
 }

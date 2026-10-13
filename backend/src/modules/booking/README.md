@@ -84,11 +84,18 @@ breakdown (paise, ADR-007), frozen at hold time.
   `CANCELLED`). So a `CONFIRMED` booking — and its pass — always has all its hours, and a crash mid-confirmation leaves
   a `HELD` booking that frees its hours when it lapses. Cancelling frees the hours; completed bookings keep them.
 - **No payment is implied.** Confirmation is a staff action; nothing here records a payment.
+- **Events** (outbox, ADR-008; `booking.events.js`): `booking.held` is saved in one transaction with the hold's
+  hours, `booking.confirmed` / `booking.cancelled` / `booking.hold_expired` with the status change they announce
+  (`payload: { from, centreRef }`; `booking.held`: `{ centreRef, expiresAt }`). None is published for a replay, a
+  clash, a refused or repeated move, and `CHECKED_IN` / `COMPLETED` have no event. A lapsed hold _reads_ as
+  `EXPIRED` at once, but `booking.hold_expired` is published only when `EXPIRED` is _saved_: by the next action on
+  it or by the worker job `booking.expire_holds` (every 30 s, conditional updates — safe in several workers). No
+  handler consumes these yet (message wording undecided).
 - **Logs** carry booking/centre refs, room, duration, total and staff refs — never guest details.
 
 ## Not built yet
 
 `PAYMENT_PENDING` and confirmation on a verified payment (orders module), refunds and the
-requested → approved → refunded cancellation flow, CAPTCHA on `/hold`, notifications (`booking.*` events — no event
-bus yet), check-in time windows, per-centre room inventory (every meeting-room centre offers every format; the
+requested → approved → refunded cancellation flow, CAPTCHA on `/hold`, guest notifications (the `booking.*` events
+exist; templates and wording do not), check-in time windows, per-centre room inventory (every meeting-room centre offers every format; the
 centre's `meetingCapacity` text is not enforced), workspace (non-meeting-room) bookings, staff edits to a booking.

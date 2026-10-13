@@ -8,9 +8,9 @@
  *  - The price comes from the pricing engine and is frozen on the booking at hold time; the client never sends one.
  *  - Overlaps are stopped by the unique (centre, room, date, hour) index on booking_slots. A hold inserts its
  *    booking first (claiming the Idempotency-Key), then its hours in order; if any hour is taken it removes the
- *    hours it inserted and the booking, and answers 409 SLOT_UNAVAILABLE. This compensating rollback works on any
- *    MongoDB deployment (the test and local servers are standalone, so multi-document transactions are not
- *    available).
+ *    hours it inserted and the booking, and answers 409 SLOT_UNAVAILABLE. The hours and `booking.held` are one
+ *    transaction (all or none) on a replica set; the compensating rollback of the booking also covers a standalone
+ *    development MongoDB, where a partial insert is possible.
  *  - A slot only blocks its hour while its booking does (RELEASED_STATUSES): a lapsed hold, a cancelled or expired
  *    booking, or a booking that no longer exists frees the hour even if its slot documents are still there. Such
  *    leftovers are cleared before the next insert on those hours (a lapsed hold is saved as EXPIRED first), and a
@@ -21,7 +21,10 @@
  *    hours when it lapses.
  *  - Confirmation is staff-only until the orders module confirms on a verified payment. Nothing here records or
  *    implies that a payment happened.
- *  - Status moves follow BOOKING_TRANSITIONS (§5); illegal moves are 409 INVALID_STATUS_TRANSITION.
+ *  - Status moves follow BOOKING_TRANSITIONS (§5); illegal moves are 409 INVALID_STATUS_TRANSITION. Each saved
+ *    hold, expiry, confirmation and cancellation records its domain event in the same transaction
+ *    (booking.events.js). A lapsed hold reads as EXPIRED at once, but `booking.hold_expired` is published only
+ *    when EXPIRED is saved — on the next action on it or by the `booking.expire_holds` job.
  *  - Logs carry booking refs, centre refs, room names and totals — never names, mobiles or emails (§21).
  */
 import { createHash } from 'node:crypto';
@@ -41,6 +44,7 @@ import {
   PASS_STATUSES,
   RELEASED_STATUSES,
 } from './booking.constants.js';
+import { reserveSlotsWithEvent, transitionWithEvent } from './booking.events.js';
 import { effectiveStatus, mapBooking, mapBookingForStaff, mapPass } from './booking.mapper.js';
 import * as repo from './booking.repository.js';
 import { addDays, formatSlot, formatTime, istDate, istInstant } from './booking.time.js';
@@ -207,7 +211,8 @@ async function reserveSlots(booking, now) {
   let reserved = false;
   try {
     await clearLeftovers((await inspectSlots(key, hours, now)).leftovers, now);
-    reserved = await repo.insertSlots(
+    reserved = await reserveSlotsWithEvent(
+      booking,
       hours.map((hour) => ({ ...key, hour, bookingRef: booking.ref, expiresAt: booking.expiresAt })),
     );
   } finally {
@@ -338,16 +343,13 @@ export async function listBookings({ status, centreRef, date, cursor, limit }, n
 
 /** Saves EXPIRED on a lapsed hold and frees its hours. Safe to repeat. */
 async function persistExpiry(booking, now) {
-  const expired = await repo.updateBookingStatus(booking.ref, 'HELD', 'EXPIRED', {
-    status: 'EXPIRED',
-    at: now,
-    actor: 'system',
-  });
+  const expired = await transitionWithEvent(booking.ref, 'HELD', 'EXPIRED', 'system', now);
   // Once EXPIRED a booking can never be confirmed, so every hour it still holds is garbage.
   if (expired) {
     await repo.deleteSlotsForBooking(booking.ref);
     log.info({ event: 'booking.hold_expired', bookingRef: booking.ref }, 'hold expired');
   }
+  return Boolean(expired);
 }
 
 function assertTransition(from, to) {
@@ -376,11 +378,12 @@ async function changeStatus(booking, to, actor, now) {
   }
   assertTransition(current, to);
 
-  const updated = await repo.updateBookingStatus(
+  const updated = await transitionWithEvent(
     booking.ref,
     current,
     to,
-    { status: to, at: now, actor },
+    actor,
+    now,
     current === 'HELD' ? { unexpiredAt: now } : {},
   );
   if (!updated) throw bookingChanged();
@@ -443,7 +446,7 @@ export async function confirmBooking(ref, actor, now = new Date()) {
   if (secured !== booking.duration) {
     const lapsed = booking.expiresAt <= now;
     const to = lapsed ? 'EXPIRED' : 'CANCELLED';
-    const ended = await repo.updateBookingStatus(ref, 'HELD', to, { status: to, at: now, actor: 'system' });
+    const ended = await transitionWithEvent(ref, 'HELD', to, 'system', now);
     if (!ended) return afterConfirmRace(ref, now);
     await repo.deleteSlotsForBooking(ref);
     log.warn({ event: 'booking.slots_missing', bookingRef: ref, secured, to }, 'hold lost some of its hours');
@@ -451,8 +454,25 @@ export async function confirmBooking(ref, actor, now = new Date()) {
     throw conflict('SLOT_UNAVAILABLE', 'This hold no longer has all its hours. Please hold the room again.');
   }
 
-  const updated = await repo.updateBookingStatus(ref, 'HELD', 'CONFIRMED', { status: 'CONFIRMED', at: now, actor });
+  const updated = await transitionWithEvent(ref, 'HELD', 'CONFIRMED', actor, now);
   if (!updated) return afterConfirmRace(ref, now);
   log.info({ event: 'booking.confirmed', bookingRef: ref, actor }, 'booking confirmed by staff');
   return mapBookingForStaff(updated, now);
+}
+
+// ──────────────────────────────────────────────
+// Expiry job (worker)
+// ──────────────────────────────────────────────
+
+/**
+ * Saves EXPIRED on holds whose time ran out (publishing `booking.hold_expired`) and frees their hours. Each move is
+ * a conditional update, so several workers — or a confirmation racing the job — can never both win.
+ * @returns {Promise<{ expired: number }>}
+ */
+export async function expireLapsedHolds({ limit = 100, now = new Date() } = {}) {
+  let expired = 0;
+  for (const booking of await repo.findLapsedHolds(now, limit)) {
+    if (await persistExpiry(booking, now)) expired += 1;
+  }
+  return { expired };
 }

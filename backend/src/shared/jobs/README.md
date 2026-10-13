@@ -12,6 +12,8 @@ connected to the same MongoDB (ADR-008 — no Redis or BullMQ).
 | Job                       | Every | Does                                                                          |
 | ------------------------- | ----- | ----------------------------------------------------------------------------- |
 | `events.dispatch`         | 1 s   | delivers outbox events to their handlers (`shared/events/bus.js`)             |
+| `booking.expire_holds`    | 30 s  | saves lapsed holds as EXPIRED (`booking.hold_expired`), frees their hours     |
+| `pricing.expire_quotes`   | 60 s  | saves open quotes past `validUntil` as EXPIRED (`quote.expired`)              |
 | `notifications.send`      | 5 s   | sends queued notifications — only registered once a messaging provider exists |
 | `subscriptions.lifecycle` | 60 s  | renewal reminders T-30/7/1, period end → GRACE, grace end → SUSPENDED         |
 

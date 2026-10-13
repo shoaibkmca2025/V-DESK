@@ -260,3 +260,14 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
   `price-preview` only (quotes/orders still use standard rules); billing = statement of orders + CSV, **not** a GST
   invoice (blocked). Permissions: `enterprise:read` OPS_ADMIN+SALES_MANAGER+FINANCE, `:manage`
   OPS_ADMIN+SALES_MANAGER, `:pricing` FINANCE.
+- **2026-10-13** — domain events completed for the modules that predate the outbox (ADR-008). Each is written in the
+  same transaction as the change it announces and only for a real move (no event for replays, no-op edits, refused
+  moves): crm `lead.status_changed`; booking `booking.held` (hours + event in one transaction), `booking.confirmed`,
+  `booking.cancelled`, `booking.hold_expired`; pricing `quote.sent`, `quote.accepted`, `quote.expired`; catalog
+  `catalog.updated` on every staff create/edit/delete (a city rename and its copied names now commit together).
+  **Expiry events fire when EXPIRED is saved, not when a record starts to read as expired:** two new worker jobs,
+  `booking.expire_holds` (30 s) and `pricing.expire_quotes` (60 s), save lapsed holds/quotes with conditional updates
+  (safe in several workers). Also fixed: a quote could be accepted in the instant it lapsed (the update now re-checks
+  `validUntil`). No new handlers: Notifications v1 documents only the lead confirmation and sales alert (already
+  wired); booking/quote messages need the owner to decide which exist and their wording. VIEWED/REJECTED quotes,
+  CHECKED_IN/COMPLETED bookings and lead assignment have no documented event, so none was added.

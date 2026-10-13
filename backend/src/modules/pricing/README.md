@@ -74,10 +74,16 @@ Pricing engine, quotes and the rules behind them (PRD §41, §55). Integer paise
   (`QUOTE_TRANSITIONS`). Repeating the current status is a no-op; `VIEWED` only records the first open of a `SENT`
   quote. Illegal moves → `409 INVALID_STATUS_TRANSITION`.
 - **Validity:** 14 days. An open quote past `validUntil` reads as `EXPIRED`; accepting it → `409 QUOTE_EXPIRED` and the
-  status is saved. There is no expiry job yet, so a staff `?status=SENT` list can include quotes that read as `EXPIRED`.
+  status is saved. The worker job `pricing.expire_quotes` (every 60 s) saves `EXPIRED` on lapsed open quotes, so a
+  staff `?status=SENT` list can include quotes that read as `EXPIRED` for at most about a minute. A status change also
+  re-checks `validUntil` in the update itself, so a quote can't be accepted in the instant it lapses.
+- **Events** (outbox, ADR-008): `quote.sent` (created), `quote.accepted`, `quote.expired`, each saved in the same
+  transaction as the change, with `payload: { productType }` (`from` on status events) — no name or company. Not
+  published for a replayed key, a repeated or refused move; `VIEWED` / `REJECTED` have no event (modules.md §3.4).
+  No handler yet.
 - **Public view** has no email, phone or internal fields; staff get the `history` timeline as well.
 
 ## Not built yet
 
 Quote PDF (`GET /quotes/:ref/pdf` — needs a PDF library and the job queue, rules.md §28), staff-drafted quotes
-(`DRAFT`), expiry job, lead ↔ quote link, coworking / private-office pricing (the client has only the ROI estimator).
+(`DRAFT`), lead ↔ quote link, coworking / private-office pricing (the client has only the ROI estimator).

@@ -37,6 +37,26 @@ await withTransaction(async (session) => {
 - `payload` stays small and **free of personal data** — refs and codes. Handlers fetch details through the owning
   module's service, so they see current data and the outbox holds no PII.
 
+## Event catalog
+
+| Event                                                            | Published by    | Payload (refs/codes only)             | Handled by                                 |
+| ---------------------------------------------------------------- | --------------- | ------------------------------------- | ------------------------------------------ |
+| `lead.created`                                                   | crm             | `source`                              | notifications (confirmations, sales alert) |
+| `lead.status_changed`                                            | crm             | `from`, `to`                          | —                                          |
+| `booking.held`                                                   | booking         | `centreRef`, `expiresAt`              | —                                          |
+| `booking.confirmed`, `booking.cancelled`, `booking.hold_expired` | booking         | `from`, `centreRef`                   | —                                          |
+| `quote.sent`                                                     | pricing         | `productType`                         | —                                          |
+| `quote.accepted`, `quote.expired`                                | pricing         | `from`, `productType`                 | —                                          |
+| `catalog.updated`                                                | catalog (staff) | `action`, `fields` (names only)       | —                                          |
+| `kyc.submitted`, `kyc.approved`, `kyc.rejected`                  | kyc             | see `modules/kyc/README.md`           | —                                          |
+| `subscription.*`, `service.activated`                            | subscriptions   | see `modules/subscriptions/README.md` | —                                          |
+| `enterprise.*`                                                   | enterprise      | see `modules/enterprise/README.md`    | —                                          |
+
+Expiry events (`booking.hold_expired`, `quote.expired`) are published when the expired status is **saved** — by
+the next action on the record or by the worker jobs `booking.expire_holds` / `pricing.expire_quotes` — not at the
+instant a record starts to _read_ as expired. Not published yet (blocked): `payment.*`, `invoice.issued`,
+`refund.processed` (payments), `lead.converted` and `user.*` (customer accounts).
+
 ## Handling (the module that reacts)
 
 In `src/modules/<module>/<module>.events.js`, then add one import line to `src/events.js`:

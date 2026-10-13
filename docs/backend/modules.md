@@ -68,7 +68,7 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 - **Collections:** `cities`, `localities`, `centres` (Location), `workspaces`, `amenities`, `workspace_types`
 - **HTTP (public):** `GET /catalog` (bundle), `GET /cities`, `GET /centres?city=`, `GET /workspaces?city=&type=&capacity=&maxPrice=`
 - **HTTP (ops):** CRUD on centres/workspaces, availability calendar, image upload (signed PUT)
-- **Events:** `catalog.updated` (invalidates CDN cache)
+- **Events:** `catalog.updated` (invalidates CDN cache) — *built: published in the same transaction as every staff create/edit/delete (`payload: { action, fields }`); no CDN-purge handler yet*
 - **Frontend:** `features/catalog/catalogStore.js`, `locations`, `marketplace`, `discovery`
 
 ### 3.3 `search` — universal search & intent
@@ -81,7 +81,7 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 - **Collections:** `pricing_rules` (base, location adjustment, add-ons, discounts, tax), `quotes`, `quote_items`
 - **Formula (PRD §55):** base + location adj + product + add-ons − discount + GST 18% → all amounts in **paise integers**
 - **HTTP:** `POST /pricing/quote-preview` (stateless calc), `POST /quotes`, `GET /quotes/:ref`, `PATCH /quotes/:ref/status` (Draft→Sent→Viewed→Accepted/Expired/Rejected), `GET /quotes/:ref/pdf`
-- **Events:** `quote.sent`, `quote.accepted`, `quote.expired` (cron)
+- **Events:** `quote.sent`, `quote.accepted`, `quote.expired` (cron) — *built: outbox events in the same transaction as the change; worker job `pricing.expire_quotes` saves lapsed quotes as EXPIRED*
 - **Frontend:** `virtualOffice/voConfigurator.js`, `quote/quoteProposal.js`, `pricing/costCalculator.js`
 
 ### 3.5 `crm` — leads & pipeline
@@ -90,14 +90,14 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 - **Scoring (PRD §44):** rule table stored in DB, recomputed on every write
 - **Attribution (PRD §60):** first-touch + last-touch UTM persisted from first form submit through conversion
 - **HTTP:** `POST /leads` (public, rate-limited, CAPTCHA), `GET /leads` (sales), `PATCH /leads/:ref` (status/assign/note), `GET /leads/stats`, `POST /leads/:ref/convert` → creates customer
-- **Events:** `lead.created`, `lead.status_changed`, `lead.converted`
+- **Events:** `lead.created`, `lead.status_changed`, `lead.converted` — *built: `lead.created`, `lead.status_changed`; `lead.converted` waits for customer accounts*
 - **Frontend:** `crm/leadStore.js`, `leads/leadForms.js`, `admin/*`
 
 ### 3.6 `booking` — meeting rooms & workspaces
 - **Collections:** `bookings`, `availability_slots`, `holds` — *built as `bookings` + `booking_slots` (one document per reserved room-hour, unique on centre + room + date + hour; TTL on hold expiry). See `backend/src/modules/booking/README.md`.*
 - **State machine (PRD §35):** available → hold (TTL 10 min, Redis lock) → payment_pending → confirmed → checked_in → completed; cancellation: requested → approved → refunded — *built: HELD → CONFIRMED (staff) → CHECKED_IN → COMPLETED, HELD/CONFIRMED → CANCELLED, HELD → EXPIRED; no Redis (DB unique index); payment_pending and refunds wait for orders*
 - **HTTP:** `GET /availability?workspaceId=&date=`, `POST /bookings/hold`, `POST /bookings/:ref/confirm`, `POST /bookings/:ref/cancel`, `GET /bookings/:ref/pass` (QR) — *built with `?centreRef=&room=&date=` (room format, as pricing), plus `GET /bookings/:ref`, staff `GET /bookings` and `PATCH /bookings/:ref/status`*
-- **Events:** `booking.held`, `booking.hold_expired` (delayed job), `booking.confirmed`, `booking.cancelled`
+- **Events:** `booking.held`, `booking.hold_expired` (delayed job), `booking.confirmed`, `booking.cancelled` — *built: all four, each in the same transaction as its change; worker job `booking.expire_holds` saves lapsed holds as EXPIRED*
 - **Frontend:** `meetingRooms/roomBooking.js`
 
 ### 3.7 `orders` — orders, payments, invoices
@@ -129,7 +129,7 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 - Consumes every domain event above and renders templates; SMS restricted to transactional (PRD §50)
 - WhatsApp inbound webhooks attach conversations to leads (PRD §51)
 - **HTTP:** admin template CRUD, `POST /webhooks/whatsapp`
-- *Built (v1 foundation): template CRUD, `notification_log` as a durable queue, `notify()` (idempotent on `dedupeKey`), `processDueNotifications()` (leases, bounded retries), masked staff log; provider contract + fake in `integrations/messaging.js`. Not yet: real providers, event-driven sending (no event bus/outbox), a scheduler (no job queue), the WhatsApp webhook. See `backend/src/modules/notifications/README.md`.*
+- *Built (v1): template CRUD, `notification_log` as a durable queue, `notify()` (idempotent on `dedupeKey`), `processDueNotifications()` (leases, bounded retries), masked staff log; provider contract + fake in `integrations/messaging.js`; `lead.created` → visitor confirmation (email, WhatsApp) + sales alert, run by the worker. Not yet: real providers (nothing is sent), templates/wording, messages for other events, the WhatsApp webhook. See `backend/src/modules/notifications/README.md`.*
 
 ### 3.11 `analytics` — telemetry & KPIs
 - **Collections:** `events` (time-series collection), materialised `kpi_daily`

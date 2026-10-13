@@ -50,10 +50,17 @@ describe('job runner', () => {
 });
 
 describe('worker jobs', () => {
-  it('always dispatches events and runs the subscription lifecycle; sends notifications only with a provider', () => {
-    expect(buildJobs({ providers: {} }).map((job) => job.name)).toEqual(['events.dispatch', 'subscriptions.lifecycle']);
+  it('always dispatches events, expires holds and runs the subscription lifecycle; sends notifications only with a provider', () => {
+    expect(buildJobs({ providers: {} }).map((job) => job.name)).toEqual([
+      'events.dispatch',
+      'booking.expire_holds',
+      'pricing.expire_quotes',
+      'subscriptions.lifecycle',
+    ]);
     expect(buildJobs({ providers: { email: { send: async () => ({}) } } }).map((job) => job.name)).toEqual([
       'events.dispatch',
+      'booking.expire_holds',
+      'pricing.expire_quotes',
       'subscriptions.lifecycle',
       'notifications.send',
     ]);
