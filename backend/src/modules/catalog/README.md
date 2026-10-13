@@ -54,10 +54,14 @@ Only active, non-deleted records are public. Prices are integer paise: `vo_price
   workspace's `locality`, which defaults to the centre's `areaName`) follow from them; renaming a city updates its
   centres and workspaces.
 - **Prices** are integer paise; a decimal like `1249.5` is `400 VALIDATION_FAILED`.
+- **`catalog.updated`** (outbox, ADR-008) is saved in the same transaction as every staff create, edit and delete,
+  with `entity: { type: city|centre|workspace, ref }` and `payload: { action, fields }` (field names, never values). A
+  city rename and the copied names on its centres and workspaces are one transaction. An edit that changes no value
+  saves nothing and publishes nothing. No handler yet — CDN purge waits for a CDN decision.
 
 ## Not built yet
 
-Image upload (signed URLs — needs the storage integration), availability calendar (comes with `booking`),
-`catalog.updated` event for CDN cache purge (needs the event outbox).
+Image upload (signed URLs — needs the storage integration), availability calendar (comes with `booking`), a
+`catalog.updated` handler that purges the CDN cache.
 
 Full spec: [docs/backend/modules.md §3.2](../../../../docs/backend/modules.md). Layer rules: [backend/README.md](../../../README.md).

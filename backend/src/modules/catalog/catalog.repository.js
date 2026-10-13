@@ -94,9 +94,9 @@ export async function findForStaff(kind, filter) {
 }
 
 /** Inserts and returns the document, or null when a unique field (ref, slug) is already taken. */
-export async function insertDoc(kind, data) {
+export async function insertDoc(kind, data, { session } = {}) {
   try {
-    const doc = await MODELS[kind].create(data);
+    const [doc] = await MODELS[kind].create([data], { session });
     return doc.toObject();
   } catch (err) {
     if (err.code === DUPLICATE_KEY) return null;
@@ -104,12 +104,18 @@ export async function insertDoc(kind, data) {
   }
 }
 
-export async function updateDoc(kind, ref, set) {
-  return MODELS[kind].findOneAndUpdate({ ref, ...notDeleted }, { $set: set }, { returnDocument: 'after' }).lean();
+export async function updateDoc(kind, ref, set, { session } = {}) {
+  return MODELS[kind]
+    .findOneAndUpdate({ ref, ...notDeleted }, { $set: set }, { returnDocument: 'after', session })
+    .lean();
 }
 
-export async function softDelete(kind, ref, now) {
-  const res = await MODELS[kind].updateOne({ ref, ...notDeleted }, { $set: { deletedAt: now, active: false } });
+export async function softDelete(kind, ref, now, { session } = {}) {
+  const res = await MODELS[kind].updateOne(
+    { ref, ...notDeleted },
+    { $set: { deletedAt: now, active: false } },
+    { session },
+  );
   return res.modifiedCount === 1;
 }
 
@@ -132,10 +138,10 @@ export async function highestRefNumber(kind, prefix) {
 }
 
 /** Centres and workspaces copy the city name for fast filtering; a rename has to reach them too. */
-export async function renameCityInChildren(cityRef, name) {
-  await Centre.updateMany({ cityRef }, { $set: { city: name } });
-  const centreRefs = await Centre.distinct('ref', { cityRef });
-  await Workspace.updateMany({ centreRef: { $in: centreRefs } }, { $set: { city: name } });
+export async function renameCityInChildren(cityRef, name, { session } = {}) {
+  await Centre.updateMany({ cityRef }, { $set: { city: name } }, { session });
+  const centreRefs = await Centre.distinct('ref', { cityRef }).session(session ?? null);
+  await Workspace.updateMany({ centreRef: { $in: centreRefs } }, { $set: { city: name } }, { session });
 }
 
 function escapeRegex(text) {

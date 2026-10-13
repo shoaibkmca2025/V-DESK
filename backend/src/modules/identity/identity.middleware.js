@@ -5,6 +5,8 @@
  *   requirePermission(p)   403 unless req.user's role holds permission p (identity.constants.js PERMISSIONS)
  *   requireStaff(p)        both of the above — or, while the admin console still uses it, the legacy
  *                          x-admin-key, which keeps full access until it is retired
+ *   requireStaffUser(p)    both of the above, never the admin key — for KYC, subscriptions and enterprise, where
+ *                          every action must be attributable to a named staff member with that permission
  */
 import { forbidden, unauthorized } from '../../shared/errors/AppError.js';
 import { requireAdminKey } from '../../shared/middleware/requireAdminKey.js';
@@ -38,4 +40,9 @@ export function requireStaff(permission) {
     if (!req.get('authorization')) return requireAdminKey(req, res, next);
     await authenticate(req, res, (err) => (err ? next(err) : checkPermission(req, res, next)));
   };
+}
+
+export function requireStaffUser(permission) {
+  const checkPermission = requirePermission(permission);
+  return (req, res, next) => authenticate(req, res, (err) => (err ? next(err) : checkPermission(req, res, next)));
 }

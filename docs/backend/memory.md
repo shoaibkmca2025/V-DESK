@@ -219,3 +219,55 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
   `blog_posts` from the plan = the existing resource guides; banners / homepage sections not built (no data source
   yet). `sitemap.xml` is generated from catalog + search services + published content and needs `SITE_URL` — the
   site domain is still an owner decision. search gained a read-only `listServices()` export for it.
+- **2026-10-12** — `kyc` built. Decisions (owner-approved in session): **customer routes fail closed** — identity has
+  no customer principal (OTP still open, §6), and an unguessable ref is not acceptable as the credential for identity
+  documents, so `POST /kyc`, upload-url, submit and the customer read answer 503 `CUSTOMER_AUTH_NOT_AVAILABLE` until
+  identity exposes a verified customer (one function to swap, `kyc.customer.js`); **added `POST /kyc/:ref/submit`**
+  (consent + every new file verified in storage: exact size, content type and file signature) because uploads go
+  straight to storage; **rejection is per document and allows a re-upload** (application → ACTION_REQUIRED,
+  `kyc.rejected` per rejection; APPROVED when every document is approved — final; no final REJECTED state). Other
+  choices: document types, required set, PDF/JPEG/PNG and 5 MB come from the frontend KycPage; staff
+  `download-url` endpoint (≤ 5 min, audited) so reviewers can see files; one open application per customer;
+  `kyc:read` / `kyc:review` → COMPLIANCE only; client file names never stored; KYC-owned append-only
+  `kyc_audit_log` (no platform audit log yet) records every change and read. Storage: `integrations/storage.js`
+  contract + `memory` adapter (`STORAGE_DRIVER=memory`, never in production → 503) — **S3 vs R2, bucket, KMS key
+  and credentials are owner/ops decisions**. Not built: virus scan, `kyc.*` notification handlers (wording + no
+  customer contact), staff review queue, retention of rejected files (§6).
+- **2026-10-12 (KYC review)** — security fixes: (1) the legacy `x-admin-key` no longer reaches KYC — staff routes need
+  a signed-in user with `kyc:*` (new `requireStaffUser` / principal guards in identity), and the service refuses an
+  admin-key actor too; (2) a file could be swapped after submit through the still-valid upload URL — upload URLs are
+  now single-use by contract (S3/R2: signed `If-None-Match: *`), submit stores the object's etag, approval and
+  download re-verify it (`409 DOCUMENT_UPLOAD_CHANGED`). The KYC-only audit collection became the shared
+  `audit_log` (`src/shared/audit`), and the customer-principal stub moved to identity (`identity.customer.js`) so
+  every module fails closed the same way.
+- **2026-10-12** — `subscriptions` built. Activation reads payment (orders `getOrder` = PAID) and KYC (kyc
+  `getApplicationSummary` = APPROVED for the same customer) at the moment ops activate — never stored flags or client
+  input. **Payments are not built, so activation and renewal application correctly fail (`PAYMENT_NOT_CONFIRMED`)
+  until orders records verified payments.** Undocumented, so not invented: the grace period length (ops set
+  `graceDays` 0–90 per subscription — **owner to set a policy**) and automatic cancellation after suspension (ops
+  cancel explicitly). Choices: subscriptions start from quote orders with tenure monthly/annual (1/12 IST calendar
+  months); owner = the KYC application's customer; one subscription per order, one agreement per period, one renewal
+  per period, an order pays for one thing; renewal price = last frozen price (pricing can't re-price a stored item);
+  a lapsed subscription restarts from the renewal date, otherwise periods are continuous; a staff suspension survives
+  a renewal. Reminders T-30/7/1 via the `subscriptions.lifecycle` worker job (only ever a more urgent one per period,
+  so outages never cause a burst). Permissions: `subscriptions:read` OPS_ADMIN+FINANCE, `:write`/`:activate`
+  OPS_ADMIN. No notification handlers (no customer contact yet).
+- **2026-10-12** — `enterprise` built (Phase 4 scope, no detailed spec). Choices to confirm: organisation roles
+  OWNER/ADMIN/MEMBER with a permission map (`ORG_PERMISSIONS`), last owner protected, only owners grant OWNER; RFP
+  pipeline copies crm's (one step or LOST, WON/LOST final), public RFP needs an Idempotency-Key and CAPTCHA, estimate
+  priced by pricing's engine; team bookings and billed orders are attributions by ref (one organisation per
+  record); price books = per-organisation `enterprise_desks` rule, versioned, priced by pricing's engine — used for
+  `price-preview` only (quotes/orders still use standard rules); billing = statement of orders + CSV, **not** a GST
+  invoice (blocked). Permissions: `enterprise:read` OPS_ADMIN+SALES_MANAGER+FINANCE, `:manage`
+  OPS_ADMIN+SALES_MANAGER, `:pricing` FINANCE.
+- **2026-10-13** — domain events completed for the modules that predate the outbox (ADR-008). Each is written in the
+  same transaction as the change it announces and only for a real move (no event for replays, no-op edits, refused
+  moves): crm `lead.status_changed`; booking `booking.held` (hours + event in one transaction), `booking.confirmed`,
+  `booking.cancelled`, `booking.hold_expired`; pricing `quote.sent`, `quote.accepted`, `quote.expired`; catalog
+  `catalog.updated` on every staff create/edit/delete (a city rename and its copied names now commit together).
+  **Expiry events fire when EXPIRED is saved, not when a record starts to read as expired:** two new worker jobs,
+  `booking.expire_holds` (30 s) and `pricing.expire_quotes` (60 s), save lapsed holds/quotes with conditional updates
+  (safe in several workers). Also fixed: a quote could be accepted in the instant it lapsed (the update now re-checks
+  `validUntil`). No new handlers: Notifications v1 documents only the lead confirmation and sales alert (already
+  wired); booking/quote messages need the owner to decide which exist and their wording. VIEWED/REJECTED quotes,
+  CHECKED_IN/COMPLETED bookings and lead assignment have no documented event, so none was added.

@@ -39,6 +39,19 @@ export const PERMISSIONS = Object.freeze({
   'content:manage': ['OPS_ADMIN', 'CONTENT'],
   /** Publishing trust claims ("10,000+ businesses") needs evidence and a super admin (memory.md §5, PRD §22). */
   'content:approve': [],
+  /** KYC applications and identity documents (PRD §46–47) — compliance only; every read is audited. */
+  'kyc:read': ['COMPLIANCE'],
+  /** Approving or rejecting KYC documents. */
+  'kyc:review': ['COMPLIANCE'],
+  /** Subscriptions: read (ops + finance), change (ops), activate (ops sign-off, modules.md §3.9). */
+  'subscriptions:read': ['OPS_ADMIN', 'FINANCE'],
+  'subscriptions:write': ['OPS_ADMIN'],
+  'subscriptions:activate': ['OPS_ADMIN'],
+  /** Enterprise accounts, team bookings, price books and reports (Phase 4). */
+  'enterprise:read': ['OPS_ADMIN', 'SALES_MANAGER', 'FINANCE'],
+  'enterprise:manage': ['OPS_ADMIN', 'SALES_MANAGER'],
+  /** Organisation price books change what customers pay — finance only. */
+  'enterprise:pricing': ['FINANCE'],
 });
 
 /** Short-lived access token (rules.md §19). */

@@ -71,6 +71,8 @@ bookingSchema.index({ deletedAt: 1, createdAt: -1, ref: -1 });
 bookingSchema.index({ deletedAt: 1, centreRef: 1, date: 1 });
 /** Per-mobile active-hold count. */
 bookingSchema.index({ 'customer.mobile': 1, status: 1, expiresAt: 1 });
+// The expiry job: holds still saved as HELD after their expiresAt.
+bookingSchema.index({ status: 1, expiresAt: 1 });
 
 // ──────────────────────────────────────────────
 // Reserved room-hour

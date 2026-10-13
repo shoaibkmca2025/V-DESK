@@ -68,7 +68,7 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 - **Collections:** `cities`, `localities`, `centres` (Location), `workspaces`, `amenities`, `workspace_types`
 - **HTTP (public):** `GET /catalog` (bundle), `GET /cities`, `GET /centres?city=`, `GET /workspaces?city=&type=&capacity=&maxPrice=`
 - **HTTP (ops):** CRUD on centres/workspaces, availability calendar, image upload (signed PUT)
-- **Events:** `catalog.updated` (invalidates CDN cache)
+- **Events:** `catalog.updated` (invalidates CDN cache) — *built: published in the same transaction as every staff create/edit/delete (`payload: { action, fields }`); no CDN-purge handler yet*
 - **Frontend:** `features/catalog/catalogStore.js`, `locations`, `marketplace`, `discovery`
 
 ### 3.3 `search` — universal search & intent
@@ -81,7 +81,7 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 - **Collections:** `pricing_rules` (base, location adjustment, add-ons, discounts, tax), `quotes`, `quote_items`
 - **Formula (PRD §55):** base + location adj + product + add-ons − discount + GST 18% → all amounts in **paise integers**
 - **HTTP:** `POST /pricing/quote-preview` (stateless calc), `POST /quotes`, `GET /quotes/:ref`, `PATCH /quotes/:ref/status` (Draft→Sent→Viewed→Accepted/Expired/Rejected), `GET /quotes/:ref/pdf`
-- **Events:** `quote.sent`, `quote.accepted`, `quote.expired` (cron)
+- **Events:** `quote.sent`, `quote.accepted`, `quote.expired` (cron) — *built: outbox events in the same transaction as the change; worker job `pricing.expire_quotes` saves lapsed quotes as EXPIRED*
 - **Frontend:** `virtualOffice/voConfigurator.js`, `quote/quoteProposal.js`, `pricing/costCalculator.js`
 
 ### 3.5 `crm` — leads & pipeline
@@ -90,14 +90,14 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 - **Scoring (PRD §44):** rule table stored in DB, recomputed on every write
 - **Attribution (PRD §60):** first-touch + last-touch UTM persisted from first form submit through conversion
 - **HTTP:** `POST /leads` (public, rate-limited, CAPTCHA), `GET /leads` (sales), `PATCH /leads/:ref` (status/assign/note), `GET /leads/stats`, `POST /leads/:ref/convert` → creates customer
-- **Events:** `lead.created`, `lead.status_changed`, `lead.converted`
+- **Events:** `lead.created`, `lead.status_changed`, `lead.converted` — *built: `lead.created`, `lead.status_changed`; `lead.converted` waits for customer accounts*
 - **Frontend:** `crm/leadStore.js`, `leads/leadForms.js`, `admin/*`
 
 ### 3.6 `booking` — meeting rooms & workspaces
 - **Collections:** `bookings`, `availability_slots`, `holds` — *built as `bookings` + `booking_slots` (one document per reserved room-hour, unique on centre + room + date + hour; TTL on hold expiry). See `backend/src/modules/booking/README.md`.*
 - **State machine (PRD §35):** available → hold (TTL 10 min, Redis lock) → payment_pending → confirmed → checked_in → completed; cancellation: requested → approved → refunded — *built: HELD → CONFIRMED (staff) → CHECKED_IN → COMPLETED, HELD/CONFIRMED → CANCELLED, HELD → EXPIRED; no Redis (DB unique index); payment_pending and refunds wait for orders*
 - **HTTP:** `GET /availability?workspaceId=&date=`, `POST /bookings/hold`, `POST /bookings/:ref/confirm`, `POST /bookings/:ref/cancel`, `GET /bookings/:ref/pass` (QR) — *built with `?centreRef=&room=&date=` (room format, as pricing), plus `GET /bookings/:ref`, staff `GET /bookings` and `PATCH /bookings/:ref/status`*
-- **Events:** `booking.held`, `booking.hold_expired` (delayed job), `booking.confirmed`, `booking.cancelled`
+- **Events:** `booking.held`, `booking.hold_expired` (delayed job), `booking.confirmed`, `booking.cancelled` — *built: all four, each in the same transaction as its change; worker job `booking.expire_holds` saves lapsed holds as EXPIRED*
 - **Frontend:** `meetingRooms/roomBooking.js`
 
 ### 3.7 `orders` — orders, payments, invoices
@@ -113,11 +113,13 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 - **Flow (PRD §46–47):** OTP-verified → upload via signed URL → UNDER_REVIEW → APPROVED/REJECTED (reason mandatory) → audit trail
 - **HTTP:** `POST /kyc`, `POST /kyc/:ref/documents/upload-url`, `PATCH /kyc/:ref/documents/:id/review` (compliance), `GET /kyc/:ref`
 - **Events:** `kyc.submitted`, `kyc.approved`, `kyc.rejected`
+- *Built: all four endpoints plus `POST /kyc/:ref/submit` (consent + storage verification → UNDER_REVIEW) and a staff `POST /kyc/:ref/documents/:id/download-url`; DRAFT → UNDER_REVIEW → ACTION_REQUIRED (per-document rejection, re-upload) → APPROVED; append-only `kyc_audit_log`; permissions `kyc:read` / `kyc:review` (COMPLIANCE). **Customer routes answer 503 until identity has customer sign-in (OTP)**; storage is a development/test adapter only (no S3/R2 yet, 503 in production). See `backend/src/modules/kyc/README.md`.*
 - **Frontend:** `kyc/kyc.js`
 
 ### 3.9 `subscriptions` — services, activation, renewals
 - **Collections:** `subscriptions`, `agreements`, `renewals`
 - **Activation rule (North Star, PRD §76):** payment.succeeded ∧ kyc.approved ∧ ops activates → `service.activated`
+- *Built: create from an order + KYC application (ops), activation reading the order (PAID) and KYC (APPROVED, same customer) through their modules, agreements per period (offline signature — no e-sign), renewal quotes + apply a paid order, suspend / reinstate / cancel, worker job `subscriptions.lifecycle` (T-30/7/1 reminders, GRACE, SUSPENDED), all with outbox events and `audit_log`. **Activation cannot succeed yet: orders has no PAID path (payments blocked).** Customer routes 503 until customer sign-in. Grace days are set per subscription (length undocumented). See `backend/src/modules/subscriptions/README.md`.*
 - **Renewal (PRD §49):** reminders at T-30/T-7/T-1, renewal quote, grace period, suspension, cancellation — all cron-driven
 - **HTTP:** `GET /me/subscriptions`, `POST /subscriptions/:ref/renew`, ops `POST /subscriptions/:ref/activate|suspend`
 - **Frontend:** `portal/customerPortal.js`
@@ -127,7 +129,7 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 - Consumes every domain event above and renders templates; SMS restricted to transactional (PRD §50)
 - WhatsApp inbound webhooks attach conversations to leads (PRD §51)
 - **HTTP:** admin template CRUD, `POST /webhooks/whatsapp`
-- *Built (v1 foundation): template CRUD, `notification_log` as a durable queue, `notify()` (idempotent on `dedupeKey`), `processDueNotifications()` (leases, bounded retries), masked staff log; provider contract + fake in `integrations/messaging.js`. Not yet: real providers, event-driven sending (no event bus/outbox), a scheduler (no job queue), the WhatsApp webhook. See `backend/src/modules/notifications/README.md`.*
+- *Built (v1): template CRUD, `notification_log` as a durable queue, `notify()` (idempotent on `dedupeKey`), `processDueNotifications()` (leases, bounded retries), masked staff log; provider contract + fake in `integrations/messaging.js`; `lead.created` → visitor confirmation (email, WhatsApp) + sales alert, run by the worker. Not yet: real providers (nothing is sent), templates/wording, messages for other events, the WhatsApp webhook. See `backend/src/modules/notifications/README.md`.*
 
 ### 3.11 `analytics` — telemetry & KPIs
 - **Collections:** `events` (time-series collection), materialised `kpi_daily`
@@ -142,10 +144,12 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 
 ### 3.13 `enterprise` (P2) — organisations, team bookings, central billing
 - Multi-user orgs, bulk RFPs, custom price books, consolidated invoices, reporting exports
+- *Built: organisations + members with org roles (OWNER/ADMIN/MEMBER, last-owner guard), public bulk RFP (server-priced estimate, crm-style pipeline), team bookings and billed orders attributed by ref (read through booking/orders), versioned price books priced by pricing's engine, billing statement + CSV, organisation report. **Not built:** GST consolidated invoices (blocked with payments), price books in checkout (needs a pricing change). Customer routes 503 until customer sign-in. See `backend/src/modules/enterprise/README.md`.*
 - **Frontend:** `enterprise/enterpriseSuite.js`
 
 ### 3.14 `platform` — cross-cutting
 - request id, structured logging, rate limiting, CAPTCHA (Turnstile), audit log (`audit_log` append-only), health/readiness, OpenAPI, feature flags
+- *Built: `audit_log` in `backend/src/shared/audit` (used by kyc, subscriptions, enterprise); the `GET /audit` endpoint is not built yet.*
 
 ## 4. Domain events (contract)
 
@@ -165,7 +169,9 @@ Published through a transactional **outbox** collection (`domain_events`, writte
 | bookings | booking | orders, subscriptions |
 | orders, payments, invoices | orders | subscriptions, analytics |
 | kyc_applications, documents | kyc | subscriptions |
-| subscriptions, agreements | subscriptions | portal, notifications |
+| subscriptions, agreements, renewals | subscriptions | portal, notifications |
+| organisations, organisation_members, organisation_links, enterprise_rfps, price_books | enterprise | — |
+| audit_log | platform (shared/audit) | SUPER_ADMIN (endpoint not built) |
 | events | analytics | admin |
 
 ## 6. API conventions

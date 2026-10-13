@@ -66,6 +66,8 @@ quoteSchema.index(
 );
 quoteSchema.index({ deletedAt: 1, createdAt: -1, ref: -1 });
 quoteSchema.index({ deletedAt: 1, status: 1, createdAt: -1 });
+// The expiry job: open quotes past validUntil.
+quoteSchema.index({ status: 1, validUntil: 1 });
 
 export const PricingRule = mongoose.model('PricingRule', pricingRuleSchema, 'pricing_rules');
 export const Quote = mongoose.model('Quote', quoteSchema, 'quotes');

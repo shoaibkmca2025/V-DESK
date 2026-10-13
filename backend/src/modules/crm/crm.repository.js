@@ -81,11 +81,11 @@ export async function countRecentLeadsByContact({ mobileDigits, email, since }) 
  * Applies `changes` only if the lead still has `expectedStatus`, so two staff members moving the same lead at
  * once cannot both succeed. Returns the updated lead, or null if it changed or disappeared meanwhile.
  */
-export async function updateLeadIfStatus(ref, expectedStatus, changes) {
+export async function updateLeadIfStatus(ref, expectedStatus, changes, { session } = {}) {
   return Lead.findOneAndUpdate(
     { ref, status: expectedStatus, ...notDeleted },
     { $set: changes },
-    { returnDocument: 'after' },
+    { returnDocument: 'after', session },
   ).lean();
 }
 

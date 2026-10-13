@@ -54,24 +54,36 @@ For manual testing, `npm run totp -- <secret>` prints the current code instead o
 
 ## Permissions (`identity.constants.js` → `PERMISSIONS`)
 
-| Permission             | Roles (SUPER_ADMIN always has every permission) | Used by                               |
-| ---------------------- | ----------------------------------------------- | ------------------------------------- |
-| `users:manage`         | —                                               | `/auth/users`                         |
-| `leads:read`           | OPS_ADMIN, SALES_MANAGER, SALES_EXEC            | `GET /leads`, `/leads/stats`, `/:ref` |
-| `leads:write`          | SALES_MANAGER, SALES_EXEC                       | `PATCH /leads/:ref`                   |
-| `leads:export`         | SALES_MANAGER                                   | `GET /leads/export.csv`               |
-| `search:manage`        | OPS_ADMIN, CONTENT                              | `/search/admin/*`                     |
-| `catalog:manage`       | OPS_ADMIN                                       | `/catalog/admin/*`                    |
-| `analytics:read`       | OPS_ADMIN, SALES_MANAGER, FINANCE               | `GET /analytics/*`                    |
-| `pricing:manage`       | FINANCE                                         | `PUT/DELETE /pricing/rules/:key`      |
-| `quotes:read`          | OPS_ADMIN, SALES_MANAGER, SALES_EXEC, FINANCE   | `GET /pricing/quotes`, `/rules`       |
-| `bookings:read`        | OPS_ADMIN, SALES_MANAGER                        | `GET /bookings`                       |
-| `bookings:write`       | OPS_ADMIN                                       | confirm / change booking status       |
-| `orders:read`          | OPS_ADMIN, SALES_MANAGER, FINANCE               | `GET /orders`                         |
-| `notifications:manage` | OPS_ADMIN, CONTENT                              | notification templates                |
-| `notifications:read`   | OPS_ADMIN                                       | delivery log (masked)                 |
-| `content:manage`       | OPS_ADMIN, CONTENT                              | `/content/admin/*`                    |
-| `content:approve`      | — (SUPER_ADMIN only)                            | publishing trust claims               |
+| Permission               | Roles (SUPER_ADMIN always has every permission) | Used by                                |
+| ------------------------ | ----------------------------------------------- | -------------------------------------- |
+| `users:manage`           | —                                               | `/auth/users`                          |
+| `leads:read`             | OPS_ADMIN, SALES_MANAGER, SALES_EXEC            | `GET /leads`, `/leads/stats`, `/:ref`  |
+| `leads:write`            | SALES_MANAGER, SALES_EXEC                       | `PATCH /leads/:ref`                    |
+| `leads:export`           | SALES_MANAGER                                   | `GET /leads/export.csv`                |
+| `search:manage`          | OPS_ADMIN, CONTENT                              | `/search/admin/*`                      |
+| `catalog:manage`         | OPS_ADMIN                                       | `/catalog/admin/*`                     |
+| `analytics:read`         | OPS_ADMIN, SALES_MANAGER, FINANCE               | `GET /analytics/*`                     |
+| `pricing:manage`         | FINANCE                                         | `PUT/DELETE /pricing/rules/:key`       |
+| `quotes:read`            | OPS_ADMIN, SALES_MANAGER, SALES_EXEC, FINANCE   | `GET /pricing/quotes`, `/rules`        |
+| `bookings:read`          | OPS_ADMIN, SALES_MANAGER                        | `GET /bookings`                        |
+| `bookings:write`         | OPS_ADMIN                                       | confirm / change booking status        |
+| `orders:read`            | OPS_ADMIN, SALES_MANAGER, FINANCE               | `GET /orders`                          |
+| `notifications:manage`   | OPS_ADMIN, CONTENT                              | notification templates                 |
+| `notifications:read`     | OPS_ADMIN                                       | delivery log (masked)                  |
+| `content:manage`         | OPS_ADMIN, CONTENT                              | `/content/admin/*`                     |
+| `content:approve`        | — (SUPER_ADMIN only)                            | publishing trust claims                |
+| `kyc:read`               | COMPLIANCE                                      | `GET /kyc/:ref`, document download URL |
+| `kyc:review`             | COMPLIANCE                                      | `PATCH /kyc/:ref/documents/:id/review` |
+| `subscriptions:read`     | OPS_ADMIN, FINANCE                              | `GET /subscriptions`, `/:ref`          |
+| `subscriptions:write`    | OPS_ADMIN                                       | create, suspend, cancel, renewals      |
+| `subscriptions:activate` | OPS_ADMIN                                       | `POST /subscriptions/:ref/activate`    |
+| `enterprise:read`        | OPS_ADMIN, SALES_MANAGER, FINANCE               | `/enterprise` reads, RFPs, reports     |
+| `enterprise:manage`      | OPS_ADMIN, SALES_MANAGER                        | organisations, members, links, RFPs    |
+| `enterprise:pricing`     | FINANCE                                         | organisation price books               |
+
+**Principal guards** (`identity.principal.js`, used by kyc, subscriptions, enterprise): `requireCustomer` (fails
+closed with 503 `CUSTOMER_AUTH_NOT_AVAILABLE` until customer sign-in exists — `identity.customer.js`),
+`requireStaffPrincipal(p)` (signed-in staff only — **never the `x-admin-key`**) and `requireCustomerOrStaff(p)`.
 
 **Switch-over:** `requireStaff(p)` also accepts the old `x-admin-key` (full access, actor `admin-key`) when no
 `Authorization` header is sent, so the admin console keeps working until it signs in with JWT. Remove that branch

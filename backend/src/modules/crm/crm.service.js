@@ -131,6 +131,9 @@ export async function createLead(input, now = new Date()) {
   return { lead: mapLeadReceipt(doc), created: true };
 }
 
+/** Staff actors are a user ref or 'admin-key' (the legacy shared key) — recorded on events as such. */
+const eventActor = (actor) => (actor === 'admin-key' ? { type: 'admin-key' } : { type: 'user', id: actor ?? null });
+
 /** Thrown inside the transaction to abort it when the ref is already taken (a concurrent replay won). */
 class RefTaken extends Error {}
 
@@ -211,12 +214,30 @@ export async function updateLead(ref, { status, assignedTo, note }, actor) {
   }
   if (note) activities.push({ type: 'note', note });
 
-  if (Object.keys(set).length > 0) {
-    set.score = computeLeadScore({ ...lead, ...set });
-    const updated = await repo.updateLeadIfStatus(ref, lead.status, set);
-    if (!updated) throw conflict('LEAD_CHANGED', 'This lead was changed by someone else. Reload and try again.');
-  }
-  await repo.insertActivities(activities.map((activity) => ({ ...activity, leadRef: ref, actor })));
+  if (Object.keys(set).length > 0) set.score = computeLeadScore({ ...lead, ...set });
+
+  // The change, its timeline entries and `lead.status_changed` are saved together or not at all (outbox, ADR-005).
+  await withTransaction(async (session) => {
+    if (Object.keys(set).length > 0) {
+      const updated = await repo.updateLeadIfStatus(ref, lead.status, set, { session });
+      if (!updated) throw conflict('LEAD_CHANGED', 'This lead was changed by someone else. Reload and try again.');
+    }
+    await repo.insertActivities(
+      activities.map((activity) => ({ ...activity, leadRef: ref, actor })),
+      { session },
+    );
+    if (set.status) {
+      await publish(
+        {
+          type: 'lead.status_changed',
+          entity: { type: 'lead', ref },
+          actor: eventActor(actor),
+          payload: { from: lead.status, to: set.status },
+        },
+        { session },
+      );
+    }
+  });
 
   if (set.status) {
     log.info({ event: 'lead.status_changed', leadRef: ref, from: lead.status, to: set.status }, 'lead status changed');
