@@ -18,7 +18,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "totp": "node scripts/totp.js"
+    "totp": "node scripts/totp.js",
+    "dev:memory:seeded": "node scripts/dev-memory-seeded.mjs"
   },
   "dependencies": {
     "argon2": "^0.45.1",

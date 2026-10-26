@@ -81,7 +81,9 @@ export function filterInventory(filters, items = searchableInventory()) {
     if (filters.city !== 'all' && item.city.toLowerCase() !== filters.city.toLowerCase()) return false;
     if (filters.type !== 'all' && item.type.toLowerCase() !== filters.type.toLowerCase()) return false;
     if (!matchesCapacity(filters.capacity, item.capacity)) return false;
-    return item.priceMonth <= filters.maxPrice;
+    // Some results (centres priced on request) carry no monthly price; a price ceiling should not
+    // silently remove them.
+    return typeof item.priceMonth !== 'number' || item.priceMonth <= filters.maxPrice;
   });
 
   if (filters.sort === 'price-asc') filtered.sort((a, b) => a.priceMonth - b.priceMonth);

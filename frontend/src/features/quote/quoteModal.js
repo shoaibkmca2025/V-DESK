@@ -1,4 +1,7 @@
+import { liveCentreRef } from '@/features/catalog/catalogApi.js';
+import { catalog } from '@/features/catalog/catalogStore.js';
 import { addLead } from '@/features/crm/leadStore.js';
+import { createQuote } from '@/features/pricing/pricingApi.js';
 import { closeModal } from '@/features/modals/modalManager.js';
 import { showToast } from '@/features/ui/toast.js';
 import { getWizardState } from '@/features/wizard/setupWizard.js';
@@ -92,4 +95,32 @@ export function handleModalQuoteSubmit(e) {
   e.target.reset();
   closeModal('quoteModal');
   showToast(`✓ Quote request received — ${lead.id}. We'll reach out within 15 minutes.`);
+  priceQuoteOnServer(lead);
+}
+
+/**
+ * Also asks the API to price and save the enquiry as a quote, so the advisor opens a priced
+ * proposal (VDQ-…) instead of re-keying it. The visitor's confirmation does not depend on it:
+ * the enquiry is already recorded by `addLead`.
+ */
+function priceQuoteOnServer(lead) {
+  /*
+   * Only a virtual office can be priced from an enquiry form — a boardroom or an incorporation
+   * needs details this form does not ask for. And it is priced against a centre in the city the
+   * visitor actually chose: a Mumbai enquiry must never come back priced for Nashik.
+   */
+  if (!/virtual office/i.test(lead.service ?? '')) return;
+  const centre = catalog.locations.find((location) => location.city === lead.city);
+  const centreRef = centre?.ref ?? liveCentreRef(centre?.id, catalog);
+  if (!centreRef) return;
+
+  createQuote({
+    name: lead.name,
+    company: lead.company,
+    item: { product: 'virtual_office', centreRef, tenure: 'annual' },
+  })
+    .then((quote) => {
+      if (quote?.ref) console.info('[V-DESK] quote saved:', quote.ref);
+    })
+    .catch((error) => console.warn('[V-DESK] quote not priced on the API:', error.code));
 }

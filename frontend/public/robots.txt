@@ -1,0 +1,14 @@
+# V-DESK — https://vdeskworkspace.com
+User-agent: *
+Allow: /
+
+# Nothing useful to a crawler, and not meant to be indexed.
+Disallow: /admin
+Disallow: /portal
+Disallow: /checkout
+Disallow: /kyc
+Disallow: /bookings
+Disallow: /quote/
+Disallow: /search
+
+Sitemap: https://vdeskworkspace.com/sitemap.xml

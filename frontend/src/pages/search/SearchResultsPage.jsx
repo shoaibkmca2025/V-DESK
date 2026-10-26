@@ -8,6 +8,7 @@ import { trackSearchEvent } from '@/features/analytics/telemetry.js';
 import { openMeetingBookingModal } from '@/features/meetingRooms/roomBooking.js';
 import { openQuoteModal } from '@/features/quote/quoteModal.js';
 import { parseSearchIntent } from '@/features/search/parseSearchIntent.js';
+import { searchApi } from '@/features/search/searchApi.js';
 import { createExplorerFilters, filterInventory, filtersFromIntent, matchServices } from '@/features/search/searchEngine.js';
 import { asset } from '@/lib/assets.js';
 
@@ -26,10 +27,10 @@ const CAPACITY_PILLS = [
   ['25+', '25+'],
 ];
 
-const CARD_IMAGE = { 'Meeting Rooms': 'assets/vdesk-boardroom.jpg', Coworking: 'assets/vdesk-coworking.jpg' };
+const CARD_IMAGE = { 'Meeting Rooms': 'assets/vdesk-boardroom.webp', Coworking: 'assets/vdesk-coworking.webp' };
 
 function ResultCard({ item, navigate }) {
-  const image = asset(CARD_IMAGE[item.type] || 'assets/vdesk-reception.jpg');
+  const image = asset(CARD_IMAGE[item.type] || 'assets/vdesk-reception.webp');
   const action = () => {
     trackSearchEvent('search_result_clicked', { id: item.id, type: item.type });
     if (item.type === 'Meeting Rooms') openMeetingBookingModal();
@@ -90,7 +91,30 @@ export default function SearchResultsPage() {
     if (query) trackSearchEvent('search_submitted', { query, page: 'search' });
   }, [query]);
 
-  const results = useMemo(() => filterInventory(filters), [filters]);
+  const localResults = useMemo(() => filterInventory(filters), [filters]);
+  /*
+   * The API ranks the live catalog and applies the staff synonym rules, so it wins when it answers.
+   * Until then — and whenever it cannot be reached — the browser searches the catalog it already
+   * has, which is why the page never shows a spinner or an empty frame.
+   */
+  const [apiResults, setApiResults] = useState(null);
+  useEffect(() => {
+    let active = true;
+    setApiResults(null);
+    if (!query.trim()) return undefined;
+    searchApi(query).then((response) => {
+      if (active && response) setApiResults(response);
+    });
+    return () => {
+      active = false;
+    };
+  }, [query]);
+
+  // Filters are applied in the browser either way, so the controls keep working on live results.
+  const results = useMemo(
+    () => (apiResults ? filterInventory(filters, apiResults.results) : localResults),
+    [apiResults, filters, localResults],
+  );
   const services = useMemo(() => matchServices(query), [query]);
   const guides = useMemo(() => {
     const q = query.toLowerCase();

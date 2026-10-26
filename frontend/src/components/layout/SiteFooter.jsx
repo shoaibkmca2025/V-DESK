@@ -40,7 +40,8 @@ export default function SiteFooter() {
           </div>
           {FOOTER_COLUMNS.map((column) => (
             <nav key={column.heading} className="ui-footer__col" aria-label={column.heading}>
-              <h4>{column.heading}</h4>
+              {/* h2: these are the footer's own section labels, and an h4 here skips a level. */}
+              <h2>{column.heading}</h2>
               <ul>
                 {column.links.map((link) => (
                   <li key={link.label}>

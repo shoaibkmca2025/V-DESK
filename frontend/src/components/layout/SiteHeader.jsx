@@ -93,7 +93,7 @@ export default function SiteHeader({ page }) {
           </ul>
         </nav>
         <div className="header-actions">
-          <button className="header-search-trigger" onClick={() => openCommandPalette()} aria-label="Quick Search (Ctrl+K)">
+          <button className="header-search-trigger" onClick={() => openCommandPalette()} aria-label="Quick Search ⌘K">
             <i className="ph-bold ph-magnifying-glass" /> <span className="search-label">Quick Search</span>{' '}
             <kbd className="search-kbd">⌘K</kbd>
           </button>

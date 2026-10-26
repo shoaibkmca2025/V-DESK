@@ -13,7 +13,7 @@ export const WORKSPACES = [
     priceHour: 1499,
     status: 'available',
     amenities: ['Wi-Fi', 'Parking', 'Reception', 'Pantry', 'Conference Room', '24/7 Access', 'CCTV', 'Power Backup', 'GST Suitable'],
-    image: 'assets/vdesk-boardroom.jpg',
+    image: 'assets/vdesk-boardroom.webp',
     rating: 4.9,
     reviews: 142
   },
@@ -30,7 +30,7 @@ export const WORKSPACES = [
     priceHour: 199,
     status: 'available',
     amenities: ['Wi-Fi', 'Pantry', 'Reception', 'Power Backup', 'CCTV', 'GST Suitable'],
-    image: 'assets/vdesk-coworking.jpg',
+    image: 'assets/vdesk-coworking.webp',
     rating: 4.8,
     reviews: 98
   },
@@ -47,7 +47,7 @@ export const WORKSPACES = [
     priceHour: 1199,
     status: 'available',
     amenities: ['Wi-Fi', 'Parking', 'Reception', 'Conference Room', 'Power Backup', 'CCTV'],
-    image: 'assets/vdesk-reception.jpg',
+    image: 'assets/vdesk-reception.webp',
     rating: 5.0,
     reviews: 210
   },
@@ -64,7 +64,7 @@ export const WORKSPACES = [
     priceHour: 1699,
     status: 'available',
     amenities: ['Wi-Fi', 'Parking', 'Reception', 'Pantry', 'Conference Room', '24/7 Access', 'CCTV', 'Power Backup', 'GST Suitable'],
-    image: 'assets/vdesk-coworking.jpg',
+    image: 'assets/vdesk-coworking.webp',
     rating: 4.9,
     reviews: 118
   },
@@ -81,7 +81,7 @@ export const WORKSPACES = [
     priceHour: 899,
     status: 'available',
     amenities: ['Wi-Fi', 'Reception', 'Pantry', 'Power Backup', 'CCTV', 'GST Suitable'],
-    image: 'assets/vdesk-reception.jpg',
+    image: 'assets/vdesk-reception.webp',
     rating: 4.8,
     reviews: 84
   },
@@ -98,7 +98,7 @@ export const WORKSPACES = [
     priceHour: 999,
     status: 'available',
     amenities: ['Wi-Fi', 'Reception', 'Conference Room', 'Power Backup', 'CCTV'],
-    image: 'assets/vdesk-boardroom.jpg',
+    image: 'assets/vdesk-boardroom.webp',
     rating: 4.9,
     reviews: 165
   }

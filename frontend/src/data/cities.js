@@ -35,7 +35,7 @@ export function cityWorkspaces(city, type) {
 }
 
 export function cityImage(city) {
-  return CITY_IMAGES[city.name] || 'assets/vdesk-reception.jpg';
+  return CITY_IMAGES[city.name] || 'assets/vdesk-reception.webp';
 }
 
 /** Lowest advertised price for a product in a city, or null when only on request. */

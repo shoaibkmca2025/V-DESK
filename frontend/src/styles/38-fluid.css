@@ -1,0 +1,459 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   38 — FLUID LAYER
+   How the interface responds, rather than how it looks. Three jobs:
+
+   1. Response — feedback starts on the press, not on release, and nothing on
+      the input path waits for an animation to finish.
+   2. Materials — floating chrome is a translucent layer over content, and it
+      only costs the compositor while it is actually on screen.
+   3. Restraint — one layer of floating controls at a time, so the content is
+      never fighting three bars for the same corner of the screen.
+
+   Honours prefers-reduced-motion, prefers-reduced-transparency and
+   prefers-contrast; every one of them has a designed fallback, not an absence.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Critically damped by default: UI settles without bouncing. */
+  --fluid-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --fluid-press: 110ms;
+  --fluid-enter: 260ms;
+  --fluid-exit: 200ms;
+}
+
+/* ── 1. Response ────────────────────────────────────────────────────────── */
+
+/* The browser's own 300ms grey flash is replaced by feedback we control. */
+.ui-page a,
+.ui-page button,
+.site-header a,
+.site-header button,
+.mobile-drawer a,
+.mobile-drawer button,
+.mobile-app-bottom-dock a,
+.mobile-app-bottom-dock button,
+.mobile-sticky-dock button,
+.modal-overlay button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Pressed state lands immediately; the release is what takes a moment. */
+.ui-btn,
+.btn,
+.ui-chip,
+.ui-city-pill,
+.header-btn-quote,
+.mobile-app-bottom-dock a,
+.mobile-sticky-dock .btn {
+  transition:
+    transform var(--fluid-press) var(--fluid-ease),
+    box-shadow var(--fluid-press) var(--fluid-ease),
+    background-color var(--fluid-press) var(--fluid-ease),
+    border-color var(--fluid-press) var(--fluid-ease),
+    color var(--fluid-press) var(--fluid-ease);
+}
+.ui-btn:active,
+.btn:active,
+.header-btn-quote:active,
+.mobile-sticky-dock .btn:active { transform: scale(0.97); }
+.ui-chip:active { transform: scale(0.96); }
+.ui-city-pill:active .ui-city-pill__badge { transform: scale(0.94); }
+.ui-card:active { transform: scale(0.995); }
+.mobile-app-bottom-dock a:active { transform: scale(0.93); }
+
+/* Hover belongs to devices that actually hover; on a phone it sticks after a tap. */
+@media (hover: none) {
+  .ui-card:hover,
+  .ui-plan:hover,
+  .ui-city:hover { transform: none; box-shadow: var(--ui-e1); }
+  .ui-city:hover img { transform: none; }
+  .ui-city-pill:hover .ui-city-pill__badge { transform: none; }
+}
+
+/* ── 2. Materials ───────────────────────────────────────────────────────── */
+
+/*
+ * Every dialog in the app stays mounted so its widget state survives. Keeping a dozen
+ * full-screen blurred surfaces composited at all times is expensive and buys nothing —
+ * the blur and the paint only switch on while the dialog is open.
+ */
+.modal-overlay:not(.active):not(.open) {
+  visibility: hidden;
+  background: transparent !important;
+  transition: opacity var(--fluid-exit) var(--fluid-ease), visibility 0s linear var(--fluid-exit);
+}
+.modal-overlay.active,
+.modal-overlay.open {
+  visibility: visible;
+  transition: opacity var(--fluid-enter) var(--fluid-ease), visibility 0s;
+}
+
+/* A dialog arrives as a material — blur and scale resolve together — and leaves the same way. */
+.modal-overlay .modal-card,
+.modal-overlay .modal-content,
+.modal-overlay .modal__dialog {
+  transition:
+    transform var(--fluid-enter) var(--fluid-ease),
+    opacity var(--fluid-enter) var(--fluid-ease),
+    filter var(--fluid-enter) var(--fluid-ease);
+}
+.modal-overlay:not(.active):not(.open) .modal-card,
+.modal-overlay:not(.active):not(.open) .modal-content,
+.modal-overlay:not(.active):not(.open) .modal__dialog {
+  filter: blur(6px);
+  transition-duration: var(--fluid-exit);
+}
+.modal-overlay.active .modal-card,
+.modal-overlay.open .modal-card,
+.modal-overlay.active .modal-content,
+.modal-overlay.active .modal__dialog { filter: blur(0); }
+
+/* Where floating chrome overlaps content, fade the meeting point instead of drawing a line. */
+.site-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 20px;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0));
+  transition: opacity var(--fluid-enter) var(--fluid-ease);
+}
+.site-header.is-scrolled { border-bottom-color: transparent !important; }
+.site-header.is-scrolled::after { opacity: 1; }
+
+/* The drawer is dragged, so its transform is owned by the gesture while a finger is down.
+   `pan-y` leaves vertical scrolling to the browser and hands horizontal movement to the gesture —
+   without it the browser claims the touch and cancels the pointer stream mid-swipe. */
+.mobile-drawer__panel { will-change: transform; touch-action: pan-y; }
+.mobile-drawer__overlay { transition: opacity var(--fluid-enter) var(--fluid-ease); }
+
+/* ── 3. Restraint: one layer of floating controls ───────────────────────── */
+
+@media (max-width: 768px) {
+  /* The bottom dock is wayfinding and the price bar is the action for this page —
+     a third and fourth floating control just cover the content. */
+  .floating-contact-widget,
+  .scroll-top-btn { display: none !important; }
+
+  /* The action bar sits directly on the dock, not across it. */
+  .mobile-sticky-dock { bottom: 58px !important; box-shadow: 0 -8px 24px -12px rgba(8, 29, 64, 0.35); }
+
+  /* Nothing is left hidden underneath the two bars at the end of a page. */
+  .ui-page { padding-bottom: 0; }
+  .ui-footer { padding-bottom: 148px; }
+}
+
+@media (min-width: 769px) {
+  /* One quiet cluster in the corner instead of pills at three different heights. */
+  .floating-contact-widget { gap: 8px; }
+  .scroll-top-btn { opacity: 0.7; transition: opacity var(--fluid-press) var(--fluid-ease), transform var(--fluid-press) var(--fluid-ease); }
+  .scroll-top-btn:hover { opacity: 1; }
+  .scroll-top-btn:active { transform: scale(0.94); }
+}
+
+/* ── 4. The three accessibility signals ─────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Not "no feedback" — a shorter, non-vestibular version of it. */
+  .ui-page *,
+  .modal-overlay *,
+  .mobile-drawer * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 120ms !important;
+    scroll-behavior: auto !important;
+  }
+  .ui-btn:active,
+  .btn:active,
+  .ui-chip:active,
+  .ui-card:active,
+  .mobile-app-bottom-dock a:active { transform: none; }
+  .modal-overlay .modal-card,
+  .modal-overlay .modal-content { filter: none !important; transform: none !important; }
+  .mobile-drawer__panel { transition: opacity 120ms linear !important; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  /* Frost the glass into a solid surface rather than dropping the layer. */
+  .site-header,
+  .site-header.is-scrolled { background: #ffffff !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .modal-overlay.active,
+  .modal-overlay.open { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(7, 26, 54, 0.92) !important; }
+  .ui-hero__badge,
+  .ui-chip,
+  .ui-hero__stats,
+  .ui-btn--glass {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(8, 29, 64, 0.88) !important;
+  }
+  .ui-city-strip__bg { opacity: 0.12; }
+}
+
+@media (prefers-contrast: more) {
+  .ui-card,
+  .ui-plan,
+  .ui-step,
+  .ui-stat,
+  .ui-table-wrap,
+  .ui-page .vo-faq-item { border-color: var(--ui-ink) !important; }
+  .ui-btn--outline { border-color: var(--ui-ink) !important; color: var(--ui-ink) !important; }
+  .ui-lead,
+  .ui-page .ui-card p,
+  .ui-page .ui-step p { color: var(--ui-text) !important; }
+  .ui-chip { background: rgba(8, 29, 64, 0.92) !important; border-color: #fff !important; }
+}
+
+/*
+ * While a finger owns the panel, its position comes from the gesture. The legacy drawer styles pin
+ * the open panel with `transform: translateX(0) !important`, so this rule has to outrank it.
+ */
+.mobile-drawer .mobile-drawer__panel.is-dragging,
+.mobile-drawer.is-active .mobile-drawer__panel.is-dragging {
+  transform: translate3d(var(--drawer-x, 0px), 0, 0) !important;
+  transition: none !important;
+}
+.mobile-drawer__overlay.is-dragging,
+.mobile-drawer.is-active .mobile-drawer__overlay.is-dragging {
+  opacity: var(--drawer-dim, 1) !important;
+  transition: none !important;
+}
+
+/* ── 5. Dialog headers ──────────────────────────────────────────────────────
+   The plain dialogs mark up a header, title, close button and subtitle, but only
+   the full-screen explorer and portal variants ever had styles for them — so the
+   close control rendered as a stray character under the heading. These are the
+   base styles; the full-screen variants keep their own and are excluded here.
+   ──────────────────────────────────────────────────────────────────────── */
+
+.modal-card:not(.modal-card--full-explorer):not(.modal-card--customer-portal):not(.modal-card--full-admin) .modal-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.modal-card:not(.modal-card--full-explorer):not(.modal-card--customer-portal):not(.modal-card--full-admin) .modal-card__title {
+  font-family: var(--ui-display, 'Outfit', system-ui, sans-serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+.modal-card:not(.modal-card--full-explorer):not(.modal-card--customer-portal):not(.modal-card--full-admin) .modal-card__close {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  margin: -10px -10px 0 0; /* optically aligned to the card's padding, full target kept */
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ui-muted, #5a6b85);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.modal-card:not(.modal-card--full-explorer):not(.modal-card--customer-portal):not(.modal-card--full-admin) .modal-card__close:hover {
+  background: rgba(8, 29, 64, 0.06);
+  color: var(--ui-ink, #0f2547);
+}
+.modal-card__close:active { transform: scale(0.92); }
+
+.modal-card__subtitle {
+  margin: 0 0 20px;
+  color: var(--ui-muted, #5a6b85);
+  font-size: 1rem;
+  line-height: 1.55;
+  max-width: 58ch;
+}
+
+/* ── 6. Dashboards ──────────────────────────────────────────────────────────
+   The customer portal and the staff console are work surfaces, not marketing
+   pages: denser spacing, a quiet header that states who you are and what is
+   active, and tables that stay readable at a glance.
+   ──────────────────────────────────────────────────────────────────────── */
+
+.ui-portal-head { background: var(--ui-surface); border-bottom: 1px solid var(--ui-border); padding: var(--sp-7) 0 var(--sp-6); }
+.ui-portal-head__row { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-5); flex-wrap: wrap; }
+.ui-portal-head__eyebrow { font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ui-teal-dark); }
+.ui-portal-head__title {
+  font-family: var(--ui-display);
+  font-size: clamp(1.7rem, 2.6vw, 2.2rem);
+  font-weight: 600;
+  color: var(--ui-ink) !important;
+  letter-spacing: -0.02em;
+  margin: var(--sp-2) 0 var(--sp-1);
+}
+.ui-portal-head__meta { color: var(--ui-muted) !important; font-size: 0.9375rem; margin: 0; }
+
+.ui-portal-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); margin-top: var(--sp-6); }
+.ui-portal-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-r-card);
+}
+.ui-portal-stat__label { font-size: 0.8125rem; color: var(--ui-muted); }
+.ui-portal-stat__value { font-family: var(--ui-display); font-size: 1.5rem; font-weight: 600; color: var(--ui-ink); line-height: 1.2; letter-spacing: -0.02em; }
+.ui-portal-stat__value.is-good { color: #047857; }
+.ui-portal-stat__value.is-warn { color: #92400e; }
+.ui-portal-stat__hint { font-size: 0.8125rem; color: var(--ui-muted); }
+
+.ui-portal-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: var(--sp-5); align-items: start; }
+.ui-portal-service__head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap; }
+.ui-portal-service__renewal { font-size: 0.9375rem; color: var(--ui-muted); }
+.ui-portal-service__renewal strong { color: var(--ui-ink); }
+.ui-page .ui-portal-service h2 {
+  font-family: var(--ui-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--ui-ink) !important;
+  margin: var(--sp-3) 0 var(--sp-1);
+  letter-spacing: -0.015em;
+}
+.ui-portal-aside { background: var(--ui-navy-50); border-color: #dbe6f3; }
+
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-border);
+}
+.ui-badge.is-good { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+.ui-badge.is-warn { background: #fffbeb; color: #92400e; border-color: #fde68a; }
+.ui-badge.is-bad { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+
+.ui-table__sub { font-size: 0.8125rem; color: var(--ui-muted); }
+.ui-table__actions { text-align: right; white-space: nowrap; }
+.ui-table td { vertical-align: middle; }
+
+.ui-empty { align-items: flex-start; gap: var(--sp-3); }
+.ui-page .ui-empty h3 { margin-bottom: 0; }
+
+@media (max-width: 1080px) {
+  .ui-portal-stats { grid-template-columns: repeat(2, 1fr); }
+  .ui-portal-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 680px) {
+  .ui-portal-stats { grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+  .ui-portal-stat { padding: var(--sp-3) var(--sp-4); }
+  .ui-portal-stat__value { font-size: 1.25rem; }
+  .ui-portal-head__row { flex-direction: column; }
+}
+
+/* Staff console: filters, form fields and the sign-in card. */
+.ui-admin-toolbar { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap; margin-bottom: var(--sp-4); }
+.ui-chips--left { justify-content: flex-start; }
+.ui-filter {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--ui-border);
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  cursor: pointer;
+  transition: background var(--fluid-press) var(--fluid-ease), border-color var(--fluid-press) var(--fluid-ease), color var(--fluid-press) var(--fluid-ease);
+}
+.ui-filter:hover { border-color: var(--ui-border-strong); }
+.ui-filter.is-on { background: var(--ui-navy); border-color: var(--ui-navy); color: #fff; }
+.ui-filter:active { transform: scale(0.97); }
+
+.ui-select {
+  min-height: 38px;
+  padding: 0 32px 0 12px;
+  border-radius: 10px;
+  border: 1px solid var(--ui-border-strong);
+  background: var(--ui-surface);
+  color: var(--ui-ink);
+  font: inherit;
+  font-size: 0.9375rem;
+}
+
+.ui-signin { max-width: 420px; margin-inline: auto; gap: var(--sp-4); }
+.ui-page .ui-signin h2 {
+  font-family: var(--ui-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--ui-ink) !important;
+  margin: 0;
+}
+.ui-signin__form { display: grid; gap: var(--sp-4); }
+.ui-signin__secret {
+  display: block;
+  padding: var(--sp-3);
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.9375rem;
+  word-break: break-all;
+  color: var(--ui-ink);
+}
+.ui-field { display: grid; gap: 6px; }
+.ui-field label { font-size: 0.9375rem; font-weight: 500; color: var(--ui-ink); }
+.ui-field input {
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid var(--ui-border-strong);
+  background: var(--ui-surface);
+  font: inherit;
+  color: var(--ui-ink);
+}
+.ui-field input:focus-visible { outline: 3px solid rgba(0, 168, 150, 0.45); outline-offset: 1px; border-color: var(--ui-teal-dark); }
+.ui-field__error { color: #b91c1c; font-size: 0.9375rem; margin: 0; }
+
+.ui-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Shown while a route's code downloads — reserves space so nothing jumps when it arrives. */
+.ui-route-loading { min-height: 60vh; display: grid; place-items: center; color: var(--ui-muted); font-size: 0.9375rem; }
+
+/* ── 7. Contrast on brand fills ─────────────────────────────────────────────
+   The client's gold and WhatsApp's green are both too light to carry white
+   text (2.8:1 and 2.0:1). The fills stay exactly as they are; the text on top
+   becomes the brand navy, which reads at 6:1 and 8.4:1.
+   ──────────────────────────────────────────────────────────────────────── */
+
+.ui-btn--gold,
+.ui-plan__badge,
+.ui-city__flag,
+.btn--gold {
+  color: var(--ui-navy) !important;
+}
+.ui-btn--gold:hover { background: var(--ui-gold-light); color: var(--ui-navy) !important; }
+.ui-btn--gold i,
+.ui-plan__badge i { color: inherit; }
+
+.floating-whatsapp-btn,
+.mobile-sticky-dock .btn--whatsapp,
+a[class*='whatsapp'] { color: var(--ui-navy) !important; }
+.floating-whatsapp-btn i { color: inherit !important; }

@@ -724,8 +724,11 @@ input[type="checkbox"]:checked::after,
 
 
 /* 13. Modals & Overlays */
-.modal-overlay,
-.modal {
+/* Scoped to the open state: a closed dialog must not keep a full-screen blur composited. */
+.modal-overlay.active,
+.modal-overlay.open,
+.modal.active,
+.modal.open {
   background-color: rgba(7, 26, 54, 0.65) !important;
   backdrop-filter: blur(8px) !important;
 }
@@ -743,7 +746,9 @@ input[type="checkbox"]:checked::after,
 .modal__title,
 .modal-card h3 {
   color: #0B2348 !important;
-  font-family: 'Cinzel', serif !important;
+  /* Was 'Cinzel', a face this site never loads — every dialog title fell back to a serif that
+     appears nowhere else. Dialogs use the same display font as the rest of the interface. */
+  font-family: var(--font-display) !important;
 }
 
 .modal-close {

@@ -1,17 +1,25 @@
 import { Link } from 'react-router';
 import CityIcon from './cityIcons.jsx';
 import { CITIES } from '@/data/cities.js';
-import { asset } from '@/lib/assets.js';
+import { asset, srcSetFor } from '@/lib/assets.js';
 
 /**
  * Quick city picker: round landmark badges over a photo band, ending in "View all".
  * Scrolls sideways on small screens.
  */
-export default function CityStrip({ image = 'assets/vdesk-coworking.jpg', limit = 8 }) {
+export default function CityStrip({ image = 'assets/vdesk-coworking.webp', limit = 8 }) {
   const cities = limit ? CITIES.slice(0, limit) : CITIES;
   return (
     <section className="ui-city-strip" aria-label="Choose a city">
-      <img className="ui-city-strip__bg" src={asset(image)} alt="" aria-hidden="true" loading="lazy" />
+      <img
+        className="ui-city-strip__bg"
+        src={asset(image)}
+        srcSet={srcSetFor(image)}
+        sizes="100vw"
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+      />
       <div className="ui-city-strip__scroll">
         <ul className="ui-city-strip__row">
           {cities.map((city) => (

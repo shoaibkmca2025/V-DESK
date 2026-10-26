@@ -1,6 +1,7 @@
 import { switchStandaloneAdminTab } from '@/features/admin/adminSuite.js';
 import { renderAdminLeads } from '@/features/admin/adminLeadsTable.js';
-import { catalog } from '@/features/catalog/catalogStore.js';
+import { CATALOG_EVENT, catalog, hydrateCatalog } from '@/features/catalog/catalogStore.js';
+import { listen } from '@/lib/pageScope.js';
 import { initCommandPalette } from '@/features/commandPalette/commandPalette.js';
 import { resetCompanyRegistrationState } from '@/features/companyRegistration/companyRegistration.js';
 import { filterDiscoveryEngine } from '@/features/discovery/discoveryEngine.js';
@@ -9,6 +10,7 @@ import { resetKycState } from '@/features/kyc/kyc.js';
 import { initAccessibility } from '@/features/layout/accessibility.js';
 import { initFooterInteractions } from '@/features/layout/footer.js';
 import { initHeader } from '@/features/layout/header.js';
+import { initDrawerGesture } from '@/features/layout/drawerGesture.js';
 import { initMobileDrawer } from '@/features/layout/mobileDrawer.js';
 import { initNavigation } from '@/features/layout/navigation.js';
 import {
@@ -64,10 +66,17 @@ export function initPageRuntime() {
   initCardSpotlight();
   initAccessibility();
   renderLocations(catalog.locations);
+  // The bundled catalog is on screen already; redraw the lists if the live one differs.
+  listen(document, CATALOG_EVENT, () => {
+    renderLocations(catalog.locations);
+    renderMarketplaceGrid();
+  });
+  hydrateCatalog();
   filterDiscoveryEngine();
   runCostCalculation();
   initTestimonials();
   initMobileDrawer();
+  initDrawerGesture();
   renderAdminLeads();
 
   // Footer, micro-interactions and shortcuts

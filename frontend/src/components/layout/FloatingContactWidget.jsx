@@ -9,7 +9,7 @@ export default function FloatingContactWidget() {
         target="_blank"
         rel="noopener"
         className="floating-whatsapp-btn"
-        aria-label="Chat with expert on WhatsApp"
+        aria-label="WhatsApp Us — chat with an expert"
       >
         <i className="ph-bold ph-whatsapp-logo" style={{ fontSize: '1.3rem' }} />
         <span>WhatsApp Us</span>
@@ -17,7 +17,7 @@ export default function FloatingContactWidget() {
       <button
         className="floating-callback-btn"
         onClick={() => openQuoteModal('Floating Dock - Quick Callback')}
-        aria-label="Request Instant Callback"
+        aria-label="Request Callback"
       >
         <i className="ph-bold ph-phone-call" style={{ fontSize: '1.15rem', color: 'var(--vd-teal-light)' }} />
         <span>Request Callback</span>

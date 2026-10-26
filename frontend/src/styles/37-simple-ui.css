@@ -810,7 +810,7 @@ a.ui-card:hover .ui-card__link i { transform: translateX(4px); }
 .ui-footer__contact, .ui-footer__col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-3); }
 .ui-footer__contact a { color: #e2e8f0; text-decoration: none; font-size: 0.9375rem; display: inline-flex; gap: var(--sp-2); align-items: center; }
 .ui-footer__contact i { color: var(--ui-gold-light); }
-.ui-footer__col h4 { color: #fff !important; font-family: var(--ui-display); font-size: 1rem; font-weight: 600; margin: 0 0 var(--sp-4); }
+.ui-footer__col h2 { color: #fff !important; font-family: var(--ui-display); font-size: 1rem; font-weight: 600; margin: 0 0 var(--sp-4); }
 .ui-footer__col a { color: #a9bcd4; text-decoration: none; font-size: 0.9375rem; }
 .ui-footer a { transition: color var(--ui-fast) var(--ui-ease); }
 .ui-footer a:hover { color: var(--ui-gold-light); }
@@ -893,7 +893,7 @@ a.ui-card:hover .ui-card__link i { transform: translateX(4px); }
 .ui-page .ui-quote p { color: var(--ui-text) !important; }
 .ui-hero__stat strong { color: #fff !important; }
 .ui-city__body strong { color: #fff !important; }
-.ui-footer__col h4 { color: #fff !important; }
+.ui-footer__col h2 { color: #fff !important; }
 .ui-section--navy .ui-stat strong { color: var(--ui-gold-light) !important; }
 
 /* ── Cards on navy (translucent content surfaces) ───────────────────────── */

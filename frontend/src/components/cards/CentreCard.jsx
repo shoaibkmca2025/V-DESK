@@ -5,7 +5,7 @@ import { asset } from '@/lib/assets.js';
 
 /** Commercial centre card — same markup as the location explorer cards on the homepage. */
 export default function CentreCard({ centre, priceKey = 'vo_price', unit = '/mo' }) {
-  const image = asset(catalog.cityImages[centre.city] || 'assets/vdesk-reception.jpg');
+  const image = asset(catalog.cityImages[centre.city] || 'assets/vdesk-reception.webp');
   return (
     <div className="location-card">
       <div className="location-card__img-wrap">

@@ -21,7 +21,7 @@ export function renderLocations(locations) {
 
   container.innerHTML = locations
     .map((loc) => {
-      const cityImg = asset(catalog.cityImages[loc.city] || 'assets/vdesk-reception.jpg');
+      const cityImg = asset(catalog.cityImages[loc.city] || 'assets/vdesk-reception.webp');
       return `
     <div class="location-card">
       <div class="location-card__img-wrap">

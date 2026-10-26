@@ -1,38 +1,54 @@
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router';
 import { LEGACY_FILE_ROUTES } from '@/config/pages.js';
 import SiteLayout from '@/layouts/SiteLayout.jsx';
-import AuthPage from '@/pages/account/AuthPage.jsx';
-import BookingsPage from '@/pages/account/BookingsPage.jsx';
-import CheckoutPage from '@/pages/account/CheckoutPage.jsx';
-import KycPage from '@/pages/account/KycPage.jsx';
-import QuotePage from '@/pages/account/QuotePage.jsx';
-import AdminPage from '@/pages/admin/AdminPage.jsx';
-import CompanyRegistrationPage from '@/pages/company-registration/CompanyRegistrationPage.jsx';
-import ContactPage from '@/pages/contact/ContactPage.jsx';
-import CoworkingPage from '@/pages/coworking/CoworkingPage.jsx';
 import HomePage from '@/pages/home/HomePage.jsx';
-import LegalPage from '@/pages/legal/LegalPage.jsx';
-import CityPage from '@/pages/locations/CityPage.jsx';
-import CityProductPage from '@/pages/locations/CityProductPage.jsx';
-import LocationsPage from '@/pages/locations/LocationsPage.jsx';
-import MeetingRoomsPage from '@/pages/meeting-rooms/MeetingRoomsPage.jsx';
 import NotFoundPage from '@/pages/not-found/NotFoundPage.jsx';
-import PortalPage from '@/pages/portal/PortalPage.jsx';
-import PricingPage from '@/pages/pricing/PricingPage.jsx';
-import FaqsPage from '@/pages/resources/FaqsPage.jsx';
-import GuidePage from '@/pages/resources/GuidePage.jsx';
-import ResourcesPage from '@/pages/resources/ResourcesPage.jsx';
-import SearchResultsPage from '@/pages/search/SearchResultsPage.jsx';
-import ServicePage from '@/pages/services/ServicePage.jsx';
-import ServicesPage from '@/pages/services/ServicesPage.jsx';
-import VirtualOfficePage from '@/pages/virtual-office/VirtualOfficePage.jsx';
-import CityWorkspacesPage from '@/pages/workspaces/CityWorkspacesPage.jsx';
 import RootLayout from './RootLayout.jsx';
+
+
+/*
+ * Only the home page ships in the first bundle; every other page is fetched when it is first
+ * opened, so a visitor landing on the home page does not download the admin console, the
+ * checkout and twenty other screens before anything appears.
+ */
+const AdminPage = lazy(() => import('@/pages/admin/AdminPage.jsx'));
+const AuthPage = lazy(() => import('@/pages/account/AuthPage.jsx'));
+const BookingsPage = lazy(() => import('@/pages/account/BookingsPage.jsx'));
+const CheckoutPage = lazy(() => import('@/pages/account/CheckoutPage.jsx'));
+const CityPage = lazy(() => import('@/pages/locations/CityPage.jsx'));
+const CityProductPage = lazy(() => import('@/pages/locations/CityProductPage.jsx'));
+const CityWorkspacesPage = lazy(() => import('@/pages/workspaces/CityWorkspacesPage.jsx'));
+const CompanyRegistrationPage = lazy(() => import('@/pages/company-registration/CompanyRegistrationPage.jsx'));
+const ContactPage = lazy(() => import('@/pages/contact/ContactPage.jsx'));
+const CoworkingPage = lazy(() => import('@/pages/coworking/CoworkingPage.jsx'));
+const FaqsPage = lazy(() => import('@/pages/resources/FaqsPage.jsx'));
+const GuidePage = lazy(() => import('@/pages/resources/GuidePage.jsx'));
+const KycPage = lazy(() => import('@/pages/account/KycPage.jsx'));
+const LegalPage = lazy(() => import('@/pages/legal/LegalPage.jsx'));
+const LocationsPage = lazy(() => import('@/pages/locations/LocationsPage.jsx'));
+const MeetingRoomsPage = lazy(() => import('@/pages/meeting-rooms/MeetingRoomsPage.jsx'));
+const PortalPage = lazy(() => import('@/pages/portal/PortalPage.jsx'));
+const PricingPage = lazy(() => import('@/pages/pricing/PricingPage.jsx'));
+const QuotePage = lazy(() => import('@/pages/account/QuotePage.jsx'));
+const ResourcesPage = lazy(() => import('@/pages/resources/ResourcesPage.jsx'));
+const SearchResultsPage = lazy(() => import('@/pages/search/SearchResultsPage.jsx'));
+const ServicePage = lazy(() => import('@/pages/services/ServicePage.jsx'));
+const ServicesPage = lazy(() => import('@/pages/services/ServicesPage.jsx'));
+const VirtualOfficePage = lazy(() => import('@/pages/virtual-office/VirtualOfficePage.jsx'));
+
+/** Shown only while a route's code is still arriving — usually a frame or two. */
+const RouteFallback = () => <div className="ui-route-loading" role="status" aria-live="polite">Loading…</div>;
+
+/** Wraps a lazily-loaded page so React has something to show while it downloads. */
+const lazyPage = (element) => <Suspense fallback={<RouteFallback />}>{element}</Suspense>;
 
 /** Static page: layout + component. Dynamic pages (services/:slug, locations/:city, …) render their own SiteLayout with computed meta. */
 const page = (key, Component, props) => (
   <SiteLayout page={key}>
-    <Component {...props} />
+    <Suspense fallback={<RouteFallback />}>
+      <Component {...props} />
+    </Suspense>
   </SiteLayout>
 );
 
@@ -60,19 +76,19 @@ export const router = createBrowserRouter(
 
         // SEO architecture (PRD §57)
         { path: 'services', element: page('services', ServicesPage) },
-        { path: 'services/:slug', element: <ServicePage /> },
+        { path: 'services/:slug', element: lazyPage(<ServicePage />) },
         { path: 'locations', element: page('locations', LocationsPage) },
-        { path: 'locations/:city', element: <CityPage /> },
-        { path: 'locations/:city/:product', element: <CityProductPage /> },
-        { path: 'workspaces/:city', element: <CityWorkspacesPage /> },
+        { path: 'locations/:city', element: lazyPage(<CityPage />) },
+        { path: 'locations/:city/:product', element: lazyPage(<CityProductPage />) },
+        { path: 'workspaces/:city', element: lazyPage(<CityWorkspacesPage />) },
         { path: 'workspaces', element: <Navigate to="/coworking-spaces" replace /> },
 
         // Discovery & resources
         { path: 'search', element: page('search', SearchResultsPage) },
         { path: 'resources', element: page('resources', ResourcesPage) },
-        { path: 'resources/:slug', element: <GuidePage /> },
+        { path: 'resources/:slug', element: lazyPage(<GuidePage />) },
         { path: 'faqs', element: page('faqs', FaqsPage) },
-        { path: 'legal/:doc', element: <LegalPage /> },
+        { path: 'legal/:doc', element: lazyPage(<LegalPage />) },
         { path: 'privacy', element: <Navigate to="/legal/privacy" replace /> },
         { path: 'terms', element: <Navigate to="/legal/terms" replace /> },
 
@@ -82,7 +98,7 @@ export const router = createBrowserRouter(
         { path: 'kyc', element: page('kyc', KycPage) },
         { path: 'checkout', element: page('checkout', CheckoutPage) },
         { path: 'bookings', element: page('bookings', BookingsPage) },
-        { path: 'quote/:ref', element: <QuotePage /> },
+        { path: 'quote/:ref', element: lazyPage(<QuotePage />) },
         { path: 'portal', element: page('portal', PortalPage) },
         { path: 'admin', element: page('admin', AdminPage) },
 

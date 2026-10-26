@@ -1,4 +1,5 @@
 import { LEGACY_LEAD_STATUSES } from '@/data/constants.js';
+import { api, isApiEnabled } from '@/lib/api.js';
 import { readJson, writeJson } from '@/lib/storage.js';
 
 /** CRM lead store persisted in localStorage (PRD §43). Seeds a demo pipeline on first visit. */
@@ -59,7 +60,44 @@ export function addLead(data, options = {}) {
   };
   leads.unshift(lead);
   saveLeads(leads);
+  sendLeadToApi(lead);
   return lead;
+}
+
+/**
+ * Mirrors the enquiry to POST /api/v1/leads when an API is configured. The caller never waits:
+ * the local copy above is what the UI shows, so a slow or missing API cannot lose an enquiry or
+ * block the confirmation. `ref` is the client-generated id, which makes the call idempotent.
+ */
+function sendLeadToApi(lead) {
+  if (!isApiEnabled()) return;
+  api
+    .post('/leads', {
+      body: {
+        ref: lead.id,
+        name: lead.name,
+        mobile: lead.mobile,
+        email: lead.email,
+        city: lead.city,
+        service: lead.service,
+        company: lead.company,
+        notes: lead.notes,
+        source: lead.source,
+      },
+    })
+    .then(() => markLeadSynced(lead.id))
+    .catch((error) => {
+      // Kept locally with synced:false — the admin list still shows it and a retry can pick it up.
+      console.warn('[V-DESK] lead not sent to the API:', error.code, error.message);
+    });
+}
+
+function markLeadSynced(id) {
+  const leads = getLeads();
+  const lead = leads.find((l) => l.id === id);
+  if (!lead) return;
+  lead.synced = true;
+  saveLeads(leads);
 }
 
 export function setLeadStatus(id, status) {

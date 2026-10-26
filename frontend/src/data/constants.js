@@ -13,3 +13,18 @@ export const PIPELINE_STAGES = ['NEW', 'CONTACTED', 'QUALIFIED', 'PROPOSAL', 'NE
 export const BOOKING_STATES = ['available', 'hold', 'payment_pending', 'confirmed', 'checked_in', 'completed', 'cancelled'];
 
 export const GST_RATE = 0.18;
+
+/**
+ * The only status moves the CRM accepts: one step forward, or LOST from any open stage.
+ * Mirrors LEAD_TRANSITIONS in backend/src/modules/crm/crm.constants.js, which is the authority —
+ * the console offers these so staff are never shown a move the API will reject with a 409.
+ */
+export const LEAD_TRANSITIONS = Object.freeze({
+  NEW: ['CONTACTED', 'LOST'],
+  CONTACTED: ['QUALIFIED', 'LOST'],
+  QUALIFIED: ['PROPOSAL', 'LOST'],
+  PROPOSAL: ['NEGOTIATION', 'LOST'],
+  NEGOTIATION: ['WON', 'LOST'],
+  WON: [],
+  LOST: [],
+});

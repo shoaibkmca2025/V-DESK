@@ -164,3 +164,18 @@ Add these when a module needs them:
 | `TURNSTILE_SECRET_KEY` | _(unset)_                         | Cloudflare Turnstile secret; set → `POST /leads` needs a CAPTCHA token, unset → check off |
 | `SALES_ALERT_EMAIL`    | _(unset)_                         | inbox for new-lead alerts (template `lead.sales_alert`); unset → no alert queued          |
 | `SITE_URL`             | _(unset)_                         | public site address, e.g. `https://vdesk.in`, for `sitemap.xml`; unset → sitemap 503      |
+
+## Running a local API for frontend work
+
+```bash
+npm run dev:memory:seeded      # API + worker on an in-memory MongoDB, no install needed
+node scripts/seed-over-api.mjs # fills the catalog through the staff endpoints (re-runnable)
+```
+
+`dev:memory:seeded` starts a single-node replica set (so transactions and the outbox behave as in
+production), waits for it to elect a primary, and falls back to a standalone server if it does not —
+with a warning, because outbox writes are not atomic there. Data is lost when the process stops.
+
+`seed-over-api.mjs` posts the frontend's bundled catalog to `/catalog/admin/*` rather than writing to
+the database directly, so it works against any environment you have a staff key for, and doubles as a
+live check of those endpoints. Set `API` and `KEY` to point it elsewhere.

@@ -75,14 +75,14 @@ export default function MeetingRoomBookingModal() {
                 </div>
                 <div className="form-field">
                   <label className="form-label" htmlFor="rbCompany">
-                    Company / Organization *
+                    Company / Organization
                   </label>
                   <input
                     type="text"
                     id="rbCompany"
                     className="form-input"
                     placeholder="e.g. Acme Innovations"
-                    required
+                   
                   />
                 </div>
               </div>

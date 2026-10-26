@@ -3,12 +3,12 @@ import FaqAccordion from '@/components/page/FaqAccordion.jsx';
 import { Button, CityGrid, CityStrip, CtaBand, Plans, SearchHero, Section, Steps, Testimonials } from '@/components/ui/index.js';
 import { FAQ_GROUPS } from '@/data/faqs.js';
 import { GUIDES } from '@/data/guides.js';
-import { asset } from '@/lib/assets.js';
+import { asset, photo, srcSetFor } from '@/lib/assets.js';
 
 const SERVICES = [
   {
     to: '/virtual-office',
-    image: 'assets/vdesk-reception.jpg',
+    image: 'assets/vdesk-reception.webp',
     tag: 'Most chosen',
     title: 'Virtual Office',
     text: 'A registered business address with the rent agreement, NOC and utility bill needed for GST and company registration.',
@@ -17,7 +17,7 @@ const SERVICES = [
   },
   {
     to: '/coworking-spaces',
-    image: 'assets/vdesk-coworking.jpg',
+    image: 'assets/vdesk-coworking.webp',
     title: 'Coworking & Cabins',
     text: 'Hot desks, dedicated desks and private cabins with Wi-Fi, reception and meeting credits.',
     price: '₹399',
@@ -25,7 +25,7 @@ const SERVICES = [
   },
   {
     to: '/meeting-rooms',
-    image: 'assets/vdesk-boardroom.jpg',
+    image: 'assets/vdesk-boardroom.webp',
     title: 'Meeting Rooms',
     text: 'Boardrooms and huddle rooms with 4K screens. Book by the hour, pay online.',
     price: '₹499',
@@ -101,7 +101,8 @@ export default function HomePage() {
           { label: 'Company Registration', icon: 'ph-certificate', to: '/company-registration' },
         ]}
         trust={['GST & MCA compliant', 'Documents in 24 hours', 'Full refund if rejected']}
-        image={asset('assets/vdesk-reception.jpg')}
+        image={photo('vdesk-reception').src}
+        imageSrcSet={photo('vdesk-reception').srcSet}
         stats={[
           ['10,000+', 'Businesses served'],
           ['10+', 'Cities'],
@@ -117,7 +118,13 @@ export default function HomePage() {
           {SERVICES.map((service) => (
             <Link key={service.title} to={service.to} className="ui-card ui-card--service">
               <div className="ui-card__media">
-                <img src={asset(service.image)} alt={service.title} loading="lazy" />
+                <img
+                  src={asset(service.image)}
+                  srcSet={srcSetFor(service.image)}
+                  sizes="(max-width: 680px) 100vw, 33vw"
+                  alt={service.title}
+                  loading="lazy"
+                />
                 {service.tag && <span className="ui-card__tag">{service.tag}</span>}
               </div>
               <div className="ui-card__body">

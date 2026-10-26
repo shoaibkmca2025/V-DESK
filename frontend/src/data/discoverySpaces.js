@@ -12,7 +12,7 @@ export const DISCOVERY_SPACES = [
     priceUnit: '/mo',
     durationMatch: ['monthly', 'annual'],
     status: 'Available',
-    image: 'assets/vdesk-reception.jpg',
+    image: 'assets/vdesk-reception.webp',
     amenities: ['Registered Rent Deed', 'Landlord NOC', 'Name Board Display', 'Courier WhatsApp Alert'],
     quoteLabel: 'Virtual Office — Nashik HQ'
   },
@@ -44,7 +44,7 @@ export const DISCOVERY_SPACES = [
     priceUnit: '/desk/mo',
     durationMatch: ['daily', 'monthly', 'annual'],
     status: 'Available',
-    image: 'assets/vdesk-coworking.jpg',
+    image: 'assets/vdesk-coworking.webp',
     amenities: ['Ergonomic Chair', '500 Mbps Wi-Fi', 'Meeting Room Credits', 'Barista Coffee'],
     quoteLabel: 'Coworking Desk — Bangalore Koramangala'
   },
@@ -60,7 +60,7 @@ export const DISCOVERY_SPACES = [
     priceUnit: '/day',
     durationMatch: ['daily'],
     status: 'Available',
-    image: 'assets/vdesk-coworking.jpg',
+    image: 'assets/vdesk-coworking.webp',
     amenities: ['High-Speed Internet', 'Power Backup', 'Cafeteria Access', 'Community Events'],
     quoteLabel: 'Flex Day Pass — Pune Baner'
   },
@@ -108,7 +108,7 @@ export const DISCOVERY_SPACES = [
     priceUnit: '/hr',
     durationMatch: ['daily'],
     status: 'Available',
-    image: 'assets/vdesk-boardroom.jpg',
+    image: 'assets/vdesk-boardroom.webp',
     amenities: ['86" 4K Smart Display', 'Polycom Video Bar', 'Reception Greeting', 'Beverage Service'],
     quoteLabel: 'Boardroom — Mumbai Andheri'
   },
@@ -124,7 +124,7 @@ export const DISCOVERY_SPACES = [
     priceUnit: '/hr',
     durationMatch: ['daily'],
     status: 'Available',
-    image: 'assets/vdesk-boardroom.jpg',
+    image: 'assets/vdesk-boardroom.webp',
     amenities: ['65" Wireless Display', 'Whiteboard Wall', 'High-Speed Wi-Fi', 'Tea/Coffee Service'],
     quoteLabel: 'Huddle Suite — Nashik Gangapur'
   }

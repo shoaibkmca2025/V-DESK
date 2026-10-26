@@ -114,3 +114,57 @@ Static hosting of `dist/` with an SPA fallback to `index.html`:
   `/index.html`. Set `VITE_BASE_PATH` only when hosting under a sub-path.
 
 Old URLs (`/virtual-office.html`, …) redirect to the new routes.
+
+## Connecting to the API
+
+The site runs on its built-in local data by default, which is what the static deployment serves today.
+Point it at the backend by setting `VITE_API_URL` at build time:
+
+```bash
+VITE_API_URL=http://localhost:5000/api/v1 npm run build
+```
+
+`src/lib/api.js` is the single client: it adds the JSON headers, sends the staff refresh cookie,
+applies a timeout, and turns the API's `{ error: { code, message } }` envelope into an `ApiError`.
+`isApiEnabled()` is false when `VITE_API_URL` is unset, so each caller keeps its local behaviour.
+
+Connected so far:
+
+| Flow | Call | Fallback when the API is unreachable |
+|---|---|---|
+| Enquiry forms (`addLead`) | `POST /leads` | the enquiry stays in localStorage, unsynced |
+| Telemetry (`trackSearchEvent`) | `POST /analytics/events` (batched, beacon on unload) | kept in the local log only |
+| Catalog (centres, workspaces) | `GET /catalog` | the data the site was built with, in `src/data/` |
+| Search results | `GET /search` | the in-browser search over the bundled catalog |
+| Quote enquiries | `POST /pricing/quotes` | the enquiry is still recorded as a lead |
+| Meeting-room holds | `POST /bookings/hold` | the scheduler's own ten-minute simulation |
+| Staff console (`/admin`) | `/auth/*`, `/leads`, `/leads/stats`, `/leads/export.csv` | the enquiries in this browser |
+
+Each client lives beside the feature it serves (`features/<feature>/<name>Api.js`) and returns `null`
+rather than throwing when there is no API, so every caller keeps its local behaviour.
+
+Staff sign in at `/admin` with their own account (password + authenticator code); the token is held
+in `sessionStorage` for that tab only. The console shows the controls that account is allowed to
+use — a role without `leads:write` sees statuses as badges rather than dropdowns.
+
+The backend's `CORS_ORIGINS` must list the site's origin, or the browser blocks the call.
+
+## Fluid layer (how the interface responds)
+
+`src/styles/38-fluid.css` and `src/features/layout/drawerGesture.js` own behaviour rather than looks:
+
+- **Response.** Controls show their pressed state on pointer-down, not on release; hover styles are
+  behind `@media (hover: hover)` so they don't stick after a tap on a phone.
+- **Direct manipulation.** The mobile drawer tracks the finger one-to-one from wherever it was
+  grabbed, resists past its open edge, and on release projects where the flick was heading and
+  springs there carrying that velocity — so a short fast swipe closes it and a slow drag springs back.
+  Grabbing the panel mid-flight picks it up at its current position and speed.
+- **Springs, not fixed durations.** `src/lib/spring.js` exposes `animateSpring` (Apple's damping +
+  response parameters, interruptible, velocity-aware), `project()` for momentum, `rubberband()` for
+  soft edges, and a velocity tracker. Reach for these for anything a finger can touch.
+- **Materials.** Dialogs only composite their blur while they are open; the sticky header fades its
+  edge into the content instead of drawing a divider.
+- **Restraint.** A phone shows at most two layers of floating controls (the bottom dock and the page's
+  action bar); the desktop-only widgets are hidden there.
+- **Preferences.** `prefers-reduced-motion`, `prefers-reduced-transparency` and `prefers-contrast`
+  each have a designed fallback, not a missing feature.

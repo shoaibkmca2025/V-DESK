@@ -1,5 +1,8 @@
 import { GST_RATE } from '@/data/constants.js';
 import { addBooking } from '@/features/bookings/bookingStore.js';
+import { holdBooking } from '@/features/bookings/bookingApi.js';
+import { liveCentreRef } from '@/features/catalog/catalogApi.js';
+import { catalog } from '@/features/catalog/catalogStore.js';
 import { openCheckoutModal } from '@/features/checkout/checkout.js';
 import { closeModal, openActiveModal } from '@/features/modals/modalManager.js';
 import { showToast } from '@/features/ui/toast.js';
@@ -127,12 +130,34 @@ function startHoldCountdown() {
   onPageExit(() => clearInterval(holdCountdownTimer));
 }
 
+/** '02:00 PM - 04:00 PM' → '14:00', which is what the API expects. */
+function startHour24(slot) {
+  const match = /^(\d{1,2}):(\d{2})\s*(AM|PM)/i.exec(slot ?? '');
+  if (!match) return null;
+  let hour = Number(match[1]) % 12;
+  if (match[3].toUpperCase() === 'PM') hour += 12;
+  return `${String(hour).padStart(2, '0')}:00`;
+}
+
+/**
+ * The date the booking is for, as YYYY-MM-DD. An untouched date field means the visitor never
+ * chose one, so the scheduler's own default — the next day — is used, and the record is updated to
+ * match so the pass, the confirmation and the server all name the same day.
+ */
+function bookingDate() {
+  const value = document.getElementById('mrDateInput')?.value;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value ?? '')) return value;
+  const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
+  activeRoomBooking.date = tomorrow;
+  return tomorrow;
+}
+
 export function handleRoomBookingHold(e) {
   if (e) e.preventDefault();
   const valueOf = (id, fallback) => document.getElementById(id)?.value || fallback;
   activeRoomBooking.customer = {
     name: valueOf('rbName', 'Guest User'),
-    company: valueOf('rbCompany', 'Acme Enterprises'),
+    company: valueOf('rbCompany', ''),
     mobile: valueOf('rbMobile', '9876543210'),
     email: valueOf('rbEmail', 'user@company.com'),
   };
@@ -142,6 +167,46 @@ export function handleRoomBookingHold(e) {
   setBookingStep(2);
   startHoldCountdown();
   showToast('Slot Held for 10 Minutes', 'Complete payment to confirm reservation.', 'info');
+  holdOnServer();
+}
+
+/**
+ * Mirrors the hold to the API, which is what actually locks the slot for everyone else. The UI has
+ * already moved on: a server hold replaces the local ref, and a clash is reported honestly instead
+ * of letting the visitor pay for a slot someone else took.
+ */
+function holdOnServer() {
+  const centreRef = liveCentreRef(document.getElementById('mrCitySelect')?.value, catalog);
+  const startTime = startHour24(activeRoomBooking.slot);
+  if (!centreRef || !startTime) return;
+
+  const { room, duration, attendees, customer } = activeRoomBooking;
+  holdBooking({
+    centreRef,
+    room,
+    date: bookingDate(),
+    startTime,
+    duration,
+    attendees,
+    customer: { name: customer.name, company: customer.company, mobile: customer.mobile, email: customer.email },
+  })
+    .then((booking) => {
+      if (booking?.ref) activeRoomBooking.ref = booking.ref;
+    })
+    .catch((error) => {
+      if (error.code === 'SLOT_UNAVAILABLE') {
+        cancelRoomBookingHold();
+        showToast('That slot has just gone', error.message, 'warning');
+        return;
+      }
+      if (error.status === 409 || error.status === 422 || error.status === 400) {
+        // The room, centre or time was not acceptable — say what the server said rather than guess.
+        cancelRoomBookingHold();
+        showToast('That booking could not be held', error.message, 'warning');
+        return;
+      }
+      console.warn('[V-DESK] booking not held on the API:', error.code);
+    });
 }
 
 export function cancelRoomBookingHold() {
@@ -156,6 +221,11 @@ function openConfirmedBookingPass() {
 
   const bookingId = activeRoomBooking.ref || 'BK-' + Date.now().toString(36).toUpperCase();
   activeRoomBooking.state = 'confirmed';
+  /*
+   * The hold stays a hold on the server: confirming is a staff action (bookings:write) and the
+   * payment that should trigger it is still simulated in the browser. Calling it from here would
+   * only ever get a 401, and the ten-minute hold would quietly expire behind a "confirmed" pass.
+   */
   const { customer, ...record } = activeRoomBooking;
   addBooking({ ...record, ref: bookingId, host: customer?.name || 'Authorized Guest' });
 

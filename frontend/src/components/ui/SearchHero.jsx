@@ -9,7 +9,7 @@ import { trackSearchEvent } from '@/features/analytics/telemetry.js';
  * one search field and a row of quick picks. The scrim keeps text at AA contrast
  * over any photo; the stats band uses a translucent control-layer material.
  */
-export default function SearchHero({ badge, title, description, placeholder, chips = [], trust = [], image, stats = [] }) {
+export default function SearchHero({ badge, title, description, placeholder, chips = [], trust = [], image, imageSrcSet, stats = [] }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
 
@@ -23,7 +23,17 @@ export default function SearchHero({ badge, title, description, placeholder, chi
 
   return (
     <section className="ui-hero" id="top">
-      {image && <img className="ui-hero__photo" src={image} alt="" aria-hidden="true" fetchPriority="high" />}
+      {image && (
+        <img
+          className="ui-hero__photo"
+          src={image}
+          srcSet={imageSrcSet}
+          sizes="100vw"
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+        />
+      )}
       <div className="ui-container">
         <div className="ui-hero__inner">
           {badge && (

@@ -125,7 +125,7 @@ export function renderExplorerResults() {
   grid.innerHTML = filtered
     .map((item) => {
       const bgImage = asset(
-        item.type === 'Meeting Rooms' ? 'assets/vdesk-boardroom.jpg' : item.type === 'Coworking' ? 'assets/vdesk-coworking.jpg' : 'assets/vdesk-reception.jpg',
+        item.type === 'Meeting Rooms' ? 'assets/vdesk-boardroom.webp' : item.type === 'Coworking' ? 'assets/vdesk-coworking.webp' : 'assets/vdesk-reception.webp',
       );
 
       return `

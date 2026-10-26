@@ -17,9 +17,9 @@ const PRECACHE_ASSETS = [
   './assets/vdesk-logo-compact-white.png',
   './assets/vdesk-mark.png',
   './assets/favicon-64.png',
-  './assets/vdesk-reception.jpg',
-  './assets/vdesk-coworking.jpg',
-  './assets/vdesk-boardroom.jpg',
+  './assets/vdesk-reception.webp',
+  './assets/vdesk-coworking.webp',
+  './assets/vdesk-boardroom.webp',
 ].map((path) => new URL(path, SCOPE_URL).toString());
 
 const OFFLINE_HTML =

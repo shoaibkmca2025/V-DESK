@@ -1077,8 +1077,11 @@
 /* --------------------------------------------------------------------------
    10. MODALS & POPUPS (CLEAN WHITE)
    -------------------------------------------------------------------------- */
-.modal-overlay,
-.modal {
+/* Open state only — a closed dialog should cost the compositor nothing. */
+.modal-overlay.active,
+.modal-overlay.open,
+.modal.active,
+.modal.open {
   background-color: rgba(7, 26, 54, 0.6) !important;
   backdrop-filter: blur(8px);
 }
