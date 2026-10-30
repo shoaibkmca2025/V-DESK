@@ -21,6 +21,7 @@ const CityProductPage = lazy(() => import('@/pages/locations/CityProductPage.jsx
 const CityWorkspacesPage = lazy(() => import('@/pages/workspaces/CityWorkspacesPage.jsx'));
 const CompanyRegistrationPage = lazy(() => import('@/pages/company-registration/CompanyRegistrationPage.jsx'));
 const ContactPage = lazy(() => import('@/pages/contact/ContactPage.jsx'));
+const ListYourSpacePage = lazy(() => import('@/pages/partners/ListYourSpacePage.jsx'));
 const CoworkingPage = lazy(() => import('@/pages/coworking/CoworkingPage.jsx'));
 const FaqsPage = lazy(() => import('@/pages/resources/FaqsPage.jsx'));
 const GuidePage = lazy(() => import('@/pages/resources/GuidePage.jsx'));
@@ -73,6 +74,7 @@ export const router = createBrowserRouter(
         { path: 'pricing', element: page('pricing', PricingPage) },
         { path: 'company-registration', element: page('companyRegistration', CompanyRegistrationPage) },
         { path: 'contact', element: page('contact', ContactPage) },
+        { path: 'list-your-space', element: page('listYourSpace', ListYourSpacePage) },
 
         // SEO architecture (PRD §57)
         { path: 'services', element: page('services', ServicesPage) },

@@ -114,6 +114,25 @@ const ICONS = {
   ),
 };
 
+/**
+ * A colour per city, so the row reads as eight places rather than eight identical discs. Deep enough that
+ * the white landmark art on top keeps its contrast, and kept away from the brand gold so a badge is never
+ * mistaken for a button.
+ */
+export const CITY_COLOURS = {
+  mumbai: ['#1F6FB2', '#0C3C6B'],
+  delhi: ['#C0563B', '#7A2E1E'],
+  gurgaon: ['#4E62B8', '#28306E'],
+  noida: ['#2E8C7E', '#14514A'],
+  bangalore: ['#3E8F4E', '#1C5130'],
+  pune: ['#8A5BB0', '#4A2A6B'],
+  hyderabad: ['#B07A2E', '#6B4415'],
+  nashik: ['#3F7FA6', '#1D4660'],
+  chennai: ['#B2563F', '#6E2F20'],
+};
+
+export const colourFor = (slug) => CITY_COLOURS[slug] ?? ['#2A4A74', '#122A49'];
+
 /** Landmark icon for a city slug; falls back to a generic building. */
 export default function CityIcon({ slug }) {
   return (

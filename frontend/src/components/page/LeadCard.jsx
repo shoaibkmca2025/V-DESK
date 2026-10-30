@@ -3,8 +3,32 @@ import { CITIES } from '@/data/cities.js';
 import { addLead } from '@/features/crm/leadStore.js';
 import { showToast } from '@/features/ui/toast.js';
 
-/** Hero lead-capture card (same markup as the pricing / locations hero forms). Saves a CRM lead. */
-export default function LeadCard({ ribbon = 'INSTANT QUOTE', title, subtitle, service, city, source, cta = 'Request Quote →' }) {
+/** What someone is asking for. A page can replace the list — a space owner is offering, not buying. */
+const REQUIREMENTS = [
+  ['Virtual Office', 'Virtual Office (GST / MCA)'],
+  ['GST Registration', 'GST Registration'],
+  ['Company Registration', 'Company Registration'],
+  ['Coworking', 'Coworking Desks'],
+  ['Private Office', 'Private Office Cabin'],
+  ['Meeting Rooms', 'Meeting Rooms'],
+];
+
+/**
+ * Hero lead-capture card (same markup as the pricing / locations hero forms). Saves a CRM lead.
+ * `requirements` and `requirementLabel` let a page ask its own question with the same form and pipeline.
+ */
+export default function LeadCard({
+  ribbon = 'INSTANT QUOTE',
+  title,
+  subtitle,
+  service,
+  city,
+  source,
+  cta = 'Request Quote →',
+  requirements = REQUIREMENTS,
+  requirementLabel = 'Requirement *',
+  cityLabel = 'Target City *',
+}) {
   const uid = useId();
 
   function handleSubmit(event) {
@@ -46,18 +70,17 @@ export default function LeadCard({ ribbon = 'INSTANT QUOTE', title, subtitle, se
           <input type="email" id={`${uid}-email`} name="email" className="form-control" placeholder="name@company.in" required />
         </div>
         <div className="form-group">
-          <label htmlFor={`${uid}-service`}>Requirement *</label>
-          <select id={`${uid}-service`} name="service" className="form-control" defaultValue={service || 'Virtual Office'}>
-            <option value="Virtual Office">Virtual Office (GST / MCA)</option>
-            <option value="GST Registration">GST Registration</option>
-            <option value="Company Registration">Company Registration</option>
-            <option value="Coworking">Coworking Desks</option>
-            <option value="Private Office">Private Office Cabin</option>
-            <option value="Meeting Rooms">Meeting Rooms</option>
+          <label htmlFor={`${uid}-service`}>{requirementLabel}</label>
+          <select id={`${uid}-service`} name="service" className="form-control" defaultValue={service || requirements[0][0]}>
+            {requirements.map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
           </select>
         </div>
         <div className="form-group">
-          <label htmlFor={`${uid}-city`}>Target City *</label>
+          <label htmlFor={`${uid}-city`}>{cityLabel}</label>
           <select id={`${uid}-city`} name="city" className="form-control" defaultValue={city || 'Mumbai'}>
             {CITIES.map((c) => (
               <option key={c.slug} value={c.name}>

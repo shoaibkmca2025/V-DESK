@@ -83,6 +83,14 @@ export const PAGES = {
     htmlClass: 'scroll-smooth',
     bodyClass: 'subpage subpage--contact',
   },
+  listYourSpace: {
+    path: '/list-your-space',
+    title: 'List Your Space | Partner with V-DESK',
+    description:
+      'Own or operate a commercial space? List it with V-DESK: we bring verified businesses, prepare the GST and MCA paperwork, and settle with you monthly.',
+    htmlClass: 'scroll-smooth',
+    bodyClass: 'subpage subpage--list-your-space',
+  },
   services: { path: '/services', title: 'Business Services — Virtual Office, GST & Company Registration | V-DESK', description: 'Start, establish and grow your business with V-DESK services across India.', htmlClass: 'scroll-smooth', bodyClass: 'subpage subpage--services' },
   service: { path: '/services/:slug', title: 'Service | V-DESK', description: '', htmlClass: 'scroll-smooth', bodyClass: 'subpage subpage--service' },
   city: { path: '/locations/:city', title: 'City | V-DESK', description: '', htmlClass: 'scroll-smooth', bodyClass: 'subpage subpage--city' },

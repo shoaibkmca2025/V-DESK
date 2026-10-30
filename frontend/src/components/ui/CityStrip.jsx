@@ -1,10 +1,11 @@
 import { Link } from 'react-router';
-import CityIcon from './cityIcons.jsx';
+import CityIcon, { colourFor } from './cityIcons.jsx';
 import { CITIES } from '@/data/cities.js';
 import { asset, srcSetFor } from '@/lib/assets.js';
 
 /**
- * Quick city picker: round landmark badges over a photo band, ending in "View all".
+ * Quick city picker: a round landmark badge per city over a photo band, ending in "View all". Each badge
+ * carries its own colour (cityIcons.jsx) so the row reads as eight places at a glance.
  * Scrolls sideways on small screens.
  */
 export default function CityStrip({ image = 'assets/vdesk-coworking.webp', limit = 8 }) {
@@ -25,7 +26,10 @@ export default function CityStrip({ image = 'assets/vdesk-coworking.webp', limit
           {cities.map((city) => (
             <li key={city.slug}>
               <Link to={`/locations/${city.slug}`} className="ui-city-pill">
-                <span className="ui-city-pill__badge">
+                <span
+                  className="ui-city-pill__badge"
+                  style={{ '--city-from': colourFor(city.slug)[0], '--city-to': colourFor(city.slug)[1] }}
+                >
                   <CityIcon slug={city.slug} />
                 </span>
                 <span className="ui-city-pill__label">{city.name}</span>

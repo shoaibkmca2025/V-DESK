@@ -1,5 +1,7 @@
 node_modules/
 dist/
+# Rendered guide videos — rebuild them with docs/guides/render.mjs
+dist-guides/
 .env
 .env.local
 # Wrangler's local-only vars for `wrangler dev`
