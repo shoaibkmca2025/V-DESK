@@ -1,17 +1,15 @@
 /**
  * Search module — integration tests for the public /api/v1/search endpoints (staff + seed: search.admin.test.js).
  *
- * Uses test/db.js (real MongoDB in memory). Catalog rows are inserted through catalog's models as test fixtures
+ * Uses test/db.js (a real PostgreSQL). Catalog rows are inserted directly as test fixtures
  * only; the search code itself reads them through catalog's public service. ADMIN_API_KEY comes from vitest.config.js.
  * Run: npm test  (or: npx vitest run src/modules/search/search.test.js)
  */
 import request from 'supertest';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createApp } from '../../app.js';
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
+import { clearTestDb, insert, startTestDb, stopTestDb } from '../../../test/db.js';
 import { POPULAR_SEARCHES_SEED, seedSearch } from '../../../scripts/seed-search.js';
-import { Centre, City, Workspace } from '../catalog/catalog.model.js';
-import { SearchSynonym } from './search.model.js';
 
 const app = createApp();
 const ADMIN_KEY = 'test-admin-key-0123456789';
@@ -50,22 +48,25 @@ const workspace = (ref, centreRef, cityName, type, capacity, price) => ({
   reviews: 50,
 });
 
+/** Inserts each fixture in turn; the search module reads them all back through the catalog. */
+const insertAll = (table, items) => Promise.all(items.map((item) => insert(table, item)));
+
 async function seedCatalog() {
-  await City.insertMany([
+  await insertAll('cities', [
     city('mumbai', 'Mumbai', ['BKC', 'Andheri East']),
     city('pune', 'Pune', ['Baner']),
     city('gurgaon', 'Gurgaon', ['DLF Cyber City']),
     city('nashik', 'Nashik', ['College Road']),
     city('bangalore', 'Bangalore', ['Koramangala', 'HSR Layout']),
   ]);
-  await Centre.insertMany([
+  await insertAll('centres', [
     centre('CTR-NSK-001', 'Nashik', 'College Road', 124900, { flagship: true }),
     centre('CTR-MUM-001', 'Mumbai', 'Andheri East', 199900),
     centre('CTR-MUM-002', 'Mumbai', 'BKC', 249900, { status: 'limited' }),
     centre('CTR-PNE-001', 'Pune', 'Baner', 159900),
     centre('CTR-GUR-001', 'Gurgaon', 'Cyber City', 229900),
   ]);
-  await Workspace.insertMany([
+  await insertAll('workspaces', [
     workspace('WS-MUM-002', 'CTR-MUM-001', 'Mumbai', 'Coworking', 1, 799900),
     workspace('WS-NSK-001', 'CTR-NSK-001', 'Nashik', 'Meeting Rooms', 12, 2500000),
     workspace('WS-MUM-001', 'CTR-MUM-002', 'Mumbai', 'Private Office', 8, 4800000),
@@ -213,7 +214,7 @@ describe('GET /api/v1/search', () => {
   });
 
   it('rewrites synonyms before parsing but reports the visitor query', async () => {
-    await SearchSynonym.create({ ref: 'SYN-TEST1', term: 'bengaluru', replacement: 'bangalore' });
+    await insert('search_synonyms', { ref: 'SYN-TEST1', term: 'bengaluru', replacement: 'bangalore' });
     const res = await search({ q: 'Virtual office Bengaluru' });
     expect(res.body.data.intent).toMatchObject({ location: 'Bangalore', rawQuery: 'Virtual office Bengaluru' });
     expect(res.body.data.route).toBe('/locations/bangalore/virtual-office');

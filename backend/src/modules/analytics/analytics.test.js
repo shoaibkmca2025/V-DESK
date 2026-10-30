@@ -5,9 +5,8 @@
 import request from 'supertest';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { createApp } from '../../app.js';
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
+import { clearTestDb, count, rows, startTestDb, stopTestDb } from '../../../test/db.js';
 import { ADMIN_KEY, staffSession } from '../../../test/staff.js';
-import { AnalyticsEvent } from './analytics.model.js';
 
 const app = createApp();
 
@@ -38,7 +37,7 @@ describe('POST /api/v1/analytics/events', () => {
     expect(res.status).toBe(202);
     expect(res.body.data).toEqual({ accepted: 2, duplicates: 0 });
 
-    const stored = await AnalyticsEvent.find().sort({ type: 1 }).lean();
+    const stored = await rows('SELECT ref, data FROM analytics_events ORDER BY type');
     expect(stored[0].data).toEqual({ docType: 'PAN Card' });
     expect(stored[1].data).toEqual({ query: 'VO in Mumbai, mail me at [email]' });
     expect(stored[0].ref).toMatch(/^EVT-[A-Z0-9]+$/);
@@ -53,7 +52,7 @@ describe('POST /api/v1/analytics/events', () => {
 
     const mixed = await ingest([batch[1], event('kyc_submitted')]);
     expect(mixed.body.data).toEqual({ accepted: 1, duplicates: 1 });
-    expect(await AnalyticsEvent.countDocuments()).toBe(3);
+    expect(await count('analytics_events')).toBe(3);
   });
 
   it('accepts a sendBeacon text/plain body', async () => {
@@ -74,7 +73,9 @@ describe('POST /api/v1/analytics/events', () => {
   it('distrusts odd devices and clocks instead of rejecting the event', async () => {
     const future = new Date(Date.now() + 86_400_000).toISOString();
     await ingest([event('search_submitted', {}, { device: 'Fridge', timestamp: future })]);
-    const [stored] = await AnalyticsEvent.find().lean();
+    const [stored] = await rows(
+      'SELECT device, occurred_at AS "occurredAt", created_at AS "createdAt" FROM analytics_events',
+    );
     expect(stored.device).toBe('Unknown');
     expect(Math.abs(stored.occurredAt - stored.createdAt)).toBeLessThan(5_000);
   });

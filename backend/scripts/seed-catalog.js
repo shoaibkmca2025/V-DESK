@@ -2,15 +2,14 @@
  * Seed script — Catalog module
  *
  * Converts the canonical frontend data (frontend/src/data/locations.js + workspaces.js + cities.js)
- * into the backend DB format (paise, refs, etc.) and upserts into MongoDB.
+ * into the backend DB format (paise, refs, etc.) and upserts into PostgreSQL.
  *
  * Usage (from repo root):
  *   node --env-file-if-exists=backend/.env backend/scripts/seed-catalog.js
- *   node --env-file-if-exists=backend/.env backend/scripts/seed-catalog.js --memory   # in-memory Mongo
- *
+ * *
  * Safe to re-run (upserts on `ref`). Existing records are updated; nothing is deleted.
  */
-import mongoose from 'mongoose';
+import { connectDb, disconnectDb } from '../src/config/db.js';
 
 // ── Inline seed data (mirrors frontend/src/data — source of truth until the API is the source) ──
 
@@ -458,9 +457,7 @@ const CITY_REF = {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/vdesk';
-  console.log(`[seed-catalog] connecting to ${uri}`);
-  await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
+  await connectDb();
 
   // Import models after connection (ESM)
   const { City, Centre, Workspace } = await import('../src/modules/catalog/catalog.model.js');
@@ -493,7 +490,7 @@ async function main() {
   }
   console.log(`[seed-catalog] workspaces upserted: ${workspacesUpserted}`);
 
-  await mongoose.disconnect();
+  await disconnectDb();
   console.log('[seed-catalog] done ✓');
 }
 

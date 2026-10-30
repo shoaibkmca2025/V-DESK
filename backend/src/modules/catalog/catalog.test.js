@@ -1,7 +1,7 @@
 /**
  * Catalog module — integration tests.
  *
- * Uses the existing test/db.js helper (real MongoDB in memory via mongodb-memory-server).
+ * Uses the existing test/db.js helper (a real PostgreSQL, migrated per test file).
  * Tests the full HTTP stack: routes → controller → service → repository → model.
  *
  * Run: npm test  (or: npx vitest run src/modules/catalog/catalog.test.js)
@@ -9,15 +9,14 @@
 import request from 'supertest';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { createApp } from '../../app.js';
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
-import { Centre, City, Workspace } from './catalog.model.js';
+import { clearTestDb, insert, startTestDb, stopTestDb } from '../../../test/db.js';
 
 const app = createApp();
 
 // ── Shared fixtures ───────────────────────────────────────────────────────────
 
 async function seedCity(overrides = {}) {
-  return City.create({
+  return insert('cities', {
     ref: 'CITY-TST',
     slug: 'testville',
     name: 'Testville',
@@ -32,7 +31,7 @@ async function seedCity(overrides = {}) {
 }
 
 async function seedCentre(overrides = {}) {
-  return Centre.create({
+  return insert('centres', {
     ref: 'CTR-TST-001',
     cityRef: 'CITY-TST',
     city: 'Testville',
@@ -52,7 +51,7 @@ async function seedCentre(overrides = {}) {
 }
 
 async function seedWorkspace(overrides = {}) {
-  return Workspace.create({
+  return insert('workspaces', {
     ref: 'WS-TST-001',
     centreRef: 'CTR-TST-001',
     city: 'Testville',
@@ -183,7 +182,7 @@ describe('catalog module', () => {
       await seedCity();
       await seedCentre();
       // Add a centre in a different city
-      await Centre.create({
+      await insert('centres', {
         ref: 'CTR-OTH-001',
         cityRef: 'CITY-OTH',
         city: 'Othertown',

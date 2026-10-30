@@ -6,7 +6,7 @@ import { logger } from './shared/lib/logger.js';
 try {
   await connectDb();
 } catch (err) {
-  logger.fatal({ err }, 'could not connect to MongoDB — is it running? Check MONGODB_URI');
+  logger.fatal({ err }, 'could not connect to PostgreSQL — is it reachable? Check DATABASE_URL');
   process.exit(1);
 }
 

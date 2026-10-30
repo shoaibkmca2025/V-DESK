@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { isDbReady } from './config/db.js';
+import { checkDbReady } from './config/db.js';
 import { AppError } from './shared/errors/AppError.js';
 import { analyticsRouter } from './modules/analytics/index.js';
 import { bookingRouter } from './modules/booking/index.js';
@@ -22,8 +22,10 @@ healthRouter.get('/health', (_req, res) => {
   res.json({ data: { status: 'ok' } });
 });
 
-healthRouter.get('/ready', (_req, res, next) => {
-  if (!isDbReady()) return next(new AppError(503, 'NOT_READY', 'Database is not connected'));
+healthRouter.get('/ready', async (_req, res, next) => {
+  // Asks the database, rather than reporting a flag set at boot: this answer decides whether to send this
+  // instance traffic, so it has to be true now.
+  if (!(await checkDbReady())) return next(new AppError(503, 'NOT_READY', 'Database is not reachable'));
   res.json({ data: { status: 'ready' } });
 });
 

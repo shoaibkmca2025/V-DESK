@@ -1,9 +1,9 @@
 /**
- * Credentials: argon2id password hashes, HS256 access/MFA tokens (jose) and opaque refresh tokens.
+ * Credentials: HS256 access/MFA tokens (jose), opaque refresh tokens and phone-OTP codes.
  * Kept apart from the service so the rules there read as rules, not crypto plumbing.
+ * Password hashing lives in identity.password.js and is re-exported here, where its callers look for it.
  */
 import { createHash, randomBytes, randomInt } from 'node:crypto';
-import argon2 from 'argon2';
 import { jwtVerify, SignJWT } from 'jose';
 import { env } from '../../config/env.js';
 import {
@@ -17,22 +17,7 @@ import {
 
 // ── Passwords ─────────────────────────────────
 
-export function hashPassword(password) {
-  return argon2.hash(password, { type: argon2.argon2id });
-}
-
-export function verifyPassword(hash, password) {
-  return argon2.verify(hash, password);
-}
-
-// Verifying against a throwaway hash when the email is unknown keeps "no such user" and "wrong password"
-// equally slow, so response time doesn't reveal which staff emails exist.
-let dummyHash;
-export async function verifyAgainstDummy(password) {
-  dummyHash ??= await hashPassword(randomBytes(16).toString('hex'));
-  await argon2.verify(dummyHash, password);
-  return false;
-}
+export { hashPassword, verifyPassword, verifyAgainstDummy } from './identity.password.js';
 
 // ── Signed tokens ─────────────────────────────
 

@@ -14,7 +14,7 @@ Non-negotiable unless an ADR in `docs/backend/adr/` says otherwise. CI enforces 
 ## 2. API
 
 7. Every endpoint has a zod request schema and a documented response schema; the OpenAPI spec is generated from them and committed.
-8. Envelope: `{ data }` / `{ error: { code, message, details?, requestId } }`. Never leak stack traces or Mongo errors.
+8. Envelope: `{ data }` / `{ error: { code, message, details?, requestId } }`. Never leak stack traces or database errors.
 9. Error codes are stable strings (`LEAD_NOT_FOUND`, `HOLD_EXPIRED`), not sentences; messages may change, codes may not.
 10. Creating money or inventory records requires an `Idempotency-Key`; replays return the original result.
 11. Public write endpoints (`/leads`, `/bookings/hold`, `/kyc`) are rate-limited per IP **and** per phone/email, and CAPTCHA-verified.
@@ -42,7 +42,7 @@ Non-negotiable unless an ADR in `docs/backend/adr/` says otherwise. CI enforces 
 
 ## 5. Reliability
 
-27. Handlers must be idempotent or guarded; jobs must be safe to retry. Event handlers run at least once (outbox, up to 8 attempts with backoff — ADR-008); jobs must be safe to run in several worker processes at once.
+27. Handlers must be idempotent or guarded; jobs must be safe to retry. Event handlers run at least once (outbox, up to 8 attempts with backoff — ADR-008); jobs must be safe to run in several worker processes at once (queue claims take one row with `FOR UPDATE SKIP LOCKED` and a lease).
 28. Long or external work (email, WhatsApp, PDF, gateway calls) never runs inside a request — enqueue it.
 29. Timeouts on every outbound call (default 5 s), circuit-break payment/messaging providers.
 30. Graceful shutdown: stop accepting, drain in-flight, close queues, then DB.
@@ -50,7 +50,7 @@ Non-negotiable unless an ADR in `docs/backend/adr/` says otherwise. CI enforces 
 
 ## 6. Testing
 
-32. Unit tests for every service function with branches; integration tests per endpoint with `mongodb-memory-server` + supertest; contract tests against the OpenAPI spec.
+32. Unit tests for every service function with branches; integration tests per endpoint against a real PostgreSQL (`embedded-postgres`, one migrated template cloned per test file) + supertest; contract tests against the OpenAPI spec.
 33. Coverage gate: 80 % lines on `modules/**/*.service.js`; no gate on controllers/routes (covered by integration).
 34. Every bug fix ships with a regression test.
 35. Payment and booking flows have end-to-end tests against provider sandboxes, run nightly.

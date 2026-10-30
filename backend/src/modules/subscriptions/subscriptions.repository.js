@@ -1,4 +1,4 @@
 /**
- * Subscriptions repository — the only file that queries MongoDB for this module (through subscriptions.model.js).
+ * Subscriptions repository — the only file that will query the database for this module.
  * Returns plain objects (`.lean()`) and hides soft-deleted records.
  */

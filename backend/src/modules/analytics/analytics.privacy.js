@@ -35,7 +35,8 @@ function clean(value, depth) {
   if (typeof value === 'object') {
     const out = {};
     for (const [key, item] of Object.entries(value)) {
-      // `$`/`.` keys can't be stored safely in MongoDB; PII keys must not be stored at all.
+      // `$`/`.` keys were unsafe to store in MongoDB and stay refused for continuity; PII keys must
+      // not be stored at all.
       if (piiKeys.has(key.toLowerCase()) || key.startsWith('$') || key.includes('.')) continue;
       const cleaned = clean(item, depth + 1);
       if (cleaned !== undefined) out[key.slice(0, 64)] = cleaned;

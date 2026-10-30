@@ -56,7 +56,8 @@ breakdown (paise, ADR-007), frozen at hold time.
 - **No overlaps:** `booking_slots` has a unique index on (centreRef, room, date, hour). A hold inserts its booking,
   then its hours in order; if an hour is taken it deletes the hours it inserted and the booking and answers
   `409 SLOT_UNAVAILABLE` (with the clashing `taken` hours). Rollback is compensating, not a transaction — the local
-  and test MongoDB are standalone servers.
+  must be visible to the Idempotency-Key lookup before its hours exist, so a replay can be told the original
+  is still in flight.
 - **A slot blocks its hour only while its booking does.** Slots of a lapsed hold, a `CANCELLED` / `EXPIRED`
   booking or a booking that no longer exists are ignored by availability and deleted before the next insert on
   those hours (a lapsed hold is saved as `EXPIRED` first). A crash between a status change and the slot clean-up

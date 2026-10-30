@@ -5,9 +5,9 @@ import { startJobs } from './shared/jobs/runner.js';
 import { logger } from './shared/lib/logger.js';
 
 /**
- * Background worker: a second process next to the API (same code, same MongoDB) that runs src/jobs.js — outbox
- * delivery and notification sending (ADR-008). Run one or more: `npm run worker` (`npm run dev:worker` locally).
- * Exported so `npm run dev:memory` can run it inside the API process.
+ * Background worker: a second process next to the API (same code, same database) that runs src/jobs.js — outbox
+ * delivery, notification sending and row purging (ADR-008, ADR-010). Run one or more: `npm run worker`
+ * (`npm run dev:worker` locally). Exported so `npm run dev:pg` can run it inside the API process.
  */
 export function startWorker() {
   const providers = messagingProviders();
@@ -21,7 +21,7 @@ async function main() {
   try {
     await connectDb();
   } catch (err) {
-    logger.fatal({ err }, 'worker could not connect to MongoDB');
+    logger.fatal({ err }, 'worker could not connect to PostgreSQL');
     process.exit(1);
   }
   const worker = startWorker();

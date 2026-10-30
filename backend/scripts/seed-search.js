@@ -13,7 +13,7 @@
  * Safe to re-run (services upsert on slug).
  */
 import { pathToFileURL } from 'node:url';
-import mongoose from 'mongoose';
+import { connectDb, disconnectDb } from '../src/config/db.js';
 import { SERVICES } from '../../frontend/src/data/services.js';
 import * as repo from '../src/modules/search/search.repository.js';
 
@@ -42,13 +42,11 @@ export async function seedSearch() {
 }
 
 async function main() {
-  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/vdesk';
-  console.log(`[seed-search] connecting to ${uri}`);
-  await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
+  await connectDb();
   const { services, popularCreated } = await seedSearch();
   console.log(`[seed-search] services upserted: ${services}`);
   console.log(`[seed-search] popularSearches ${popularCreated ? 'created' : 'already configured — left unchanged'}`);
-  await mongoose.disconnect();
+  await disconnectDb();
   console.log('[seed-search] done ✓');
 }
 

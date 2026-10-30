@@ -15,11 +15,13 @@
 import { randomUUID } from 'node:crypto';
 import { logger } from '../lib/logger.js';
 import { generateRef } from '../lib/refs.js';
-import { DomainEvent } from './events.model.js';
+import { exec, row } from '../lib/sql.js';
 
 const log = logger.child({ module: 'events' });
 
 export const EVENT_TYPE_PATTERN = /^[a-z][a-z_]*(\.[a-z][a-z_]*)+$/;
+/** PENDING until every handler is done, DEAD once it has given up. Matches the CHECK on domain_events. */
+export const EVENT_STATUSES = ['PENDING', 'DONE', 'DEAD'];
 export const MAX_ATTEMPTS = 8;
 /** Wait before attempt n+1 (seconds): 10 s, 1 min, 5 min, 15 min, 1 h, 3 h, 6 h. */
 export const RETRY_DELAYS_SECONDS = [10, 60, 300, 900, 3600, 10800, 21600];
@@ -33,30 +35,33 @@ const subscribers = new Map();
 // ──────────────────────────────────────────────
 
 /**
- * Records an event in the outbox. Call inside withTransaction() and pass its `session`, so the event is saved if and
- * only if the change it announces is.
+ * Records an event in the outbox. Call inside withTransaction() and pass its client as `session`, so the event
+ * is saved if and only if the change it announces is.
  * @param {{ type: string, entity: { type: string, ref: string }, actor?: { type: string, id?: string|null },
  *           payload?: object, occurredAt?: Date }} event
- * @param {{ session?: import('mongoose').ClientSession }} [options]
+ * @param {{ session?: import('pg').PoolClient }} [options]
  */
-export async function publish(event, { session } = {}) {
+export async function publish(event, { session: tx } = {}) {
   if (!EVENT_TYPE_PATTERN.test(event.type)) throw new Error(`Invalid event type '${event.type}'`);
   if (!event.entity?.type || !event.entity?.ref)
     throw new Error(`Event '${event.type}' needs entity.type and entity.ref`);
   const occurredAt = event.occurredAt ?? new Date();
-  const [doc] = await DomainEvent.create(
+  const doc = await row(
+    `INSERT INTO domain_events (ref, type, occurred_at, actor_type, actor_id, entity_type, entity_ref,
+                                payload, next_attempt_at)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $3)
+       RETURNING ref`,
     [
-      {
-        ref: generateRef('DE', 6),
-        type: event.type,
-        occurredAt,
-        actor: { type: event.actor?.type ?? 'system', id: event.actor?.id ?? null },
-        entity: event.entity,
-        payload: event.payload ?? {},
-        nextAttemptAt: occurredAt,
-      },
+      generateRef('DE', 6),
+      event.type,
+      occurredAt,
+      event.actor?.type ?? 'system',
+      event.actor?.id ?? null,
+      event.entity.type,
+      event.entity.ref,
+      JSON.stringify(event.payload ?? {}),
     ],
-    { session },
+    tx,
   );
   return { ref: doc.ref };
 }
@@ -97,22 +102,68 @@ const viewOf = (doc) =>
     payload: doc.payload,
   });
 
+/**
+ * Takes the next due event: oldest first, in one statement. `FOR UPDATE SKIP LOCKED` is what lets several
+ * workers run at once, each stepping over rows another has already taken.
+ */
 async function claimNext(now) {
-  return DomainEvent.findOneAndUpdate(
-    {
-      status: 'PENDING',
-      nextAttemptAt: { $lte: now },
-      $or: [{ leaseUntil: null }, { leaseUntil: { $lte: now } }],
-    },
-    { $set: { claimToken: randomUUID(), leaseUntil: secondsAfter(now, LEASE_SECONDS) }, $inc: { attempts: 1 } },
-    { sort: { nextAttemptAt: 1 }, returnDocument: 'after' },
-  ).lean();
+  return row(
+    `UPDATE domain_events
+        SET claim_token = $1, lease_until = $2, attempts = attempts + 1
+      WHERE id = (
+        SELECT id FROM domain_events
+         WHERE status = 'PENDING' AND next_attempt_at <= $3 AND (lease_until IS NULL OR lease_until <= $3)
+         ORDER BY next_attempt_at, id
+         FOR UPDATE SKIP LOCKED
+         LIMIT 1
+      )
+      RETURNING ref, type, version, occurred_at AS "occurredAt",
+                jsonb_build_object('type', actor_type, 'id', actor_id) AS actor,
+                jsonb_build_object('type', entity_type, 'ref', entity_ref) AS entity,
+                payload, status, handled, attempts,
+                next_attempt_at AS "nextAttemptAt", claim_token AS "claimToken", lease_until AS "leaseUntil"`,
+    [randomUUID(), secondsAfter(now, LEASE_SECONDS), now],
+  );
 }
 
-/** Writes only while this worker still holds the claim; returns false if the lease was lost. */
-async function updateClaimed(event, update) {
-  const res = await DomainEvent.updateOne({ ref: event.ref, claimToken: event.claimToken }, update);
-  return res.modifiedCount === 1;
+/** Records one finished handler, while this worker still holds the claim. */
+async function markHandled(event, name) {
+  await exec(
+    `UPDATE domain_events SET handled = array_append(handled, $3)
+      WHERE ref = $1 AND claim_token = $2 AND NOT (handled @> ARRAY[$3])`,
+    [event.ref, event.claimToken, name],
+  );
+}
+
+/**
+ * Releases the claim and writes the outcome, but only while this worker still holds it; returns false when
+ * the lease was lost to another worker in the meantime.
+ */
+async function releaseClaim(
+  event,
+  { status = null, completedAt = null, expireAt = null, nextAttemptAt = null, failure = null },
+) {
+  const changed = await exec(
+    `UPDATE domain_events
+        SET claim_token = NULL,
+            lease_until = NULL,
+            status = coalesce($3, status),
+            completed_at = coalesce($4, completed_at),
+            expire_at = coalesce($5, expire_at),
+            next_attempt_at = coalesce($6, next_attempt_at),
+            last_error = coalesce($7::jsonb, last_error)
+      WHERE ref = $1 AND claim_token = $2`,
+    [
+      event.ref,
+      event.claimToken,
+      status,
+      completedAt,
+      expireAt,
+      nextAttemptAt,
+      failure ? JSON.stringify(failure) : null,
+    ],
+  );
+  return changed === 1;
 }
 
 /** Runs the handlers this event still needs and records the outcome. Returns 'done' | 'retry' | 'dead' | 'lost'. */
@@ -124,7 +175,7 @@ async function deliver(event, now) {
     if (event.handled.includes(name)) continue;
     try {
       await handler(viewOf(event));
-      await updateClaimed(event, { $addToSet: { handled: name } });
+      await markHandled(event, name);
     } catch (err) {
       // Codes and names only — error messages can carry personal data (rules.md §21).
       failure = { handler: name, code: String(err?.code ?? err?.name ?? 'ERROR'), at: new Date() };
@@ -133,22 +184,21 @@ async function deliver(event, now) {
   }
 
   const finishedAt = new Date();
-  const release = { claimToken: null, leaseUntil: null };
   if (!failure) {
     const done = {
       status: 'DONE',
       completedAt: finishedAt,
       expireAt: secondsAfter(finishedAt, RETENTION_DAYS * 86400),
     };
-    return (await updateClaimed(event, { $set: { ...done, ...release } })) ? 'done' : 'lost';
+    return (await releaseClaim(event, done)) ? 'done' : 'lost';
   }
   if (event.attempts >= MAX_ATTEMPTS) {
-    const ok = await updateClaimed(event, { $set: { status: 'DEAD', lastError: failure, ...release } });
+    const ok = await releaseClaim(event, { status: 'DEAD', failure });
     if (ok) log.error({ event: 'event.dead', ...meta, handler: failure.handler }, 'event gave up after max attempts');
     return ok ? 'dead' : 'lost';
   }
   const retryAt = secondsAfter(now, RETRY_DELAYS_SECONDS[event.attempts - 1]);
-  const ok = await updateClaimed(event, { $set: { nextAttemptAt: retryAt, lastError: failure, ...release } });
+  const ok = await releaseClaim(event, { nextAttemptAt: retryAt, failure });
   return ok ? 'retry' : 'lost';
 }
 

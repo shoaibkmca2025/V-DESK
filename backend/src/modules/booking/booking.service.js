@@ -7,14 +7,15 @@
  *    from 09:00 to 20:00 Asia/Kolkata, never in the past and at most MAX_ADVANCE_DAYS ahead.
  *  - The price comes from the pricing engine and is frozen on the booking at hold time; the client never sends one.
  *  - Overlaps are stopped by the unique (centre, room, date, hour) index on booking_slots. A hold inserts its
- *    booking first (claiming the Idempotency-Key), then its hours in order; if any hour is taken it removes the
- *    hours it inserted and the booking, and answers 409 SLOT_UNAVAILABLE. This compensating rollback works on any
- *    MongoDB deployment (the test and local servers are standalone, so multi-document transactions are not
- *    available).
+ *    booking first (claiming the Idempotency-Key), then its hours; if any hour is taken it removes the hours it
+ *    inserted and the booking, and answers 409 SLOT_UNAVAILABLE. That rollback is a compensating write rather
+ *    than a transaction on purpose: the booking has to be visible to the Idempotency-Key lookup before its
+ *    hours are reserved, so a replay of the same key can be told the original is still in flight.
  *  - A slot only blocks its hour while its booking does (RELEASED_STATUSES): a lapsed hold, a cancelled or expired
- *    booking, or a booking that no longer exists frees the hour even if its slot documents are still there. Such
- *    leftovers are cleared before the next insert on those hours (a lapsed hold is saved as EXPIRED first), and a
- *    TTL index removes lapsed hold slots in the background — so a crash between two writes never blocks an hour.
+ *    booking, or a booking that no longer exists frees the hour even if its slot rows are still there. Such
+ *    leftovers are cleared before the next insert on those hours (a lapsed hold is saved as EXPIRED first), and
+ *    the worker's purge job deletes lapsed hold slots in the background — so a crash between two writes never
+ *    blocks an hour.
  *  - Holds last HOLD_SECONDS and read as EXPIRED the moment they lapse.
  *  - Confirmation makes every hour permanent first and only then marks the booking CONFIRMED, so a CONFIRMED
  *    booking (and its pass) always has all its hours; a crash in between leaves a HELD booking that frees its

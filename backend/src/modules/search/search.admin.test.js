@@ -2,17 +2,15 @@
  * Search module — integration tests for the staff endpoints (/api/v1/search/admin/*) and the seed script.
  * Public search endpoints are covered in search.test.js.
  *
- * Uses test/db.js (real MongoDB in memory). One catalog centre is inserted as a fixture so promoted-centre
+ * Uses test/db.js (a real PostgreSQL). One catalog centre is inserted as a fixture so promoted-centre
  * validation has something to find. ADMIN_API_KEY comes from vitest.config.js.
  * Run: npx vitest run src/modules/search/search.admin.test.js
  */
 import request from 'supertest';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createApp } from '../../app.js';
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
+import { clearTestDb, count, insert, row, startTestDb, stopTestDb } from '../../../test/db.js';
 import { POPULAR_SEARCHES_SEED, seedSearch } from '../../../scripts/seed-search.js';
-import { Centre } from '../catalog/catalog.model.js';
-import { SearchService, SearchSynonym } from './search.model.js';
 
 const app = createApp();
 const ADMIN_KEY = 'test-admin-key-0123456789';
@@ -21,7 +19,7 @@ const admin = (method, path) => request(app)[method](`/api/v1/search/admin${path
 
 beforeAll(startTestDb);
 beforeEach(async () => {
-  await Centre.create({
+  await insert('centres', {
     ref: 'CTR-MUM-001',
     cityRef: 'CITY-MUM',
     city: 'Mumbai',
@@ -59,7 +57,7 @@ describe('search admin', () => {
 
   it('lists synonyms (none seeded) without internal fields', async () => {
     expect((await admin('get', '/synonyms')).body.data).toEqual([]);
-    await SearchSynonym.create({ ref: 'SYN-TEST1', term: 'gurugram', replacement: 'gurgaon' });
+    await insert('search_synonyms', { ref: 'SYN-TEST1', term: 'gurugram', replacement: 'gurgaon' });
     const [synonym] = (await admin('get', '/synonyms')).body.data;
     expect(synonym).toMatchObject({ ref: 'SYN-TEST1', term: 'gurugram', replacement: 'gurgaon' });
     expect(synonym).not.toHaveProperty('_id');
@@ -164,8 +162,12 @@ describe('search admin', () => {
 
 describe('seed-search', () => {
   it('stores every client service and is safe to re-run', async () => {
-    expect(await SearchService.countDocuments()).toBe(3);
-    const gst = await SearchService.findOne({ slug: 'gst-registration' }).lean();
+    expect(await count('search_services')).toBe(3);
+    const gst = await row(
+      `SELECT ref, name, starting_price_paise, price_unit AS "priceUnit", faqs
+         FROM search_services WHERE slug = $1`,
+      ['gst-registration'],
+    );
     expect(gst).toMatchObject({
       ref: 'SVC-GST-REGISTRATION',
       name: 'GST Registration',
@@ -178,7 +180,7 @@ describe('seed-search', () => {
       .send({ value: ['Admin choice'] })
       .expect(200);
     expect(await seedSearch()).toEqual({ services: 3, popularCreated: false });
-    expect(await SearchService.countDocuments()).toBe(3);
+    expect(await count('search_services')).toBe(3);
     expect((await request(app).get('/api/v1/search/popular')).body.data).toEqual([{ query: 'Admin choice' }]);
   });
 });

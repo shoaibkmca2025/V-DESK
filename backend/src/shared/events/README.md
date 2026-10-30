@@ -59,5 +59,5 @@ subscribe('lead.created', 'notifications.lead_confirmation', async (event) => { 
   — find them with `db.domain_events.find({ status: 'DEAD' })`; set `status: 'PENDING', nextAttemptAt: new Date()` to
   retry after fixing the cause. (A staff endpoint for this can come with the admin console.)
 - Several workers can run at once: each event is claimed with an atomic update and a 60 s lease.
-- Needs a replica set for the transaction (Atlas is one). On a standalone local `mongod` the API still runs, but the
+- PostgreSQL has transactions everywhere, so publishing an event is always atomic with the change it announces
   write and its event are not atomic — see backend/README.md.

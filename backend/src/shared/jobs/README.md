@@ -1,7 +1,7 @@
 # jobs — background work
 
 Work that must not run inside a request (rules.md §28) runs in the **worker**: a second process from the same code,
-connected to the same MongoDB (ADR-008 — no Redis or BullMQ).
+connected to the same PostgreSQL (ADR-008, ADR-010 — no Redis or BullMQ).
 
 | File            | What                                                                                 |
 | --------------- | ------------------------------------------------------------------------------------ |
@@ -14,7 +14,7 @@ connected to the same MongoDB (ADR-008 — no Redis or BullMQ).
 | `events.dispatch`    | 1 s   | delivers outbox events to their handlers (`shared/events/bus.js`)             |
 | `notifications.send` | 5 s   | sends queued notifications — only registered once a messaging provider exists |
 
-Run it: `npm run worker` (production), `npm run dev:worker` (local, restarts on change), or `npm run dev:memory`,
+Run it: `npm run worker` (production), `npm run dev:worker` (local, restarts on change), or `npm run dev:pg`,
 which runs API and worker in one process.
 
 ## Adding a job

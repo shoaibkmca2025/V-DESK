@@ -34,7 +34,7 @@ Structured JSON via **pino**, one line per event, stdout only (the platform ship
 | Store | Hot | Cold |
 |---|---|---|
 | App logs | 14 days searchable | 90 days archived (S3, Glacier) |
-| Audit log (Mongo, append-only) | 7 years (statutory) | — |
+| Audit log (append-only table) | 7 years (statutory) | — |
 | Notification log | 1 year | — |
 | Analytics events | 13 months hot | warehouse indefinitely |
 
@@ -65,7 +65,7 @@ SLOs: availability 99.9 % monthly; API p95 < 500 ms; search p95 < 300 ms; webhoo
 
 ## 4. Tracing
 
-OpenTelemetry auto-instrumentation (http, express, mongoose, ioredis, bullmq). `traceId` propagated into logs and outgoing requests (`traceparent`). Sampling 10 % in prod, 100 % for errors and for `/payments/*`.
+OpenTelemetry auto-instrumentation (http, express, pg, ioredis, bullmq). `traceId` propagated into logs and outgoing requests (`traceparent`). Sampling 10 % in prod, 100 % for errors and for `/payments/*`.
 
 ## 5. Alerting
 

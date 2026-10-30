@@ -2,7 +2,7 @@
  * CRM service — business rules for website leads and the sales pipeline.
  *
  * Rules (docs/backend/rules.md):
- *  - No req/res and no Mongoose here; data goes through crm.repository.js.
+ *  - No req/res and no SQL here; data goes through crm.repository.js.
  *  - Status moves follow the single transition table in crm.constants.js; illegal moves are 409 (§5).
  *  - The score is recomputed on every write (modules.md §3.5).
  *  - Public submissions are idempotent on a caller-supplied ref so the client can retry safely (§43).
@@ -13,7 +13,7 @@ import { AppError, badRequest, conflict, notFound } from '../../shared/errors/Ap
 import { publish } from '../../shared/events/bus.js';
 import { csvRow } from '../../shared/lib/csv.js';
 import { logger } from '../../shared/lib/logger.js';
-import { withTransaction } from '../../shared/lib/transactions.js';
+import { withTransaction } from '../../shared/lib/sql.js';
 import {
   CONTACT_LIMIT,
   CONTACT_WINDOW_MS,
@@ -70,16 +70,22 @@ export function mobileKey(mobile) {
 /**
  * Keeps the known touch fields; URLs lose their query string and hash (the UTM values arrive as their own fields,
  * and query strings can carry personal data). Returns null for an empty touch.
+ *
+ * Every known field is present in the result, null where this visit didn't carry it, so a stored touch always
+ * has the same shape — the CSV export and the staff view read fields they may not have been given.
  */
 export function cleanTouch(touch) {
   if (!touch) return null;
   const out = {};
+  let given = false;
   for (const field of TOUCH_FIELDS) {
     const value = touch[field];
-    if (value) out[field] = field === 'referrer' || field === 'landingPage' ? value.split(/[?#]/)[0] : value;
+    if (value) given = true;
+    out[field] = value ? (field === 'referrer' || field === 'landingPage' ? value.split(/[?#]/)[0] : value) : null;
   }
-  if (touch.at) out.at = touch.at;
-  return Object.keys(out).length > 0 ? out : null;
+  out.at = touch.at ?? null;
+  if (touch.at) given = true;
+  return given ? out : null;
 }
 
 // ──────────────────────────────────────────────
@@ -228,8 +234,8 @@ export async function updateLead(ref, { status, assignedTo, note }, actor) {
 export async function getLeadStats() {
   const [statusCounts, sourceCounts] = await Promise.all([repo.countLeadsBy('status'), repo.countLeadsBy('source')]);
   const byStatus = Object.fromEntries(LEAD_STATUSES.map((s) => [s, 0]));
-  for (const { _id, count } of statusCounts) byStatus[_id] = count;
-  const bySource = Object.fromEntries(sourceCounts.map(({ _id, count }) => [_id || 'Unknown', count]));
+  for (const { value, count } of statusCounts) byStatus[value] = count;
+  const bySource = Object.fromEntries(sourceCounts.map(({ value, count }) => [value || 'Unknown', count]));
   const total = statusCounts.reduce((sum, { count }) => sum + count, 0);
   return { total, byStatus, bySource };
 }

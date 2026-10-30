@@ -1,0 +1,43 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vdesk-api",
+  "main": "src/cloudflare/entry.js",
+  "compatibility_date": "2026-10-05",
+  // nodejs_compat gives the Worker node:crypto, node:buffer and the rest the API uses, and (from the
+  // compatibility date) populates process.env from the vars and secrets below — which is how
+  // src/config/env.js reads its settings here, exactly as it does on a server.
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Neon, through Hyperdrive: it keeps the connection pool, so this Worker opens a connection per use
+  // (src/config/db.js). `wrangler hyperdrive create vdesk-neon --connection-string=…` made this id.
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "e75840b9e3344a23853c39e6d8ff3322",
+    },
+  ],
+
+  // The background jobs src/worker.js runs in a loop (ADR-008). A Worker cannot hold a loop, so: every
+  // minute for the outbox and the message queue, hourly for the row purge (ADR-011).
+  "triggers": {
+    "crons": ["* * * * *", "0 * * * *"],
+  },
+
+  "vars": {
+    // Without this the API behaves as a development server: it would answer /auth/otp/request with the
+    // code it was supposed to text, and leave `Secure` off the refresh cookie.
+    "NODE_ENV": "production",
+    "LOG_LEVEL": "info",
+    // Rate limits must see the visitor's address, not Cloudflare's.
+    "TRUST_PROXY": "1",
+    // Set to the deployed site once it has a domain; sitemap.xml needs it.
+    "SITE_URL": "https://vdesk.shoaibk-mca2024.workers.dev",
+    "CORS_ORIGINS": "https://vdesk.shoaibk-mca2024.workers.dev,http://localhost:5173,http://localhost:4173",
+  },
+
+  // JWT_SECRET, MFA_ENCRYPTION_KEY and ADMIN_API_KEY are secrets, not vars:
+  //   npx wrangler secret put JWT_SECRET
+  "observability": {
+    "enabled": true,
+  },
+}

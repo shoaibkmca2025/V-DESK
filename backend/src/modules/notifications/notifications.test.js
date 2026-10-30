@@ -7,14 +7,25 @@
 import request from 'supertest';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { createApp } from '../../app.js';
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
+import { clearTestDb, count, query, row, startTestDb, stopTestDb } from '../../../test/db.js';
 import { ADMIN_KEY, staffSession } from '../../../test/staff.js';
 import { MessagingError, createFakeMessagingProvider } from '../../integrations/messaging.js';
 import { MAX_ATTEMPTS, RETRY_DELAYS_SECONDS, SEND_LEASE_SECONDS } from './notifications.constants.js';
 import { notify, processDueNotifications } from './index.js';
-import { Notification } from './notifications.model.js';
 
 const app = createApp();
+
+/** A stored notification, under the field names the module uses (`to` is the `recipient` column). */
+const storedNotification = (ref) =>
+  row(
+    `SELECT ref, template_key AS "templateKey", template_version AS "templateVersion", channel,
+            recipient AS "to", subject, body, status, attempts,
+            next_attempt_at AS "nextAttemptAt", lease_until AS "leaseUntil", claim_token AS "claimToken",
+            last_error AS "lastError", provider_message_id AS "providerMessageId",
+            accepted_at AS "acceptedAt", failed_at AS "failedAt"
+       FROM notification_log WHERE ref = $1`,
+    [ref],
+  );
 const adminKey = { 'x-admin-key': ADMIN_KEY };
 const NOW = new Date('2026-10-11T06:00:00.000Z');
 const later = (seconds) => new Date(NOW.getTime() + seconds * 1000);
@@ -142,7 +153,7 @@ describe('notify()', () => {
       channel: 'email',
       templateKey: 'lead.confirmation',
     });
-    const stored = await Notification.findOne({ ref: notification.ref }).lean();
+    const stored = await storedNotification(notification.ref);
     expect(stored).toMatchObject({
       to: 'priya@zenith.in',
       subject: 'We received your enquiry, Priya',
@@ -156,7 +167,7 @@ describe('notify()', () => {
     await createTemplate(TEMPLATES.whatsapp);
     const base = { templateKey: 'lead.confirmation_whatsapp', variables: { name: 'Priya' } };
     const { notification } = await notify({ ...base, to: '98765 43210', dedupeKey: 'a' }, NOW);
-    expect((await Notification.findOne({ ref: notification.ref }).lean()).to).toBe('+919876543210');
+    expect((await storedNotification(notification.ref)).to).toBe('+919876543210');
     for (const to of ['12345', 'priya@zenith.in', '+1 415 555 0100']) {
       await expect(notify({ ...base, to, dedupeKey: `bad-${to}` }, NOW)).rejects.toMatchObject({
         status: 400,
@@ -183,7 +194,7 @@ describe('notify()', () => {
       .set(adminKey)
       .send({ ...TEMPLATES.email, key: undefined, channel: undefined, version: 1, active: false });
     await expect(notify(emailRequest(), NOW)).rejects.toMatchObject({ status: 409, code: 'TEMPLATE_INACTIVE' });
-    expect(await Notification.countDocuments()).toBe(0);
+    expect(await count('notification_log')).toBe(0);
   });
 
   it('is idempotent on dedupeKey, including in parallel, and refuses a reused key', async () => {
@@ -192,7 +203,7 @@ describe('notify()', () => {
     const results = await Promise.all([1, 2, 3, 4].map(() => notify(req, NOW)));
     expect(new Set(results.map((r) => r.notification.ref)).size).toBe(1);
     expect(results.filter((r) => r.created)).toHaveLength(1);
-    expect(await Notification.countDocuments()).toBe(1);
+    expect(await count('notification_log')).toBe(1);
 
     await expect(notify({ ...req, to: 'someone@else.in' }, NOW)).rejects.toMatchObject({ code: 'DEDUPE_KEY_REUSED' });
     // Same values in another key order are the same request, not a reuse.
@@ -210,7 +221,7 @@ describe('processDueNotifications()', () => {
     for (let i = 0; i < count; i++) refs.push((await notify(emailRequest(), NOW)).notification.ref);
     return refs;
   }
-  const stored = (ref) => Notification.findOne({ ref }).lean();
+  const stored = storedNotification;
 
   it('sends through the provider, records ACCEPTED (not delivered) and drops the content', async () => {
     const [ref] = await queued();
@@ -321,9 +332,11 @@ describe('processDueNotifications()', () => {
 
   it('retries a notification whose worker died, with the same provider idempotency key', async () => {
     const [ref] = await queued();
-    await Notification.updateOne(
-      { ref },
-      { $set: { status: 'SENDING', attempts: 1, leaseUntil: later(SEND_LEASE_SECONDS), claimToken: 'dead-worker' } },
+    await query(
+      `UPDATE notification_log
+          SET status = 'SENDING', attempts = 1, lease_until = $2, claim_token = 'dead-worker'
+        WHERE ref = $1`,
+      [ref, later(SEND_LEASE_SECONDS)],
     );
     const provider = countingProvider();
     await processDueNotifications({ providers: { email: provider }, now: later(SEND_LEASE_SECONDS - 1) });
@@ -377,9 +390,11 @@ describe('processDueNotifications()', () => {
 
   it('fails a reclaimed notification that already used its last attempt, without sending', async () => {
     const [ref] = await queued();
-    await Notification.updateOne(
-      { ref },
-      { $set: { status: 'SENDING', attempts: MAX_ATTEMPTS, leaseUntil: NOW, claimToken: 'dead-worker' } },
+    await query(
+      `UPDATE notification_log
+          SET status = 'SENDING', attempts = $3, lease_until = $2, claim_token = 'dead-worker'
+        WHERE ref = $1`,
+      [ref, NOW, MAX_ATTEMPTS],
     );
     const provider = countingProvider();
     expect((await processDueNotifications({ providers: { email: provider }, now: NOW })).failed).toBe(1);
@@ -398,7 +413,7 @@ describe('processDueNotifications()', () => {
     const leaseLeft = [];
     const slow = {
       async send(message) {
-        const { leaseUntil } = await Notification.findOne({ ref: message.idempotencyKey }).lean();
+        const { leaseUntil } = await storedNotification(message.idempotencyKey);
         leaseLeft.push(leaseUntil.getTime() - Date.now());
         vi.advanceTimersByTime(40_000); // each send takes 40 s — three exceed one 60 s lease
         return { providerMessageId: message.idempotencyKey };
@@ -416,7 +431,7 @@ describe('processDueNotifications()', () => {
     await queued(3);
     const provider = countingProvider();
     expect((await processDueNotifications({ providers: { email: provider }, now: NOW, limit: 2 })).accepted).toBe(2);
-    expect(await Notification.countDocuments({ status: 'PENDING' })).toBe(1);
+    expect(await count('notification_log', `status = 'PENDING'`)).toBe(1);
   });
 });
 

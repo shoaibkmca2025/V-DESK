@@ -8,16 +8,16 @@ Status: Planning · Owner: Backend team · Source of truth for scope: `docs/vdes
 |---|---|---|
 | Runtime | Node 22 LTS, ESM | Same language as the client; long-term support |
 | Framework | Express 5 | Async error propagation built in, minimal, well understood |
-| Database | MongoDB 7 + Mongoose 9 | Document model fits catalog/lead/booking shapes; easy multi-city expansion |
+| Database | PostgreSQL 17 (Neon) + `pg`, SQL written by hand in the repositories | ADR-010: transactions everywhere (the outbox depends on them), constraints the application cannot bypass, and the reporting the business will want. jsonb keeps the document-shaped parts (frozen price breakdowns, status history) |
 | Validation | Zod 4 | Single schema per endpoint, reused for OpenAPI generation |
 | Auth | JWT (access 15 min) + rotating refresh token (httpOnly cookie), bcrypt/argon2 | Stateless API, RBAC per PRD §69, admin MFA (TOTP) per §70 |
 | Queue | MongoDB: transactional outbox + lease-claimed queues, run by a worker process (ADR-008; Redis/BullMQ deferred) | Notifications, renewals, hold expiry, webhooks must not block requests |
 | Storage | S3-compatible (AWS S3 / Cloudflare R2) | KYC files with SSE encryption + signed URLs (PRD §70) |
 | Payments | Razorpay (primary) / Cashfree (fallback adapter) | PRD §67 |
-| Search | MongoDB text index (MVP) → Atlas Search / OpenSearch at scale | PRD §21 |
+| Search | In-memory ranking over the catalog (MVP) → PostgreSQL full-text (`tsvector`) when it outgrows that | PRD §21 |
 | Messaging | Email (Resend/SES), WhatsApp Business API, SMS (MSG91) | PRD §50–51 |
 | Observability | pino logs, OpenTelemetry traces, Prometheus metrics, Sentry | see `logs.md` |
-| Infra | Docker, GitHub Actions, MongoDB Atlas (replica set — transactions required), Redis only when ADR-008 triggers it | reproducible environments |
+| Infra | GitHub Actions, Neon (managed PostgreSQL, pooled connection string), Cloudflare for the frontend and the API, Redis only when ADR-008 triggers it | reproducible environments |
 
 ## 2. Repository layout
 
@@ -32,9 +32,9 @@ backend/
       <module>.routes.js      HTTP surface only
       <module>.validation.js  zod request schemas
       <module>.controller.js  request → service → response
-      <module>.service.js     business rules (no req/res, no Mongoose)
+      <module>.service.js     business rules (no req/res, no SQL)
       <module>.repository.js  all database queries for the module (only file using the model)
-      <module>.model.js       mongoose schema(s)
+      (tables live in backend/migrations/*.sql; the repository owns the SQL)
       <module>.constants.js   statuses, transition tables (when needed)
       <module>.events.js      domain events emitted / consumed (when needed)
       <module>.mapper.js      document → API response (when needed)
@@ -47,7 +47,8 @@ backend/
       errors/                 HttpError hierarchy
     integrations/             razorpay, cashfree, whatsapp, email, sms, s3 adapters (interface + impl)
   scripts/                    seed, migrate, backfill
-  test/                       e2e (supertest + mongodb-memory-server), fixtures
+  migrations/                 numbered SQL files, applied once each by npm run migrate
+  test/                       e2e (supertest + embedded-postgres), fixtures
   openapi/                    generated spec + Redoc page
 ```
 
@@ -152,7 +153,7 @@ Each module lists: purpose, owned collections, HTTP surface, events, and the fro
 ```
 { id, type, occurredAt, actor: { type: user|system, id }, entity: { type, ref }, payload, version: 1 }
 ```
-Published through a transactional **outbox** collection (`domain_events`, written in the same MongoDB transaction as the change) and delivered to subscribed handlers by the worker process, so a crash between DB write and publish cannot lose an event (ADR-008, `backend/src/shared/events/README.md`).
+Published through a transactional **outbox** table (`domain_events`, written in the same transaction as the change) and delivered to subscribed handlers by the worker process, so a crash between DB write and publish cannot lose an event (ADR-008, `backend/src/shared/events/README.md`).
 
 ## 5. Data ownership matrix
 

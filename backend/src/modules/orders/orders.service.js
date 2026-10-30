@@ -176,9 +176,9 @@ export async function createOrder({ source }, idempotencyKey, now = new Date()) 
   });
 
   if (result.duplicate) {
-    // A unique index refused the insert. Which index MongoDB reports is not reliable when both the key and the
-    // source collide, so check for our own key first: a concurrent request with the same key → its replay;
-    // otherwise another order for the same source is open.
+    // A unique index refused the insert. When both the key and the source collide, which index the database
+    // names is not what decides the answer, so check for our own key first: a concurrent request with the
+    // same key → its replay; otherwise another order for the same source is open.
     const mine = await findReplay(idempotencyKey, requestHash);
     if (mine) return { order: mapOrder(mine, now), created: false };
     const winner = await repo.findOpenOrderForSource(source);

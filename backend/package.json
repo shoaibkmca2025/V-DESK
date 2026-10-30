@@ -10,7 +10,8 @@
   "scripts": {
     "dev": "node --env-file-if-exists=.env --watch src/server.js",
     "dev:worker": "node --env-file-if-exists=.env --watch src/worker.js",
-    "dev:memory": "node --env-file-if-exists=.env scripts/dev-memory.js",
+    "dev:pg": "node scripts/dev-postgres.mjs",
+    "migrate": "node --env-file-if-exists=.env scripts/migrate.mjs",
     "start": "node src/server.js",
     "worker": "node src/worker.js",
     "test": "vitest run",
@@ -18,29 +19,28 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "totp": "node scripts/totp.js",
-    "dev:memory:seeded": "node scripts/dev-memory-seeded.mjs"
+    "totp": "node scripts/totp.js"
   },
   "dependencies": {
-    "argon2": "^0.45.1",
+    "@noble/hashes": "^2.0.1",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "helmet": "^8.3.0",
     "jose": "^6.2.12",
-    "mongoose": "^9.10.4",
+    "pg": "^8.16.3",
     "pino": "^10.4.0",
-    "pino-http": "^11.0.0",
     "sanitize-html": "^2.18.0",
     "zod": "^4.6.5"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "embedded-postgres": "^17.10.0-beta.17",
     "eslint": "^10.12.0",
     "globals": "^17.13.0",
-    "mongodb-memory-server": "^11.3.0",
     "pino-pretty": "^13.2.0",
     "prettier": "^3.9.9",
     "supertest": "^7.3.1",
-    "vitest": "^5.0.3"
+    "vitest": "^5.0.3",
+    "wrangler": "^4.156.0"
   }
 }

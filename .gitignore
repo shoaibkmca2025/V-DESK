@@ -2,6 +2,9 @@ node_modules/
 dist/
 .env
 .env.local
+# Wrangler's local-only vars for `wrangler dev`
+.dev.vars
+.dev.vars.*
 *.log
 .DS_Store
 Thumbs.db

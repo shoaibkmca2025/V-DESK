@@ -10,7 +10,10 @@ const blankToUndefined = (value) => (value === '' ? undefined : value);
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(5000),
-  MONGODB_URI: z.string().min(1).default('mongodb://127.0.0.1:27017/vdesk'),
+  /** PostgreSQL (Neon in every deployed environment). Use the pooled `-pooler` host there. */
+  DATABASE_URL: z.string().min(1).default('postgresql://postgres:postgres@127.0.0.1:5432/vdesk'),
+  /** Connections per API instance. Neon's pooler sits in front, so this stays small. */
+  DATABASE_POOL_MAX: z.coerce.number().int().positive().max(100).default(10),
   CORS_ORIGINS: z
     .string()
     .default('http://localhost:5173')

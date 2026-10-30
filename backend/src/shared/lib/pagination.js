@@ -2,7 +2,8 @@ import { badRequest } from '../errors/AppError.js';
 
 /**
  * Opaque cursors for newest-first lists ordered by (createdAt, ref) — modules.md §6.
- * Built from public fields only (never _id), so a cursor reveals nothing a client couldn't already see.
+ * Built from public fields only (never the surrogate id), so a cursor reveals nothing a client couldn't
+ * already see.
  */
 export function encodeCursor(doc) {
   return Buffer.from(JSON.stringify({ c: doc.createdAt.toISOString(), r: doc.ref })).toString('base64url');
@@ -20,9 +21,22 @@ export function decodeCursor(cursor) {
   }
 }
 
-/** Mongo filter for "older than the cursor" under a (createdAt desc, ref desc) sort. */
-export function olderThan(after) {
-  return { $or: [{ createdAt: { $lt: after.createdAt } }, { createdAt: after.createdAt, ref: { $lt: after.ref } }] };
+/**
+ * The "older than the cursor" condition under an `ORDER BY created_at DESC, ref DESC` sort, as a SQL
+ * fragment the caller appends to its WHERE clause. Postgres compares the pair in one go, so the tie on
+ * equal timestamps is broken by `ref` without a second OR branch.
+ *
+ * @param {{ createdAt: Date, ref: string } | undefined} after  a decoded cursor, or nothing for page one
+ * @param {number} from  the next free parameter number ($1 is 1)
+ * @returns {{ text: string, params: unknown[], next: number }} `text` is '' when there is no cursor
+ */
+export function cursorClause(after, from = 1) {
+  if (!after) return { text: '', params: [], next: from };
+  return {
+    text: `AND (created_at, ref) < ($${from}, $${from + 1})`,
+    params: [after.createdAt, after.ref],
+    next: from + 2,
+  };
 }
 
 /** Splits a `limit + 1` fetch into the page and the cursor for the next one. */

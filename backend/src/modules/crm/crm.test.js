@@ -1,18 +1,27 @@
 /**
  * CRM module — unit tests for the pure rules and integration tests for every /api/v1/leads endpoint.
  *
- * Uses test/db.js (real MongoDB in memory). ADMIN_API_KEY comes from vitest.config.js.
+ * Uses test/db.js (a real PostgreSQL, migrated per test file). ADMIN_API_KEY comes from vitest.config.js.
  * Run: npm test  (or: npx vitest run src/modules/crm/crm.test.js)
  */
 import request from 'supertest';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { createApp } from '../../app.js';
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
+import { clearTestDb, count, insert, query, row, rows, startTestDb, stopTestDb } from '../../../test/db.js';
 import { LEAD_REF_PATTERN } from './crm.constants.js';
-import { Lead, LeadActivity } from './crm.model.js';
 import { assertTransition, computeLeadScore, generateLeadRef } from './crm.service.js';
 
 const app = createApp();
+
+/** A stored lead, under the field names the API uses. */
+const storedLead = (ref) =>
+  row(
+    `SELECT ref, name, mobile, email, city, service, company, notes, source, status, score,
+            assigned_to AS "assignedTo", attribution, mobile_digits AS "mobileDigits",
+            deleted_at AS "deletedAt", created_at AS "createdAt", updated_at AS "updatedAt"
+       FROM leads WHERE ref = $1`,
+    [ref],
+  );
 const ADMIN_KEY = 'test-admin-key-0123456789';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -47,7 +56,7 @@ async function moveTo(ref, statuses) {
   for (const status of statuses) expect((await staffPatch(ref, { status })).status).toBe(200);
 }
 
-const softDelete = (ref) => Lead.updateOne({ ref }, { deletedAt: new Date() });
+const softDelete = (ref) => query('UPDATE leads SET deleted_at = now() WHERE ref = $1', [ref]);
 
 // ── Unit: pure rules ─────────────────────────────────────────────────────────
 
@@ -106,7 +115,7 @@ describe('crm module', () => {
       expect(Object.keys(res.body.data).sort()).toEqual(['createdAt', 'ref']);
       expect(res.body.data.ref).toMatch(LEAD_REF_PATTERN);
 
-      const stored = await Lead.findOne({ ref: res.body.data.ref }).lean();
+      const stored = await storedLead(res.body.data.ref);
       expect(stored).toMatchObject({ name: 'Priya Kulkarni', status: 'NEW', score: 85, assignedTo: null });
       expect(stored.deletedAt).toBeNull();
     });
@@ -117,14 +126,17 @@ describe('crm module', () => {
 
     it('records a "created" activity', async () => {
       const ref = await createLead();
-      const activities = await LeadActivity.find({ leadRef: ref }).lean();
+      const activities = await rows(
+        `SELECT type, from_status AS "from", to_status AS "to", actor FROM lead_activities WHERE lead_ref = $1`,
+        [ref],
+      );
       expect(activities).toHaveLength(1);
       expect(activities[0]).toMatchObject({ type: 'created', to: 'NEW', actor: 'public' });
     });
 
     it('ignores a status sent by the client and drops unknown fields', async () => {
       const ref = await createLead({ status: 'WON', score: 999, isAdmin: true });
-      const stored = await Lead.findOne({ ref }).lean();
+      const stored = await storedLead(ref);
       expect(stored.status).toBe('NEW');
       expect(stored.score).toBe(85);
       expect(stored.isAdmin).toBeUndefined();
@@ -132,7 +144,7 @@ describe('crm module', () => {
 
     it('treats empty strings from untouched inputs as absent', async () => {
       const ref = await createLead({ company: '', email: '', notes: '   ' });
-      const stored = await Lead.findOne({ ref }).lean();
+      const stored = await storedLead(ref);
       expect(stored).toMatchObject({ company: '', email: '', notes: '', score: 60 });
     });
 
@@ -143,8 +155,8 @@ describe('crm module', () => {
       expect(first.status).toBe(201);
       expect(replay.status).toBe(200);
       expect(replay.body.data).toEqual(first.body.data);
-      expect(await Lead.countDocuments({ ref: 'VD-MUM-8921' })).toBe(1);
-      expect((await Lead.findOne({ ref: 'VD-MUM-8921' }).lean()).name).toBe('Priya Kulkarni');
+      expect(await count('leads', 'ref = $1', ['VD-MUM-8921'])).toBe(1);
+      expect((await storedLead('VD-MUM-8921')).name).toBe('Priya Kulkarni');
     });
 
     it('does not reveal stored details when a ref is replayed', async () => {
@@ -159,7 +171,7 @@ describe('crm module', () => {
       const ref = await createLead({ ref: 'VD-GONE-0001' });
       await softDelete(ref);
       expect((await postLead(validLead({ ref }))).status).toBe(200);
-      expect(await Lead.countDocuments({ ref })).toBe(1);
+      expect(await count('leads', 'ref = $1', [ref])).toBe(1);
     });
 
     it('normalises a lower-case client ref', async () => {
@@ -193,7 +205,7 @@ describe('crm module', () => {
       expect(res.status).toBe(400);
       expect(res.body.error.code).toBe('VALIDATION_FAILED');
       expect(res.body.error.details.map((d) => d.path)).toContain(path);
-      expect(await Lead.countDocuments()).toBe(0);
+      expect(await count('leads')).toBe(0);
     });
   });
 
@@ -297,7 +309,7 @@ describe('crm module', () => {
     it('breaks createdAt ties by ref so no lead is skipped', async () => {
       const at = new Date('2026-10-01T10:00:00Z');
       const refs = ['VD-TIE-0001', 'VD-TIE-0002', 'VD-TIE-0003'];
-      await Lead.insertMany(refs.map((ref) => ({ ref, name: ref, score: 40, createdAt: at, updatedAt: at })));
+      for (const ref of refs) await insert('leads', { ref, name: ref, score: 40, createdAt: at, updatedAt: at });
 
       const page1 = await staffGet('?limit=2');
       const page2 = await staffGet(`?limit=2&cursor=${page1.body.meta.nextCursor}`);
@@ -401,7 +413,7 @@ describe('crm module', () => {
         code: 'INVALID_STATUS_TRANSITION',
         details: { from: 'NEW', to: 'PROPOSAL', allowed: ['CONTACTED', 'LOST'] },
       });
-      expect((await Lead.findOne({ ref }).lean()).status).toBe('NEW');
+      expect((await storedLead(ref)).status).toBe('NEW');
     });
 
     it('returns 409 when leaving a terminal status', async () => {
@@ -442,10 +454,10 @@ describe('crm module', () => {
 
     it('updates updatedAt when the lead changes', async () => {
       const ref = await createLead();
-      const before = (await Lead.findOne({ ref }).lean()).updatedAt;
+      const before = (await storedLead(ref)).updatedAt;
       await new Promise((resolve) => setTimeout(resolve, 5));
       await staffPatch(ref, { status: 'CONTACTED' });
-      expect((await Lead.findOne({ ref }).lean()).updatedAt.getTime()).toBeGreaterThan(before.getTime());
+      expect((await storedLead(ref)).updatedAt.getTime()).toBeGreaterThan(before.getTime());
     });
 
     it.each([

@@ -2,7 +2,7 @@
  * Search service — universal search (PRD §9–16) and its admin-managed settings (PRD §20).
  *
  * Rules (docs/backend/rules.md, modules.md §3.3):
- *  - No req/res and no Mongoose here; search data goes through search.repository.js.
+ *  - No req/res and no SQL here; search data goes through search.repository.js.
  *  - Centres, workspaces and cities come from catalog's public service (its index.js), never its models (§1).
  *  - Matching and ranking reuse the client's rules (search.intent.js), in memory over the catalog — no text index
  *    in Phase 1 (decision 2026-10-07, docs/backend/memory.md).

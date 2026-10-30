@@ -18,12 +18,15 @@ starting any backend work; append to it whenever a decision is made. Newest entr
 |---|---|---|---|---|
 | ADR-001 | 2026-09-15 | Frontend restructured from static HTML to React 19 + Vite; **UI pixel-identical**, verified by DOM+screenshot diff | Client approved the design; only code structure was in scope | done |
 | ADR-002 | 2026-09-15 | Backend deferred; site ships frontend-only with localStorage for leads/telemetry | Owner request ("currently only frontend") | active |
-| ADR-003 | 2026-09-15 | Backend stack: Node 22 / Express 5 / MongoDB / Redis / BullMQ / Razorpay / S3 (see `modules.md` §1) | PRD §67 recommends PostgreSQL; MongoDB chosen for document-shaped catalog and team familiarity with MERN. Revisit if reporting needs heavy joins → add warehouse export rather than switching OLTP DB | active — Redis/BullMQ deferred by ADR-008 |
+| ADR-003 | 2026-09-15 | Backend stack: Node 22 / Express 5 / MongoDB / Redis / BullMQ / Razorpay / S3 (see `modules.md` §1) | PRD §67 recommends PostgreSQL; MongoDB chosen for document-shaped catalog and team familiarity with MERN. Revisit if reporting needs heavy joins → add warehouse export rather than switching OLTP DB | superseded in part — the database is PostgreSQL since ADR-010 (PRD §67 was right); Redis/BullMQ deferred by ADR-008 |
 | ADR-004 | 2026-09-15 | Money stored as integer paise; GST computed at final line | Avoid float drift on invoices | planned |
 | ADR-005 | 2026-09-15 | Domain events via transactional outbox, not direct queue publish | Payment/booking events must never be lost | done (ADR-008) |
 | ADR-006 | 2026-09-15 | API field names mirror existing `src/features/*` objects | Switch-over is transport-only; no client data-model rewrite | planned |
 | ADR-007 | 2026-10-08 | Pricing is paise-exact: intermediate amounts (discounts, GST) are kept exact and rounded **once, at the final total**; the API does **not** copy the client's per-step rupee rounding | Owner-approved; rules.md §13 and invoice reconciliation to the paisa. Totals can differ from today's client by under ₹1 (e.g. Nashik annual VO + GST + mail: client ₹21,501, API ₹21,500.54); the frontend shows API totals at switch-over | active |
-| ADR-008 | 2026-10-12 | **MongoDB is the queue, the outbox and the job store; no Redis / BullMQ for now.** Outbox = `domain_events` written in the same transaction as the change, delivered by a worker process (`npm run worker`) to idempotent handlers (at least once, 8 attempts, DEAD after). Background queues (notifications) claim items with atomic updates + leases. MongoDB must be a replica set (transactions): production refuses to start otherwise; tests and `dev:memory` run single-node replica sets | One datastore to run, back up and secure; the volumes are small (leads, bookings, messages per day, not per second); the patterns were already in the code (notifications lease queue, booking unique-index slots). **Bring in Redis when any of these happens:** more than one API instance (in-memory rate limits stop being shared), job throughput needs sub-second latency or > ~50 jobs/s, many cron-style jobs need exact scheduling, or a cache is needed for the catalog bundle | active |
+| ADR-008 | 2026-10-12 | **MongoDB is the queue, the outbox and the job store; no Redis / BullMQ for now.** Outbox = `domain_events` written in the same transaction as the change, delivered by a worker process (`npm run worker`) to idempotent handlers (at least once, 8 attempts, DEAD after). Background queues (notifications) claim items with a lease. The datastore is PostgreSQL since ADR-010, which has transactions everywhere, so the replica-set requirement and the "outbox writes are not atomic locally" warning are gone | One datastore to run, back up and secure; the volumes are small (leads, bookings, messages per day, not per second); the patterns were already in the code (notifications lease queue, booking unique-index slots). **Bring in Redis when any of these happens:** more than one API instance (in-memory rate limits stop being shared), job throughput needs sub-second latency or > ~50 jobs/s, many cron-style jobs need exact scheduling, or a cache is needed for the catalog bundle | active |
+| ADR-009 | 2026-10-27 | **Customers sign in with a phone OTP; they are not staff users.** Own `customers` table, own token type (`typ: customer`), own refresh cookie (`vd_crt`, path `/api/v1/auth/customer`). The verified mobile number is the account, so one request → verify pair both registers and signs in; a first verify needs a name. Holding a meeting room needs that session, and the booking takes the name, number and email from the account, never from the request | Rooms are real inventory held against a real person; the client already asked for a mobile + OTP, and keeping customers out of `users` means a portal sign-in can never reach a staff permission. Codes are stored as a peppered hash, 5 minutes, single use, 5 wrong tries, 5 sends per 30 min per number | active |
+| ADR-010 | 2026-10-30 | **PostgreSQL (Neon) replaces MongoDB.** One table per former collection, same names and same API field names (repositories alias `created_at AS "createdAt"`); jsonb only where a value was genuinely a sub-document (frozen price breakdowns, status history, attribution touches). Schema lives in `backend/migrations/*.sql`, applied by `npm run migrate`; tests run against a real PostgreSQL (embedded, migrated template cloned per test file). No TTL indexes — the worker purges expired rows hourly (`shared/jobs/purge.js`) | Owner decision (database on Neon, 2026-10-30). What changed for the better: transactions are now available everywhere, so the outbox is always atomic and ADR-008's standalone caveat is gone; queue claims use `SELECT … FOR UPDATE SKIP LOCKED`; CHECK constraints are tested against the JS constants (`test/schema.test.js`). What to watch: the booking rollback stays a compensating write (not a transaction) because the booking must be visible to the Idempotency-Key lookup before its hours are reserved | active — supersedes the MongoDB half of ADR-003 and ADR-008 |
+| ADR-011 | 2026-10-30 | **The site and the API both run on Cloudflare Workers; Neon is reached through Hyperdrive.** The API is the same Express app, handed to the Workers lifecycle by `httpServerHandler` (`src/cloudflare/entry.js`); background jobs run on cron triggers (every minute for the outbox and the message queue, hourly for the row purge) instead of the worker process's 1-second loop. Two things had to change to fit the runtime: password hashing moved from the native `argon2` addon to pure-JS argon2id (`@noble/hashes`) in the same PHC format, because Workers cannot load native addons and cannot compile WebAssembly at runtime; and the access log is now ours (`shared/middleware/httpLogger.js`) because `pino-http` reads pino internals that the Workers bundle does not expose | Owner decision (deploy both on Cloudflare, 2026-10-30). **Consequences to know:** staff password sign-in needs the Workers **Paid** plan — an argon2id hash costs ~460 ms of CPU and the free plan allows 10 ms, so `/auth/login` fails intermittently with Cloudflare 1102; every other route is I/O-bound and fits the free plan. Hyperdrive query caching must stay **disabled** (a read right after a write was served stale: "ask for a code first" immediately after asking for one). `NODE_ENV=production` must be set as a Worker var or the API hands out OTP codes and drops `Secure` from cookies. Rate limits are per isolate rather than per API instance, so they are weaker than on a server — move to Cloudflare's rate-limiting binding if that starts to matter | active |
 
 ## 3. Frontend integration points (what the backend must satisfy)
 
@@ -37,7 +40,7 @@ starting any backend work; append to it whenever a decision is made. Newest entr
 | `features/meetingRooms/roomBooking.js` | in-memory 10-min timer | `/bookings/hold` + expiry job | hold TTL 599 s in UI |
 | `features/checkout/*` | simulated | Razorpay intent + webhook | invoice split CGST/SGST 9 %+9 % today |
 | `features/kyc/kyc.js` | toast only | `/kyc` + signed uploads | never store docs in localStorage (PRD §47) |
-| `features/portal/customerPortal.js` | static demo data | `/me/*` | needs customer auth first |
+| `features/portal/customerPortal.js` | static demo data | `/me/*` | customer auth exists (ADR-009): the portal reads `/auth/customer/me` and `/bookings/mine`; subscriptions, documents and invoices are still sample data |
 | `features/admin/*` | reads leadStore | admin endpoints + RBAC | admin key/JWT via `x-admin-key` → Bearer later |
 
 ## 4. Business numbers currently hard-coded in the client (must move to `pricing_rules`)
@@ -58,7 +61,7 @@ starting any backend work; append to it whenever a decision is made. Newest entr
 - WhatsApp number `+91 98765 43210` and emails in the codebase are placeholders — confirm real numbers before wiring messaging.
 - Trust claims (“100 % GST approval”, “2,400 reviews”) must be admin-substantiated before they are served from the CMS (PRD §22).
 - `_archive/legacy-static-site/` is the visual regression reference; do not delete until the client signs off on the React build.
-- Windows dev machines: use `npm run dev:memory`-style in-memory Mongo for local work if Docker/Mongo is unavailable.
+- Windows dev machines: `npm run dev:pg` starts a throwaway PostgreSQL (downloaded binaries, no Docker), migrates it and runs the API plus worker in one process. `npm run dev` with `DATABASE_URL` set works against Neon directly.
 
 ## 6. Open questions (assign an owner, close with a decision)
 
@@ -219,3 +222,49 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
   `blog_posts` from the plan = the existing resource guides; banners / homepage sections not built (no data source
   yet). `sitemap.xml` is generated from catalog + search services + published content and needs `SITE_URL` — the
   site domain is still an owner decision. search gained a read-only `listServices()` export for it.
+- **2026-10-27** — customer sign-in and registration built (ADR-009), and meeting-room holds moved behind it.
+  Decisions: the mobile number is the account, so request → verify both registers and signs in and there is no
+  separate `/register` endpoint to keep in step; a first verify needs a name, which is why `/auth/otp/request`
+  answers `isNewAccount` (the sign-in form asks for the name only then). Customers live in their own table with
+  their own token type and cookie, so a portal session can never reach a staff permission — and a staff token is
+  refused on portal routes. Codes: 6 digits, 5 minutes, single use, hashed with a pepper, 5 wrong tries, and per
+  number 1 send / 30 s and 5 per 30 min on top of the per-IP limit. The code is checked **before** the name is
+  required, so someone who typed the right code is never sent back to a dead one. Delivery goes through
+  notifications' `customer.otp` template — until staff write it, nothing is sent, and outside production the API
+  returns the code so local and test sign-in work without an SMS provider. `POST /bookings/hold` now needs that
+  session and takes the name, mobile and email from the account: the request schema drops them, so a booking can
+  never be made in someone else's name. A booking records `customerRef`, which is what `GET /bookings/mine` and
+  the portal read. Still open: the OTP's rendered text sits in the notifications queue in the clear (it has to, to
+  be sendable) — if that becomes a concern, store the variables instead and render in the sender.
+- **2026-10-30** — MongoDB → PostgreSQL on Neon (ADR-010), owner's decision. One table per collection, same names,
+  and the repositories alias columns back to the API's field names, so services, mappers, controllers and the API
+  contract did not change; jsonb only where a value was genuinely a sub-document. What the move improved: real
+  transactions everywhere (ADR-008's "writes and their events are not atomic locally" warning is gone), queue
+  claims via `SELECT … FOR UPDATE SKIP LOCKED`, partial unique indexes expressing the rules exactly ("one open
+  order per source", "one live entry per (type, key)"), a generated column for the per-mobile hold cap, and CHECK
+  constraints that `test/schema.test.js` compares against the JS constants so the two cannot drift. What needed a
+  decision: there are no TTL indexes, so the worker purges expired rows hourly (`shared/jobs/purge.js`) — nothing
+  depends on it for correctness, since every expired row is already refused on read; the two queue tables and the
+  lead timeline use counting keys, because rows written in the same statement share a timestamp and uuids have no
+  order; `updated_at` is kept current by one trigger per table rather than by every UPDATE remembering it. Tests
+  run against a real PostgreSQL: `globalSetup` migrates a template database once and each test file clones it
+  (`CREATE DATABASE … TEMPLATE`), which is why 33 files still finish in about a minute. Bugs the suite caught
+  during the port, both now covered: a four-column search clause only substituted its first parameter, and the
+  notification queue claimed rows in an undefined order when two fell due in the same millisecond.
+- **2026-10-30** — deployed: site and API on Cloudflare Workers, database on Neon (ADR-011), both on
+  `*.shoaibk-mca2024.workers.dev` until a domain is attached; the runbook is `docs/deployment.md`. Four
+  things only showed up against the real runtime, and each one is now written down where it bit:
+  (1) reading the Hyperdrive binding mints a credential, which Workers forbid at module scope — the
+  connection string is handed to `config/db.js` as a function it calls on first use; (2) Hyperdrive caches
+  SELECTs by default, which broke read-your-writes (a customer asked for an OTP and was then told to ask
+  for one) — caching is off on the `vdesk-neon` config and must stay off; (3) without `NODE_ENV=production`
+  as a var, the deployed API answered `/auth/otp/request` with the code it was meant to text and left
+  `Secure` off the refresh cookies; (4) an argon2id hash costs ~460 ms of CPU, and Workers free allows
+  10 ms, so staff sign-in needs the Paid plan — the customer journey (OTP sign-in, catalog, search,
+  booking, quotes, leads) is I/O-bound and fine either way. A Worker also cannot hold the 1-second job
+  loop, so the outbox is delivered by a per-minute cron: a lead confirmation now leaves within a minute
+  rather than a second, and `npm run worker` on any always-on host still works against the same database
+  if that needs to be faster. Verified on the deployment: health, readiness through Hyperdrive, the public
+  catalog, customer registration and sign-in, the booking gate, holding a room, `/bookings/mine`, session
+  refresh and sign-out (`scripts/smoke.mjs`, 16/16), and a real lead whose `lead.created` event was
+  delivered to both notification handlers by the cron 36 s later.

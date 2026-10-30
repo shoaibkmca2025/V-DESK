@@ -7,15 +7,23 @@
 import request from 'supertest';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createApp } from '../../app.js';
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
+import { clearTestDb, count, insert, row, startTestDb, stopTestDb } from '../../../test/db.js';
 import { customerSession } from '../../../test/customer.js';
 import { ADMIN_KEY, staffSession } from '../../../test/staff.js';
-import { Centre } from '../catalog/catalog.model.js';
 import { HOLD_SECONDS } from './booking.constants.js';
-import { Booking, BookingSlot } from './booking.model.js';
+import * as repo from './booking.repository.js';
 import { addDays, istDate } from './booking.time.js';
 
 const app = createApp();
+
+/** A stored booking, under the field names the module uses; `id` is the surrogate key the API never shows. */
+const storedBooking = (where, params) =>
+  row(
+    `SELECT id::text AS id, ref, status, customer_ref AS "customerRef", customer, history,
+            expires_at AS "expiresAt", idempotency_key AS "idempotencyKey", request_hash AS "requestHash"
+       FROM bookings WHERE ${where}`,
+    params,
+  );
 const date = () => addDays(istDate(new Date()), 1);
 
 /** The signed-in customer every hold below is made by; contact details come from this account, not the body. */
@@ -50,7 +58,7 @@ async function heldRef(overrides) {
 
 beforeAll(startTestDb);
 beforeEach(async () => {
-  await Centre.create({
+  await insert('centres', {
     ref: 'CTR-NSK-001',
     cityRef: 'CITY-NSK',
     city: 'Nashik',
@@ -130,12 +138,12 @@ describe('POST /api/v1/bookings/hold', () => {
     const replay = await postHold(holdRequest(), 'replay-key');
     expect(replay.status).toBe(200);
     expect(replay.body.data.ref).toBe(first.body.data.ref);
-    expect(await Booking.countDocuments()).toBe(1);
+    expect(await count('bookings')).toBe(1);
   });
 
   it('answers a replay of a hold that died mid-way with a retryable 409 and its worst-case wait', async () => {
-    vi.spyOn(BookingSlot, 'insertMany').mockRejectedValueOnce(new Error('process crashed'));
-    vi.spyOn(BookingSlot, 'deleteMany').mockRejectedValueOnce(new Error('process crashed'));
+    vi.spyOn(repo, 'insertSlots').mockRejectedValueOnce(new Error('process crashed'));
+    vi.spyOn(repo, 'deleteSlotsForBooking').mockRejectedValueOnce(new Error('process crashed'));
     expect((await postHold(holdRequest(), 'crash-key')).status).toBe(500);
     vi.restoreAllMocks();
 
@@ -145,7 +153,7 @@ describe('POST /api/v1/bookings/hold', () => {
       code: 'IDEMPOTENCY_KEY_IN_PROGRESS',
       details: { expiresAt: expect.any(String) },
     });
-    const stuck = await Booking.findOne({ idempotencyKey: 'crash-key' }).lean();
+    const stuck = await storedBooking('idempotency_key = $1', ['crash-key']);
     expect(new Date(replay.body.error.details.expiresAt)).toEqual(stuck.expiresAt);
     expect(JSON.stringify(replay.body)).not.toContain(stuck.ref);
   });
@@ -177,7 +185,7 @@ describe('POST /api/v1/bookings/hold', () => {
     const results = await Promise.all(racers.map((racer) => postHold(holdRequest(), undefined, racer.auth)));
     expect(results.map((r) => r.status).sort()).toEqual([201, 409, 409, 409]);
     for (const res of results.filter((r) => r.status === 409)) expect(res.body.error.code).toBe('SLOT_UNAVAILABLE');
-    expect(await BookingSlot.countDocuments()).toBe(2);
+    expect(await count('booking_slots')).toBe(2);
   });
 
   it('caps unexpired holds per mobile number', async () => {
@@ -209,12 +217,12 @@ describe('POST /api/v1/bookings/hold', () => {
     const asStaff = await postHold(holdRequest(), 'staff-token', staff.auth);
     expect(asStaff.status).toBe(401);
     expect(asStaff.body.error.code).toBe('TOKEN_INVALID');
-    expect(await Booking.countDocuments()).toBe(0);
+    expect(await count('bookings')).toBe(0);
   });
 
   it('books in the name on the account, whatever the body says', async () => {
     const ref = await heldRef({ company: 'Zenith Labs LLP' });
-    const stored = await Booking.findOne({ ref }).lean();
+    const stored = await storedBooking('ref = $1', [ref]);
     expect(stored.customerRef).toBe(customer.ref);
     expect(stored.customer).toMatchObject({
       name: CUSTOMER.name,
@@ -246,7 +254,7 @@ describe('public booking ref', () => {
     const res = await request(app).post(`/api/v1/bookings/${ref}/cancel`);
     expect(res.status).toBe(200);
     expect(res.body.data.status).toBe('CANCELLED');
-    expect(await BookingSlot.countDocuments()).toBe(0);
+    expect(await count('booking_slots')).toBe(0);
   });
 
   it('GET /:ref/pass is only issued once confirmed, and carries no contact details', async () => {
@@ -303,7 +311,7 @@ describe('public booking ref', () => {
       ['attendees', 'date', 'endsAt', 'hub', 'qr', 'ref', 'room', 'slot', 'startsAt', 'status'].sort(),
     );
 
-    const stored = await Booking.findOne({ ref }).lean();
+    const stored = await storedBooking('ref = $1', [ref]);
     for (const res of [held, replay, view, cancelled, pass]) {
       const raw = JSON.stringify(res.body);
       for (const secret of [
@@ -313,7 +321,7 @@ describe('public booking ref', () => {
         CUSTOMER.company,
         'privacy-key',
         stored.requestHash,
-        String(stored._id),
+        stored.id,
       ]) {
         expect(raw).not.toContain(secret);
       }
@@ -349,7 +357,7 @@ describe('staff routes', () => {
     ]) {
       expect(res.status).toBe(401);
     }
-    expect((await Booking.findOne({ ref }).lean()).status).toBe('HELD');
+    expect((await storedBooking('ref = $1', [ref])).status).toBe('HELD');
   });
 
   it('enforce bookings:read / bookings:write', async () => {

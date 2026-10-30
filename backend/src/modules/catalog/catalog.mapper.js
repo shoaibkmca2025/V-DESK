@@ -1,5 +1,5 @@
 /**
- * Catalog mapper — strips internal MongoDB fields before sending to the client.
+ * Catalog mapper — strips internal fields before sending to the client.
  * Rule: _id never leaves the API (rules.md §15); deletedAt and __v are also internal.
  */
 

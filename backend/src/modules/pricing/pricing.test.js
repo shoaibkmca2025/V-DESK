@@ -6,9 +6,8 @@
 import request from 'supertest';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createApp } from '../../app.js';
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
+import { clearTestDb, insert, startTestDb, stopTestDb } from '../../../test/db.js';
 import { ADMIN_KEY, staffSession } from '../../../test/staff.js';
-import { Centre } from '../catalog/catalog.model.js';
 
 const app = createApp();
 
@@ -29,7 +28,7 @@ const quoteBody = { name: 'Priya Kulkarni', company: 'Zenith D2C Brands Pvt Ltd'
 
 beforeAll(startTestDb);
 beforeEach(() =>
-  Centre.create({
+  insert('centres', {
     ref: 'CTR-NSK-001',
     cityRef: 'CITY-NSK',
     city: 'Nashik',

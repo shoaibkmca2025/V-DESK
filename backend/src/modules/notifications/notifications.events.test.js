@@ -9,10 +9,8 @@ import { createApp } from '../../app.js';
 import '../../events.js';
 import { createFakeMessagingProvider } from '../../integrations/messaging.js';
 import { dispatchDueEvents } from '../../shared/events/bus.js';
-import { DomainEvent } from '../../shared/events/events.model.js';
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
+import { clearTestDb, count, query, rows, startTestDb, stopTestDb } from '../../../test/db.js';
 import { ADMIN_KEY } from '../../../test/staff.js';
-import { Notification } from './notifications.model.js';
 import { processDueNotifications } from './notifications.service.js';
 
 const app = createApp();
@@ -56,7 +54,11 @@ const LEAD = {
 };
 
 const postLead = (body = LEAD) => request(app).post('/api/v1/leads').send(body);
-const queued = () => Notification.find().sort({ templateKey: 1 }).lean();
+const queued = () =>
+  rows(
+    `SELECT template_key AS "templateKey", recipient AS "to", subject, body, status, channel
+       FROM notification_log ORDER BY template_key`,
+  );
 
 beforeAll(startTestDb);
 afterEach(clearTestDb);
@@ -65,7 +67,12 @@ afterAll(stopTestDb);
 describe('lead.created → notifications', () => {
   it('records the event with the lead, carrying refs only', async () => {
     await postLead();
-    const [event] = await DomainEvent.find().lean();
+    const [event] = await rows(
+      `SELECT type, status, handled, payload,
+              jsonb_build_object('type', actor_type, 'id', actor_id) AS actor,
+              jsonb_build_object('type', entity_type, 'ref', entity_ref) AS entity
+         FROM domain_events`,
+    );
     expect(event).toMatchObject({
       type: 'lead.created',
       entity: { type: 'lead', ref: 'VD-FLOW-0001' },
@@ -77,7 +84,7 @@ describe('lead.created → notifications', () => {
 
     // A replayed submission is answered from the existing lead — no second event.
     expect((await postLead()).status).toBe(200);
-    expect(await DomainEvent.countDocuments()).toBe(1);
+    expect(await count('domain_events')).toBe(1);
   });
 
   it('queues the confirmation (email + WhatsApp) and the sales alert once templates exist', async () => {
@@ -102,9 +109,9 @@ describe('lead.created → notifications', () => {
     await postLead();
     await dispatchDueEvents();
     // Simulate a redelivery: the worker crashed after the handlers ran but before recording them.
-    await DomainEvent.updateMany({}, { $set: { status: 'PENDING', handled: [], nextAttemptAt: new Date(0) } });
+    await query(`UPDATE domain_events SET status = 'PENDING', handled = '{}', next_attempt_at = $1`, [new Date(0)]);
     await dispatchDueEvents();
-    expect(await Notification.countDocuments()).toBe(3);
+    expect(await count('notification_log')).toBe(3);
   });
 
   it('skips messages whose template is missing or needs a value the lead lacks', async () => {
@@ -115,7 +122,7 @@ describe('lead.created → notifications', () => {
     });
     await postLead(); // no city given
     expect(await dispatchDueEvents()).toMatchObject({ done: 1 });
-    expect(await Notification.countDocuments()).toBe(0);
+    expect(await count('notification_log')).toBe(0);
   });
 
   it('is sent by the worker once a provider is configured', async () => {

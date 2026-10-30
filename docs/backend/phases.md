@@ -12,12 +12,12 @@ Estimates assume 1–2 backend engineers. Durations are working weeks.
 **Goal:** a deployable, observable, empty API.
 
 - `backend/` folder (repo root) per `modules.md` §2; Express 5 app factory; zod-validated env
-- MongoDB Atlas (dev/staging/prod projects), Redis, S3 bucket with SSE
+- Neon PostgreSQL (one project, a branch per environment), Redis, S3 bucket with SSE
 - Middleware: request id, pino logger, helmet, CORS allow-list, rate limit, error handler
 - `GET /health` (liveness), `GET /ready` (db + redis ping)
-- Docker image, GitHub Actions: lint → unit → integration (mongodb-memory-server) → build → deploy staging
+- GitHub Actions: lint → unit → integration (embedded-postgres) → migrate → build → deploy staging
 - OpenAPI skeleton served at `/docs`
-- Seed script loading `src/data/*` catalog into MongoDB
+- Seed script loading `src/data/*` catalog into PostgreSQL
 
 **Exit criteria:** staging URL returns `/health`; CI green; on-call runbook stub in `logs.md`.
 

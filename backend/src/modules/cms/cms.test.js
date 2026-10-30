@@ -11,9 +11,8 @@ import { TESTIMONIALS } from '../../../../frontend/src/data/testimonials.js';
 import { createApp } from '../../app.js';
 import { seedContent } from '../../../scripts/seed-content.js';
 import { seedSearch } from '../../../scripts/seed-search.js';
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
+import { clearTestDb, insert, startTestDb, stopTestDb } from '../../../test/db.js';
 import { ADMIN_KEY } from '../../../test/staff.js';
-import { City } from '../catalog/catalog.model.js';
 
 const app = createApp();
 const get = (path) => request(app).get(`/api/v1/content${path}`);
@@ -105,7 +104,7 @@ describe('SEO overrides', () => {
 
 describe('sitemap.xml', () => {
   it('lists static pages, cities, services, guides and legal pages, minus noindex', async () => {
-    await City.create({ ref: 'CITY-NSK', slug: 'nashik', name: 'Nashik', state: 'Maharashtra', tier: 'Tier-2' });
+    await insert('cities', { ref: 'CITY-NSK', slug: 'nashik', name: 'Nashik', state: 'Maharashtra', tier: 'Tier-2' });
     await seedSearch();
     await seedContent();
     await admin('put', `/seo/${encodeURIComponent('/pricing')}`).send({

@@ -8,7 +8,7 @@
  * The new admin signs in, enrols an authenticator app (MFA is mandatory) and changes the password
  * with POST /api/v1/auth/password.
  */
-import mongoose from 'mongoose';
+import { connectDb, disconnectDb } from '../src/config/db.js';
 import { createUser } from '../src/modules/identity/index.js';
 
 const [email, name] = process.argv.slice(2);
@@ -19,8 +19,7 @@ if (!email || !name || password.length < 12) {
   process.exit(1);
 }
 
-const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/vdesk';
-await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
+await connectDb();
 try {
   const user = await createUser({ email: email.trim().toLowerCase(), name, role: 'SUPER_ADMIN', password }, 'script');
   console.log(`[create-admin] created ${user.ref} (${user.role})`);
@@ -28,5 +27,5 @@ try {
   console.error(`[create-admin] ${err.code ?? 'FAILED'}: ${err.message}`);
   process.exitCode = 1;
 } finally {
-  await mongoose.disconnect();
+  await disconnectDb();
 }

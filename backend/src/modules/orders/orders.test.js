@@ -6,17 +6,27 @@
 import request from 'supertest';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createApp } from '../../app.js';
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
+import { clearTestDb, count, insert, query, row, startTestDb, stopTestDb } from '../../../test/db.js';
 import { customerSession } from '../../../test/customer.js';
 import { ADMIN_KEY, staffSession } from '../../../test/staff.js';
 import { addDays, istDate } from '../booking/booking.time.js';
-import { Centre } from '../catalog/catalog.model.js';
 import { previewItem } from '../pricing/index.js';
 import { ORDER_TRANSITIONS } from './orders.constants.js';
-import { Order } from './orders.model.js';
+import * as repo from './orders.repository.js';
 import * as service from './orders.service.js';
 
 const app = createApp();
+
+/** A stored order, under the field names the API uses. */
+const storedOrder = (ref) =>
+  row(
+    `SELECT ref, status, jsonb_build_object('type', source_type, 'ref', source_ref) AS source,
+            description, tenure, pricing, total_paise, currency,
+            expires_at AS "expiresAt", history, idempotency_key AS "idempotencyKey",
+            request_hash AS "requestHash", created_at AS "createdAt", updated_at AS "updatedAt"
+       FROM orders WHERE ref = $1`,
+    [ref],
+  );
 const adminKey = { 'x-admin-key': ADMIN_KEY };
 /** The signed-in customer that holds the bookings orders are made from. */
 let customer;
@@ -64,7 +74,7 @@ async function heldBooking(startTime = '14:00') {
 
 beforeAll(startTestDb);
 beforeEach(async () => {
-  await Centre.create({
+  await insert('centres', {
     ref: 'CTR-NSK-001',
     cityRef: 'CITY-NSK',
     city: 'Nashik',
@@ -180,7 +190,7 @@ describe('idempotency and one open order per purchase', () => {
     const reused = await postOrder(fromQuote(other.ref), 'same-key');
     expect(reused.status).toBe(409);
     expect(reused.body.error.code).toBe('IDEMPOTENCY_KEY_REUSED');
-    expect(await Order.countDocuments()).toBe(1);
+    expect(await count('orders')).toBe(1);
   });
 
   it('turns parallel requests with one key into one order', async () => {
@@ -188,13 +198,16 @@ describe('idempotency and one open order per purchase', () => {
     const results = await Promise.all([1, 2, 3, 4].map(() => postOrder(fromQuote(quote.ref), 'twin-key')));
     expect(results.map((r) => r.status).sort()).toEqual([200, 200, 200, 201]);
     expect(new Set(results.map((r) => r.body.data.ref)).size).toBe(1);
-    expect(await Order.countDocuments()).toBe(1);
+    expect(await count('orders')).toBe(1);
   });
 
-  /** Makes the next `n` order lookups miss, as if they ran just before a concurrent same-key request committed. */
+  /**
+   * Makes the next lookups miss, as if they ran just before a concurrent same-key request committed:
+   * first the replay lookup by Idempotency-Key, then the open-order check for the source.
+   */
   const missLookups = (n) => {
-    const spy = vi.spyOn(Order, 'findOne');
-    for (let i = 0; i < n; i++) spy.mockImplementationOnce(() => ({ lean: async () => null }));
+    vi.spyOn(repo, 'findOrderByIdempotencyKey').mockImplementationOnce(async () => null);
+    if (n > 1) vi.spyOn(repo, 'findOpenOrderForSource').mockImplementationOnce(async () => null);
   };
 
   it('replays, not refuses, when its own key order appears after the replay lookup', async () => {
@@ -213,7 +226,7 @@ describe('idempotency and one open order per purchase', () => {
     const second = await postOrder(fromQuote(quote.ref), 'race-key');
     expect(second.status).toBe(200);
     expect(second.body.data.ref).toBe(first.body.data.ref);
-    expect(await Order.countDocuments()).toBe(1);
+    expect(await count('orders')).toBe(1);
   });
 
   it('allows one open order per source; others get its ref', async () => {
@@ -232,7 +245,7 @@ describe('idempotency and one open order per purchase', () => {
     for (const res of results.filter((r) => r.status === 409)) {
       expect(res.body.error).toMatchObject({ code: 'ORDER_ALREADY_OPEN', details: { ref: winner } });
     }
-    expect(await Order.countDocuments()).toBe(1);
+    expect(await count('orders')).toBe(1);
   });
 
   it('allows a new order once the open one is cancelled', async () => {
@@ -259,7 +272,7 @@ describe('lifecycle', () => {
     const lapse = new Date(booking.expiresAt);
     expect((await service.getOrder(order.ref, new Date(lapse.getTime() - 1))).status).toBe('PENDING_PAYMENT');
     expect((await service.getOrder(order.ref, lapse)).status).toBe('EXPIRED');
-    const stored = await Order.findOne({ ref: order.ref }).lean();
+    const stored = await storedOrder(order.ref);
     expect(stored.status).toBe('EXPIRED');
     expect(stored.history.at(-1)).toMatchObject({ status: 'EXPIRED', actor: 'system' });
     await expect(service.cancelOrder(order.ref, 'public', lapse)).rejects.toMatchObject({ code: 'ORDER_EXPIRED' });
@@ -270,7 +283,7 @@ describe('lifecycle', () => {
     const { order } = await service.createOrder(fromQuote(quote.ref), key());
     const at = new Date(quote.validUntil);
     expect((await service.getOrder(order.ref, at)).status).toBe('EXPIRED');
-    expect(await Order.countDocuments({ status: 'PENDING_PAYMENT' })).toBe(0);
+    expect(await count('orders', `status = 'PENDING_PAYMENT'`)).toBe(0);
   });
 
   it('is cancelled by the system once its booking is no longer held', async () => {
@@ -284,7 +297,7 @@ describe('lifecycle', () => {
       await release(booking.ref);
       const res = await request(app).get(`/api/v1/orders/${created.body.data.ref}`);
       expect(res.body.data.status).toBe('CANCELLED');
-      const stored = await Order.findOne({ ref: created.body.data.ref }).lean();
+      const stored = await storedOrder(created.body.data.ref);
       expect(stored.history.at(-1)).toMatchObject({ actor: 'system', reason: 'SOURCE_UNAVAILABLE' });
     }
   });
@@ -303,7 +316,7 @@ describe('lifecycle', () => {
     const quote = await acceptedQuote();
     const { ref } = (await postOrder(fromQuote(quote.ref))).body.data;
     // Nothing in the API can set PAID yet; simulate what a verified gateway payment will do.
-    await Order.updateOne({ ref }, { $set: { status: 'PAID' } });
+    await query(`UPDATE orders SET status = 'PAID' WHERE ref = $1`, [ref]);
     const res = await request(app).post(`/api/v1/orders/${ref}/cancel`);
     expect(res.status).toBe(409);
     expect(res.body.error.code).toBe('INVALID_STATUS_TRANSITION');
@@ -319,7 +332,7 @@ describe('lifecycle', () => {
     ]) {
       expect(res.status).toBe(404);
     }
-    expect((await Order.findOne({ ref }).lean()).status).toBe('PENDING_PAYMENT');
+    expect((await storedOrder(ref)).status).toBe('PENDING_PAYMENT');
   });
 });
 
@@ -392,7 +405,7 @@ describe('staff list and privacy', () => {
     const created = await postOrder(fromBooking(booking.ref), 'privacy-key');
     const fromQuoteRes = await postOrder(fromQuote(quote.ref));
     const read = await request(app).get(`/api/v1/orders/${created.body.data.ref}`);
-    const stored = await Order.findOne({ ref: created.body.data.ref }).lean();
+    const stored = await storedOrder(created.body.data.ref);
 
     const FIELDS = [
       'createdAt',

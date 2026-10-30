@@ -117,12 +117,25 @@ Old URLs (`/virtual-office.html`, …) redirect to the new routes.
 
 ## Connecting to the API
 
-The site runs on its built-in local data by default, which is what the static deployment serves today.
-Point it at the backend by setting `VITE_API_URL` at build time:
+The site runs on its built-in local data by default. Point it at the backend by setting `VITE_API_URL` at
+build time — it is baked into the bundle, and must end in `/api/v1`:
 
 ```bash
-VITE_API_URL=http://localhost:5000/api/v1 npm run build
+VITE_API_URL=http://localhost:5000/api/v1 npm run build                            # a local API
+VITE_API_URL=https://vdesk-api.shoaibk-mca2024.workers.dev/api/v1 npm run build    # the deployment
 ```
+
+## Deploying
+
+The site is a static-asset Worker on Cloudflare (`wrangler.jsonc`, SPA fallback so deep links survive a
+refresh). Build with the API URL above, then:
+
+```bash
+npx wrangler deploy      # https://vdesk.shoaibk-mca2024.workers.dev
+```
+
+The API only accepts browser calls from the origins in its `CORS_ORIGINS`, so a new site domain has to be
+added there **before** the site starts calling from it. Full runbook: `docs/deployment.md`.
 
 `src/lib/api.js` is the single client: it adds the JSON headers, sends the staff refresh cookie,
 applies a timeout, and turns the API's `{ error: { code, message } }` envelope into an `ApiError`.

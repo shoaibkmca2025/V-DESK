@@ -4,12 +4,10 @@
  * HTTP surface, auth and privacy are covered in booking.test.js.
  * Run: npx vitest run src/modules/booking/booking.service.test.js
  */
-import mongoose from 'mongoose';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
-import { Centre } from '../catalog/catalog.model.js';
+import { clearTestDb, count, insert, query, row, rows, startTestDb, stopTestDb } from '../../../test/db.js';
 import { BOOKING_TRANSITIONS, HOLD_SECONDS } from './booking.constants.js';
-import { Booking, BookingSlot } from './booking.model.js';
+import * as repo from './booking.repository.js';
 import * as service from './booking.service.js';
 import { addDays, formatSlot, isCalendarDate, istDate, istInstant } from './booking.time.js';
 import { holdBody } from './booking.validation.js';
@@ -19,6 +17,9 @@ const NOW = new Date('2026-10-11T03:30:00.000Z');
 const TODAY = '2026-10-11';
 const TOMORROW = '2026-10-12';
 const later = (seconds) => new Date(NOW.getTime() + seconds * 1000);
+
+/** The centres these tests price and book against. */
+const insertCentres = (centres) => Promise.all(centres.map((centre) => insert('centres', centre)));
 
 let seq = 0;
 const nextKey = () => `key-${++seq}`;
@@ -45,17 +46,36 @@ function body({ customer, customerRef, ...overrides } = {}) {
 }
 
 const hold = (overrides, key = nextKey(), now = NOW) => service.holdBooking(body(overrides), key, now);
-const slotHours = async (bookingRef) =>
-  (await BookingSlot.find({ bookingRef }).sort({ hour: 1 }).lean()).map((s) => s.hour);
 
-beforeAll(async () => {
-  await startTestDb();
-  // These tests run on a fixed clock in the real past, so every hold's expiresAt has already passed in real time;
-  // stop the TTL monitor deleting slots mid-test. Expiry is asserted on the service's own clock instead.
-  await mongoose.connection.db.admin().command({ setParameter: 1, ttlMonitorEnabled: false });
-});
+/** The hours one booking holds, in order. */
+const slotHours = async (bookingRef) =>
+  (await rows('SELECT hour FROM booking_slots WHERE booking_ref = $1 ORDER BY hour', [bookingRef])).map((s) => s.hour);
+
+/** How many hours are reserved: all of them, one booking's, or only its permanent (confirmed) ones. */
+const slotCount = (where, params) => count('booking_slots', where, params);
+const heldBy = (bookingRef) => slotCount('booking_ref = $1', [bookingRef]);
+const permanentlyHeldBy = (bookingRef) => slotCount('booking_ref = $1 AND expires_at IS NULL', [bookingRef]);
+
+/** A stored booking, under the field names the module uses. */
+const storedBooking = (where, params) =>
+  row(
+    `SELECT ref, status, centre_ref AS "centreRef", hub, room, "date", start_hour AS "startHour", duration,
+            starts_at AS "startsAt", ends_at AS "endsAt", attendees, customer_ref AS "customerRef",
+            customer, pricing, expires_at AS "expiresAt", history,
+            idempotency_key AS "idempotencyKey", request_hash AS "requestHash",
+            created_at AS "createdAt", updated_at AS "updatedAt"
+       FROM bookings WHERE ${where}`,
+    params,
+  );
+
+beforeAll(startTestDb);
+/*
+ * These tests run on a fixed clock in the real past, so every hold's expiresAt has already passed in real
+ * time. Nothing deletes those rows behind the tests' back: purging expired rows is a worker job, not a
+ * database feature, and it is not running here. Expiry is asserted on the service's own clock.
+ */
 beforeEach(() =>
-  Centre.create([
+  insertCentres([
     {
       ref: 'CTR-NSK-001',
       cityRef: 'CITY-NSK',
@@ -169,7 +189,7 @@ describe('holdBooking', () => {
     expect(await slotHours(booking.ref)).toEqual([14, 15]);
 
     // A later price change does not touch the stored booking.
-    const stored = await Booking.findOne({ ref: booking.ref }).lean();
+    const stored = await storedBooking('ref = $1', [booking.ref]);
     expect(stored.pricing.total_paise).toBe(188564);
   });
 
@@ -227,8 +247,8 @@ describe('holdBooking', () => {
     const replay = await hold({}, 'same-key', later(5));
     expect(replay.created).toBe(false);
     expect(replay.booking.ref).toBe(first.booking.ref);
-    expect(await Booking.countDocuments()).toBe(1);
-    expect(await BookingSlot.countDocuments()).toBe(2);
+    expect(await count('bookings')).toBe(1);
+    expect(await slotCount()).toBe(2);
 
     await expect(hold({ attendees: 4 }, 'same-key')).rejects.toMatchObject({ code: 'IDEMPOTENCY_KEY_REUSED' });
   });
@@ -242,8 +262,8 @@ describe('holdBooking', () => {
     }
     expect(new Set(results.map((r) => r.booking.ref)).size).toBe(1);
     expect(results.filter((r) => r.created)).toHaveLength(1);
-    expect(await Booking.countDocuments()).toBe(1);
-    expect(await BookingSlot.countDocuments()).toBe(2);
+    expect(await count('bookings')).toBe(1);
+    expect(await slotCount()).toBe(2);
   });
 
   it('caps unexpired holds per mobile', async () => {
@@ -287,9 +307,9 @@ describe('overlap protection', () => {
     for (const lost of results.filter((r) => r.status === 'rejected')) {
       expect(lost.reason.code).toBe('SLOT_UNAVAILABLE');
     }
-    expect(await Booking.countDocuments()).toBe(1);
+    expect(await count('bookings')).toBe(1);
     expect(await slotHours(won[0].value.booking.ref)).toHaveLength(2);
-    expect(await BookingSlot.countDocuments()).toBe(2);
+    expect(await slotCount()).toBe(2);
   });
 
   it('releases the hours it inserted when a later hour is taken', async () => {
@@ -299,21 +319,21 @@ describe('overlap protection', () => {
       code: 'SLOT_UNAVAILABLE',
       details: { taken: ['12:00'] },
     });
-    expect((await BookingSlot.find().lean()).map((s) => s.hour)).toEqual([12]);
-    expect(await Booking.countDocuments()).toBe(1);
+    expect((await rows('SELECT hour FROM booking_slots')).map((s) => s.hour)).toEqual([12]);
+    expect(await count('bookings')).toBe(1);
     // The failed key can be retried once the clash is gone.
     expect((await hold(other({ startTime: '09:00', duration: 3 }))).created).toBe(true);
   });
 
   it('rolls back on an unexpected failure part-way through inserting slots', async () => {
-    const realInsert = BookingSlot.insertMany.bind(BookingSlot);
-    vi.spyOn(BookingSlot, 'insertMany').mockImplementationOnce(async (docs) => {
-      await realInsert(docs.slice(0, 1));
+    const realInsert = repo.insertSlots;
+    vi.spyOn(repo, 'insertSlots').mockImplementationOnce(async (slots) => {
+      await realInsert(slots.slice(0, 1));
       throw new Error('connection reset');
     });
     await expect(hold({ startTime: '10:00', duration: 3 })).rejects.toThrow('connection reset');
-    expect(await BookingSlot.countDocuments()).toBe(0);
-    expect(await Booking.countDocuments()).toBe(0);
+    expect(await slotCount()).toBe(0);
+    expect(await count('bookings')).toBe(0);
   });
 });
 
@@ -332,11 +352,11 @@ describe('hold expiry', () => {
     expect(avail.slots.filter((s) => !s.available)).toEqual([]);
 
     // The lapsed slot documents are still there (TTL not run) — a new hold takes the hours anyway.
-    expect(await BookingSlot.countDocuments({ bookingRef: booking.ref })).toBe(2);
+    expect(await heldBy(booking.ref)).toBe(2);
     const next = await hold({ customer: { name: 'Next', mobile: '9123456780' } }, nextKey(), later(HOLD_SECONDS));
     expect(next.created).toBe(true);
     expect(await slotHours(next.booking.ref)).toEqual([14, 15]);
-    expect(await BookingSlot.countDocuments({ bookingRef: booking.ref })).toBe(0);
+    expect(await heldBy(booking.ref)).toBe(0);
   });
 });
 
@@ -348,7 +368,7 @@ describe('confirm, cancel and staff moves', () => {
     const confirmed = await service.confirmBooking(booking.ref, 'USR-OPS', later(HOLD_SECONDS - 1));
     expect(confirmed.status).toBe('CONFIRMED');
     expect(confirmed.history.at(-1)).toMatchObject({ status: 'CONFIRMED', actor: 'USR-OPS' });
-    expect(await BookingSlot.countDocuments({ bookingRef: booking.ref, expiresAt: null })).toBe(2);
+    expect(await permanentlyHeldBy(booking.ref)).toBe(2);
 
     const avail = await service.getAvailability(
       { centreRef: 'CTR-NSK-001', room: 'Conference Room', date: TOMORROW },
@@ -369,20 +389,21 @@ describe('confirm, cancel and staff moves', () => {
       status: 409,
       code: 'HOLD_EXPIRED',
     });
-    expect((await Booking.findOne({ ref: booking.ref }).lean()).status).toBe('EXPIRED');
-    expect(await BookingSlot.countDocuments({ bookingRef: booking.ref })).toBe(0);
+    expect((await storedBooking('ref = $1', [booking.ref])).status).toBe('EXPIRED');
+    expect(await heldBy(booking.ref)).toBe(0);
   });
 
   it('never confirms a hold that lost its hours, and cancels it', async () => {
     const { booking } = await hold();
-    await BookingSlot.deleteOne({ bookingRef: booking.ref, hour: 15 }); // e.g. a crash mid-hold
+    // e.g. a crash mid-hold
+    await query('DELETE FROM booking_slots WHERE booking_ref = $1 AND hour = 15', [booking.ref]);
     await expect(service.confirmBooking(booking.ref, 'USR-OPS', later(10))).rejects.toMatchObject({
       code: 'SLOT_UNAVAILABLE',
     });
-    const stored = await Booking.findOne({ ref: booking.ref }).lean();
+    const stored = await storedBooking('ref = $1', [booking.ref]);
     expect(stored.status).toBe('CANCELLED');
     expect(stored.history.at(-1)).toMatchObject({ status: 'CANCELLED', actor: 'system' });
-    expect(await BookingSlot.countDocuments()).toBe(0);
+    expect(await slotCount()).toBe(0);
   });
 
   it('lets only one of two parallel confirmations win', async () => {
@@ -391,17 +412,17 @@ describe('confirm, cancel and staff moves', () => {
       service.confirmBooking(booking.ref, 'USR-A', later(10)),
       service.confirmBooking(booking.ref, 'USR-B', later(10)),
     ]);
-    const stored = await Booking.findOne({ ref: booking.ref }).lean();
+    const stored = await storedBooking('ref = $1', [booking.ref]);
     expect(stored.status).toBe('CONFIRMED');
     expect(stored.history.filter((h) => h.status === 'CONFIRMED')).toHaveLength(1);
     expect(results.some((r) => r.status === 'fulfilled')).toBe(true);
-    expect(await BookingSlot.countDocuments({ bookingRef: booking.ref, expiresAt: null })).toBe(2);
+    expect(await permanentlyHeldBy(booking.ref)).toBe(2);
   });
 
   it('lets the customer cancel a hold, freeing the hours; repeating is a no-op', async () => {
     const { booking } = await hold();
     expect((await service.cancelHold(booking.ref, later(10))).status).toBe('CANCELLED');
-    expect(await BookingSlot.countDocuments()).toBe(0);
+    expect(await slotCount()).toBe(0);
     expect((await service.cancelHold(booking.ref, later(20))).status).toBe('CANCELLED');
     await expect(service.confirmBooking(booking.ref, 'USR-OPS', later(30))).rejects.toMatchObject({
       code: 'INVALID_STATUS_TRANSITION',
@@ -416,7 +437,7 @@ describe('confirm, cancel and staff moves', () => {
     });
     const cancelled = await service.setStatusByStaff(booking.ref, 'CANCELLED', 'USR-OPS', later(30));
     expect(cancelled.status).toBe('CANCELLED');
-    expect(await BookingSlot.countDocuments()).toBe(0);
+    expect(await slotCount()).toBe(0);
   });
 
   it('walks CONFIRMED → CHECKED_IN → COMPLETED and refuses illegal moves', async () => {
@@ -435,7 +456,7 @@ describe('confirm, cancel and staff moves', () => {
     });
     expect((await service.setStatusByStaff(booking.ref, 'COMPLETED', 'USR-OPS', later(30))).status).toBe('COMPLETED');
     // Completed bookings keep their hours on record.
-    expect(await BookingSlot.countDocuments({ bookingRef: booking.ref })).toBe(2);
+    expect(await heldBy(booking.ref)).toBe(2);
   });
 
   it('saves EXPIRED when anything acts on a lapsed hold', async () => {
@@ -443,7 +464,7 @@ describe('confirm, cancel and staff moves', () => {
     await expect(service.cancelHold(booking.ref, later(HOLD_SECONDS + 1))).rejects.toMatchObject({
       code: 'HOLD_EXPIRED',
     });
-    expect((await Booking.findOne({ ref: booking.ref }).lean()).status).toBe('EXPIRED');
+    expect((await storedBooking('ref = $1', [booking.ref])).status).toBe('EXPIRED');
   });
 });
 
@@ -451,8 +472,8 @@ describe('confirm, cancel and staff moves', () => {
 
 /** The status a booking is in and the hours it holds, checked against the slot invariants. */
 async function assertConsistent(ref) {
-  const booking = await Booking.findOne({ ref }).lean();
-  const slots = await BookingSlot.find({ bookingRef: ref }).lean();
+  const booking = await storedBooking('ref = $1', [ref]);
+  const slots = await rows('SELECT hour, expires_at AS "expiresAt" FROM booking_slots WHERE booking_ref = $1', [ref]);
   const permanent = slots.filter((s) => s.expiresAt === null).length;
   if (['CONFIRMED', 'CHECKED_IN'].includes(booking.status)) {
     expect(permanent).toBe(booking.duration);
@@ -463,27 +484,27 @@ async function assertConsistent(ref) {
   return booking.status;
 }
 
-/** Makes the next Booking status write to `status` fail as if the process died there. */
+/** Makes the next booking status write to `status` fail as if the process died there. */
 function crashOnStatusWrite(status) {
-  const real = Booking.findOneAndUpdate.bind(Booking);
+  const real = repo.updateBookingStatus;
   let armed = true;
-  vi.spyOn(Booking, 'findOneAndUpdate').mockImplementation((filter, update, options) => {
-    if (armed && update?.$set?.status === status) {
+  vi.spyOn(repo, 'updateBookingStatus').mockImplementation(async (ref, from, to, entry, options) => {
+    if (armed && to === status) {
       armed = false;
-      return { lean: async () => Promise.reject(new Error('process crashed')) };
+      throw new Error('process crashed');
     }
-    return real(filter, update, options);
+    return real(ref, from, to, entry, options);
   });
 }
 
 /** Holds the next slot insert until `release()` — lets a test act while a hold is half-way through. */
 function pauseSlotInsert() {
-  const real = BookingSlot.insertMany.bind(BookingSlot);
+  const real = repo.insertSlots;
   let release;
   let entered;
   const gate = new Promise((resolve) => (release = resolve));
   const reached = new Promise((resolve) => (entered = resolve));
-  vi.spyOn(BookingSlot, 'insertMany').mockImplementationOnce(async (...args) => {
+  vi.spyOn(repo, 'insertSlots').mockImplementationOnce(async (...args) => {
     entered();
     await gate;
     return real(...args);
@@ -500,16 +521,12 @@ const takenAt = async (date, now) =>
 describe('confirmation ordering (review F1–F3)', () => {
   it('makes every hour permanent before the booking reads CONFIRMED', async () => {
     const { booking } = await hold();
-    const real = Booking.findOneAndUpdate.bind(Booking);
+    const real = repo.updateBookingStatus;
     const seen = [];
-    vi.spyOn(Booking, 'findOneAndUpdate').mockImplementation((filter, update, options) => ({
-      lean: async () => {
-        if (update?.$set?.status === 'CONFIRMED') {
-          seen.push(await BookingSlot.countDocuments({ bookingRef: filter.ref, expiresAt: null }));
-        }
-        return real(filter, update, options).lean();
-      },
-    }));
+    vi.spyOn(repo, 'updateBookingStatus').mockImplementation(async (ref, from, to, entry, options) => {
+      if (to === 'CONFIRMED') seen.push(await permanentlyHeldBy(ref));
+      return real(ref, from, to, entry, options);
+    });
     await service.confirmBooking(booking.ref, 'USR-OPS', later(10));
     expect(seen).toEqual([2]);
   });
@@ -520,7 +537,7 @@ describe('confirmation ordering (review F1–F3)', () => {
     await expect(service.confirmBooking(booking.ref, 'USR-OPS', later(10))).rejects.toThrow('process crashed');
     vi.restoreAllMocks();
 
-    expect((await Booking.findOne({ ref: booking.ref }).lean()).status).toBe('HELD');
+    expect((await storedBooking('ref = $1', [booking.ref])).status).toBe('HELD');
     await expect(service.getPass(booking.ref)).rejects.toMatchObject({ code: 'PASS_NOT_AVAILABLE' });
     expect(await takenAt(TOMORROW, later(10))).toEqual(['14:00', '15:00']);
 
@@ -528,7 +545,7 @@ describe('confirmation ordering (review F1–F3)', () => {
     expect(await takenAt(TOMORROW, later(HOLD_SECONDS))).toEqual([]);
     const next = await hold({ customer: { name: 'Next', mobile: '9123456780' } }, nextKey(), later(HOLD_SECONDS));
     expect(next.created).toBe(true);
-    expect((await Booking.findOne({ ref: booking.ref }).lean()).status).toBe('EXPIRED');
+    expect((await storedBooking('ref = $1', [booking.ref])).status).toBe('EXPIRED');
     await assertConsistent(booking.ref);
     await assertConsistent(next.booking.ref);
   });
@@ -583,7 +600,7 @@ describe('confirmation ordering (review F1–F3)', () => {
       ]);
       const status = await assertConsistent(booking.ref);
       expect(['CONFIRMED', 'EXPIRED']).toContain(status);
-      const stored = await Booking.findOne({ ref: booking.ref }).lean();
+      const stored = await storedBooking('ref = $1', [booking.ref]);
       expect(stored.history.filter((h) => h.status === 'CONFIRMED').length).toBe(status === 'CONFIRMED' ? 1 : 0);
     }
   });
@@ -593,12 +610,12 @@ describe('leftover slots never block (review F4)', () => {
   it('a crash between a staff cancellation and its slot clean-up does not block the hours', async () => {
     const { booking } = await hold();
     await service.confirmBooking(booking.ref, 'USR-OPS', later(10));
-    vi.spyOn(BookingSlot, 'deleteMany').mockRejectedValueOnce(new Error('process crashed'));
+    vi.spyOn(repo, 'deleteSlotsForBooking').mockRejectedValueOnce(new Error('process crashed'));
     await expect(service.setStatusByStaff(booking.ref, 'CANCELLED', 'USR-OPS', later(20))).rejects.toThrow();
     vi.restoreAllMocks();
 
-    expect((await Booking.findOne({ ref: booking.ref }).lean()).status).toBe('CANCELLED');
-    expect(await BookingSlot.countDocuments({ bookingRef: booking.ref, expiresAt: null })).toBe(2);
+    expect((await storedBooking('ref = $1', [booking.ref])).status).toBe('CANCELLED');
+    expect(await permanentlyHeldBy(booking.ref)).toBe(2);
     expect(await takenAt(TOMORROW, later(30))).toEqual([]);
     const next = await hold({ customer: { name: 'Next', mobile: '9123456780' } }, nextKey(), later(30));
     expect(next.created).toBe(true);
@@ -606,7 +623,7 @@ describe('leftover slots never block (review F4)', () => {
   });
 
   it('ignores and clears slots whose booking no longer exists', async () => {
-    await BookingSlot.create({
+    await insert('booking_slots', {
       centreRef: 'CTR-NSK-001',
       room: 'Conference Room',
       date: TOMORROW,
@@ -615,7 +632,7 @@ describe('leftover slots never block (review F4)', () => {
     });
     expect(await takenAt(TOMORROW, NOW)).toEqual([]);
     expect((await hold()).created).toBe(true);
-    expect(await BookingSlot.countDocuments({ bookingRef: 'BK-GONE' })).toBe(0);
+    expect(await heldBy('BK-GONE')).toBe(0);
   });
 });
 
@@ -661,14 +678,14 @@ describe('expired holds and the transition table (review F6)', () => {
     for (const [from, setup] of Object.entries(setups)) {
       for (const to of ['CHECKED_IN', 'COMPLETED', 'CANCELLED']) {
         const ref = await setup(i++);
-        const kept = await BookingSlot.countDocuments({ bookingRef: ref });
+        const kept = await heldBy(ref);
         const attempt = service.setStatusByStaff(ref, to, 'USR-OPS', later(10));
         if (from === to || BOOKING_TRANSITIONS[from].includes(to)) {
           expect((await attempt).status).toBe(to);
-          expect(await BookingSlot.countDocuments({ bookingRef: ref })).toBe(to === 'CANCELLED' ? 0 : kept);
+          expect(await heldBy(ref)).toBe(to === 'CANCELLED' ? 0 : kept);
         } else {
           await expect(attempt).rejects.toMatchObject({ status: 409, code: 'INVALID_STATUS_TRANSITION' });
-          expect(await BookingSlot.countDocuments({ bookingRef: ref })).toBe(kept);
+          expect(await heldBy(ref)).toBe(kept);
         }
         await assertConsistent(ref);
       }
@@ -688,7 +705,7 @@ describe('idempotency while the original is in flight (review F5)', () => {
 
     const replay = await hold({}, 'in-flight');
     expect(replay).toMatchObject({ created: false, booking: { ref: booking.ref } });
-    expect(await BookingSlot.countDocuments()).toBe(2);
+    expect(await slotCount()).toBe(2);
   });
 
   it('never hands out a ref that the original then rolls back', async () => {
@@ -700,7 +717,7 @@ describe('idempotency while the original is in flight (review F5)', () => {
     paused.release();
     await expect(original).rejects.toMatchObject({ code: 'SLOT_UNAVAILABLE' });
 
-    expect(await Booking.countDocuments()).toBe(1);
+    expect(await count('bookings')).toBe(1);
     // With the key free again, a retry is a fresh attempt.
     await expect(hold({}, 'doomed')).rejects.toMatchObject({ code: 'SLOT_UNAVAILABLE' });
   });
@@ -713,22 +730,22 @@ describe('idempotency while the original is in flight (review F5)', () => {
  * rollback dies too, leaving a HELD booking (holding the Idempotency-Key) with incomplete slots.
  */
 async function crashMidHold(key, inserted, overrides) {
-  const realInsert = BookingSlot.insertMany.bind(BookingSlot);
-  vi.spyOn(BookingSlot, 'insertMany').mockImplementationOnce(async (docs) => {
-    if (inserted > 0) await realInsert(docs.slice(0, inserted));
+  const realInsert = repo.insertSlots;
+  vi.spyOn(repo, 'insertSlots').mockImplementationOnce(async (slots) => {
+    if (inserted > 0) await realInsert(slots.slice(0, inserted));
     throw new Error('process crashed');
   });
-  vi.spyOn(BookingSlot, 'deleteMany').mockRejectedValueOnce(new Error('process crashed'));
+  vi.spyOn(repo, 'deleteSlotsForBooking').mockRejectedValueOnce(new Error('process crashed'));
   await expect(hold(overrides, key)).rejects.toThrow('process crashed');
   vi.restoreAllMocks();
-  return Booking.findOne({ idempotencyKey: key }).lean();
+  return storedBooking('idempotency_key = $1', [key]);
 }
 
 describe('a hold whose process died before reserving its hours', () => {
   it('answers IDEMPOTENCY_KEY_IN_PROGRESS with the worst-case wait until it lapses, then replays EXPIRED for good', async () => {
     const stuck = await crashMidHold('stuck-key', 1);
     expect(stuck.status).toBe('HELD');
-    expect(await BookingSlot.countDocuments({ bookingRef: stuck.ref })).toBe(1);
+    expect(await heldBy(stuck.ref)).toBe(1);
 
     for (const at of [later(1), later(HOLD_SECONDS - 1)]) {
       await expect(hold({}, 'stuck-key', at)).rejects.toMatchObject({
@@ -741,7 +758,7 @@ describe('a hold whose process died before reserving its hours', () => {
       const replay = await hold({}, 'stuck-key', at);
       expect(replay).toMatchObject({ created: false, booking: { ref: stuck.ref, status: 'EXPIRED' } });
     }
-    expect(await Booking.countDocuments()).toBe(1);
+    expect(await count('bookings')).toBe(1);
   });
 
   it('blocks only the hours it inserted, and only until it lapses; a new key never duplicates it', async () => {
@@ -754,7 +771,7 @@ describe('a hold whose process died before reserving its hours', () => {
     expect(fresh.created).toBe(true);
     expect(await assertConsistent(stuck.ref)).toBe('EXPIRED');
     expect(await assertConsistent(fresh.booking.ref)).toBe('HELD');
-    expect(await Booking.countDocuments({ status: 'HELD' })).toBe(1);
+    expect(await count('bookings', `status = 'HELD'`)).toBe(1);
   });
 
   it('blocks nothing when it died before inserting any hour', async () => {

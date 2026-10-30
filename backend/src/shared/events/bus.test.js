@@ -1,16 +1,28 @@
 /**
- * Event bus / outbox — integration tests on the test replica set (real transactions).
+ * Event bus / outbox — integration tests on a real PostgreSQL (real transactions).
  * Each test uses its own event type, because subscriptions are registered process-wide.
  * Run: npx vitest run src/shared/events/bus.test.js
  */
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
-import { withTransaction } from '../lib/transactions.js';
+import { clearTestDb, query, row, rows, startTestDb, stopTestDb } from '../../../test/db.js';
+import { withTransaction } from '../lib/sql.js';
 import { MAX_ATTEMPTS, RETRY_DELAYS_SECONDS, dispatchDueEvents, publish, subscribe } from './bus.js';
-import { DomainEvent } from './events.model.js';
 
 const entity = { type: 'lead', ref: 'VD-TEST-0001' };
 const later = (date, seconds) => new Date(date.getTime() + seconds * 1000);
+
+/** One stored event, under the field names the bus and its handlers use. */
+const storedEvent = (ref) =>
+  row(
+    `SELECT ref, type, version, status, handled, attempts, payload,
+            jsonb_build_object('type', actor_type, 'id', actor_id) AS actor,
+            jsonb_build_object('type', entity_type, 'ref', entity_ref) AS entity,
+            next_attempt_at AS "nextAttemptAt", claim_token AS "claimToken",
+            lease_until AS "leaseUntil", last_error AS "lastError",
+            completed_at AS "completedAt", expire_at AS "expireAt"
+       FROM domain_events WHERE ref = $1`,
+    [ref],
+  );
 
 beforeAll(startTestDb);
 afterEach(clearTestDb);
@@ -18,15 +30,15 @@ afterAll(stopTestDb);
 
 describe('publish', () => {
   it('saves the event only if the transaction commits', async () => {
-    await withTransaction((session) => publish({ type: 'test.committed', entity }, { session }));
+    await withTransaction((tx) => publish({ type: 'test.committed', entity }, { session: tx }));
     await expect(
-      withTransaction(async (session) => {
-        await publish({ type: 'test.rolled_back', entity }, { session });
+      withTransaction(async (tx) => {
+        await publish({ type: 'test.rolled_back', entity }, { session: tx });
         throw new Error('the business write failed');
       }),
     ).rejects.toThrow('the business write failed');
 
-    const types = (await DomainEvent.find().lean()).map((e) => e.type);
+    const types = (await rows('SELECT type FROM domain_events ORDER BY created_at')).map((e) => e.type);
     expect(types).toEqual(['test.committed']);
   });
 
@@ -37,9 +49,8 @@ describe('publish', () => {
       actor: { type: 'user', id: 'USR-1' },
       payload: { a: 1 },
     });
-    const doc = await DomainEvent.findOne({ ref }).lean();
     expect(ref).toMatch(/^DE-[A-Z0-9]+$/);
-    expect(doc).toMatchObject({
+    expect(await storedEvent(ref)).toMatchObject({
       type: 'test.shape',
       version: 1,
       actor: { type: 'user', id: 'USR-1' },
@@ -67,7 +78,7 @@ describe('dispatchDueEvents', () => {
     expect(first.mock.calls[0][0]).toMatchObject({ ref, type: 'test.delivered', entity, payload: { n: 1 } });
     expect(second).toHaveBeenCalledOnce();
 
-    const doc = await DomainEvent.findOne({ ref }).lean();
+    const doc = await storedEvent(ref);
     expect(doc).toMatchObject({ status: 'DONE', handled: ['first', 'second'], claimToken: null });
     expect(doc.expireAt.getTime()).toBeGreaterThan(Date.now() + 29 * 86400_000);
     expect(await dispatchDueEvents()).toEqual({ done: 0, retry: 0, dead: 0, lost: 0 });
@@ -87,7 +98,7 @@ describe('dispatchDueEvents', () => {
     const { ref } = await publish({ type: 'test.partial', entity, occurredAt: start });
 
     expect((await dispatchDueEvents({ now: start })).retry).toBe(1);
-    let doc = await DomainEvent.findOne({ ref }).lean();
+    let doc = await storedEvent(ref);
     expect(doc).toMatchObject({ status: 'PENDING', handled: ['ok'], lastError: { handler: 'flaky', code: 'TIMEOUT' } });
     expect(doc.nextAttemptAt).toEqual(later(start, RETRY_DELAYS_SECONDS[0]));
 
@@ -96,7 +107,7 @@ describe('dispatchDueEvents', () => {
     expect((await dispatchDueEvents({ now: later(start, 11) })).done).toBe(1);
     expect(ok).toHaveBeenCalledOnce();
     expect(flaky).toHaveBeenCalledTimes(2);
-    doc = await DomainEvent.findOne({ ref }).lean();
+    doc = await storedEvent(ref);
     expect(doc).toMatchObject({ status: 'DONE', handled: ['ok', 'flaky'], attempts: 2 });
   });
 
@@ -111,8 +122,7 @@ describe('dispatchDueEvents', () => {
       expect(summary[attempt < MAX_ATTEMPTS ? 'retry' : 'dead']).toBe(1);
       now = later(now, 6 * 3600 + 1);
     }
-    const doc = await DomainEvent.findOne({ ref }).lean();
-    expect(doc).toMatchObject({ status: 'DEAD', attempts: MAX_ATTEMPTS, expireAt: null });
+    expect(await storedEvent(ref)).toMatchObject({ status: 'DEAD', attempts: MAX_ATTEMPTS, expireAt: null });
     expect(await dispatchDueEvents({ now })).toEqual({ done: 0, retry: 0, dead: 0, lost: 0 });
   });
 
@@ -133,9 +143,10 @@ describe('dispatchDueEvents', () => {
     const now = new Date();
     const { ref } = await publish({ type: 'test.crashed', entity, occurredAt: now });
     // A worker claimed it and died without recording anything.
-    await DomainEvent.updateOne(
-      { ref },
-      { $set: { claimToken: 'dead-worker', leaseUntil: later(now, 60) }, $inc: { attempts: 1 } },
+    await query(
+      `UPDATE domain_events SET claim_token = 'dead-worker', lease_until = $2, attempts = attempts + 1
+        WHERE ref = $1`,
+      [ref, later(now, 60)],
     );
 
     expect((await dispatchDueEvents({ now: later(now, 30) })).done).toBe(0);

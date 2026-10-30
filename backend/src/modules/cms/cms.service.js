@@ -13,7 +13,7 @@
 import sanitizeHtml from 'sanitize-html';
 import { AppError, badRequest, conflict, notFound } from '../../shared/errors/AppError.js';
 import { logger } from '../../shared/lib/logger.js';
-import { withTransaction } from '../../shared/lib/transactions.js';
+import { withTransaction } from '../../shared/lib/sql.js';
 import { LEGAL_HTML } from './cms.constants.js';
 import { mapPublic, mapRevision, mapStaff } from './cms.mapper.js';
 import * as repo from './cms.repository.js';

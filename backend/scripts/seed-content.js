@@ -8,13 +8,13 @@
  * Trust claims from the homepage ("10,000+ businesses"…) are created as **drafts only**: they need evidence and a
  * super admin's approval before the API serves them (memory.md §5).
  *
- * Usage (from repo root; needs the monorepo checkout because it reads the frontend files):
+ * Usage (from repo root, after `npm run migrate`; needs the monorepo checkout for the frontend files):
  *   node --env-file-if-exists=backend/.env backend/scripts/seed-content.js
  *
  * Safe to re-run: entries that already exist are left exactly as staff last edited them.
  */
 import { pathToFileURL } from 'node:url';
-import mongoose from 'mongoose';
+import { connectDb, disconnectDb } from '../src/config/db.js';
 import { LEGAL_DOCUMENTS } from '../../frontend/src/content/legal.js';
 import { FAQ_GROUPS } from '../../frontend/src/data/faqs.js';
 import { GUIDES } from '../../frontend/src/data/guides.js';
@@ -84,14 +84,10 @@ export async function seedContent() {
 }
 
 async function main() {
-  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/vdesk';
-  console.log(`[seed-content] connecting to ${uri}`);
-  await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
-  const { detectTransactionSupport } = await import('../src/config/db.js');
-  await detectTransactionSupport();
+  await connectDb();
   const created = await seedContent();
   console.log(`[seed-content] created: ${JSON.stringify(created)} (existing entries left unchanged)`);
-  await mongoose.disconnect();
+  await disconnectDb();
   console.log('[seed-content] done ✓');
 }
 

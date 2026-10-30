@@ -6,9 +6,8 @@
 import request from 'supertest';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { createApp } from '../../app.js';
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
+import { clearTestDb, count, query, startTestDb, stopTestDb } from '../../../test/db.js';
 import { ADMIN_KEY, staffSession } from '../../../test/staff.js';
-import { Lead } from './crm.model.js';
 import { cleanTouch, mobileKey } from './crm.service.js';
 
 const app = createApp();
@@ -26,8 +25,9 @@ const csvLines = (text) =>
     .trim()
     .split('\r\n');
 
-/** Mongoose treats createdAt as immutable, so tests move leads back in time through the raw collection. */
-const backdate = (filter, createdAt) => Lead.collection.updateMany(filter, { $set: { createdAt } });
+/** Pretends a lead was created earlier, to test the windows the service measures from created_at. */
+const backdate = (ref, createdAt) =>
+  query('UPDATE leads SET created_at = $1 WHERE $2::text IS NULL OR ref = $2', [createdAt, ref ?? null]);
 
 beforeAll(startTestDb);
 afterEach(clearTestDb);
@@ -42,13 +42,25 @@ describe('helpers', () => {
   });
 
   it('drops query strings from URLs and empty touches', () => {
+    // Every known field is present, null where this visit didn't carry it, so a stored touch has one shape.
     expect(
       cleanTouch({
         source: 'google',
         referrer: 'https://www.google.com/search?q=rahul+9876543210',
         landingPage: '/virtual-office?utm_source=google#form',
       }),
-    ).toEqual({ source: 'google', referrer: 'https://www.google.com/search', landingPage: '/virtual-office' });
+    ).toEqual({
+      source: 'google',
+      medium: null,
+      campaign: null,
+      term: null,
+      content: null,
+      referrer: 'https://www.google.com/search',
+      landingPage: '/virtual-office',
+      gclid: null,
+      fbclid: null,
+      at: null,
+    });
     expect(cleanTouch({})).toBeNull();
     expect(cleanTouch(undefined)).toBeNull();
   });
@@ -107,7 +119,7 @@ describe('per-contact limit', () => {
     const fourth = await postLead({ mobile: '919876543210', email: 'new@acme.in' });
     expect(fourth.status).toBe(429);
     expect(fourth.body.error.code).toBe('TOO_MANY_ENQUIRIES');
-    expect(await Lead.countDocuments()).toBe(3);
+    expect(await count('leads')).toBe(3);
   });
 
   it('counts the email too, and lets a different contact through', async () => {
@@ -126,7 +138,7 @@ describe('per-contact limit', () => {
 
   it('only looks back one hour', async () => {
     for (let i = 0; i < 3; i++) await postLead({ mobile: '9876543210' });
-    await backdate({}, new Date(Date.now() - 61 * 60 * 1000));
+    await backdate(null, new Date(Date.now() - 61 * 60 * 1000));
     expect((await postLead({ mobile: '9876543210' })).status).toBe(201);
   });
 });
@@ -164,7 +176,7 @@ describe('GET /api/v1/leads/export.csv', () => {
   it('applies the list filters and a created-at window', async () => {
     await postLead({ ref: 'VD-CSV-0101', mobile: '9876543210', city: 'Pune' });
     await postLead({ ref: 'VD-CSV-0102', mobile: '9876543211', city: 'Nashik' });
-    await backdate({ ref: 'VD-CSV-0101' }, new Date('2026-01-15T00:00:00Z'));
+    await backdate('VD-CSV-0101', new Date('2026-01-15T00:00:00Z'));
 
     const pune = csvLines((await staffGet('/export.csv?city=Pune')).text);
     expect(pune.slice(1).map((l) => l.split(',')[0])).toEqual(['VD-CSV-0101']);

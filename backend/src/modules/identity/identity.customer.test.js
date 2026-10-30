@@ -9,10 +9,9 @@
 import request from 'supertest';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { createApp } from '../../app.js';
-import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
+import { clearTestDb, count, query, row, startTestDb, stopTestDb } from '../../../test/db.js';
 import { staffSession } from '../../../test/staff.js';
 import { OTP_MAX_ATTEMPTS, OTP_MAX_SENDS_PER_WINDOW, OTP_RESEND_MS, OTP_TTL_MS } from './identity.constants.js';
-import { Customer, OtpChallenge } from './identity.customer.model.js';
 
 const app = createApp();
 const MOBILE = '9876543210';
@@ -49,7 +48,10 @@ async function signIn({ mobile = MOBILE, name = 'Priya Kulkarni', ...rest } = {}
 
 /** Lets a number ask for another code without waiting out the resend gap. */
 const allowResend = (mobile = MOBILE) =>
-  OtpChallenge.updateOne({ mobile }, { $set: { lastSentAt: new Date(Date.now() - OTP_RESEND_MS - 1000) } });
+  query('UPDATE otp_challenges SET last_sent_at = $2 WHERE mobile = $1', [
+    mobile,
+    new Date(Date.now() - OTP_RESEND_MS - 1000),
+  ]);
 
 // ── Registration & sign-in ────────────────────
 
@@ -68,7 +70,7 @@ describe('POST /api/v1/auth/otp/request', () => {
 
   it('stores the code only as a hash, never in the clear', async () => {
     const code = await codeFor();
-    const stored = await OtpChallenge.findOne({ mobile: MOBILE }).lean();
+    const stored = await row('SELECT code_hash AS "codeHash" FROM otp_challenges WHERE mobile = $1', [MOBILE]);
     expect(stored.codeHash).toMatch(/^[0-9a-f]{64}$/);
     expect(JSON.stringify(stored)).not.toContain(code);
   });
@@ -134,7 +136,7 @@ describe('POST /api/v1/auth/otp/verify', () => {
     const again = await verify({ mobile: MOBILE, code: await codeFor() });
     expect(again.status).toBe(200);
     expect(again.body.data.customer.name).toBe('Priya Kulkarni');
-    expect(await Customer.countDocuments()).toBe(1);
+    expect(await count('customers')).toBe(1);
   });
 
   it('treats a number with and without +91 and spaces as one account', async () => {
@@ -144,7 +146,7 @@ describe('POST /api/v1/auth/otp/verify', () => {
     const res = await verify({ mobile: '+91 98765-43210', code });
     expect(res.status).toBe(200);
     expect(res.body.data.customer.mobile).toBe(MOBILE);
-    expect(await Customer.countDocuments()).toBe(1);
+    expect(await count('customers')).toBe(1);
   });
 
   it('fills in details the account is missing but never overwrites what is there', async () => {
@@ -152,7 +154,10 @@ describe('POST /api/v1/auth/otp/verify', () => {
     await allowResend();
     await signIn({ name: 'Someone Else', email: 'other@elsewhere.in', company: 'Zenith D2C' });
 
-    const stored = await Customer.findOne({ mobile: MOBILE }).lean();
+    const stored = await row(
+      'SELECT name, email, company, last_login_at AS "lastLoginAt" FROM customers WHERE mobile = $1',
+      [MOBILE],
+    );
     expect(stored).toMatchObject({ name: 'Priya Kulkarni', email: 'priya@zenith.in', company: 'Zenith D2C' });
     expect(stored.lastLoginAt).toBeInstanceOf(Date);
   });
@@ -172,7 +177,7 @@ describe('POST /api/v1/auth/otp/verify', () => {
     const locked = await verify({ mobile: MOBILE, code: '000000', name: 'A' });
     expect(locked.status).toBe(429);
     expect(locked.body.error.code).toBe('OTP_ATTEMPTS_EXCEEDED');
-    expect(await Customer.countDocuments()).toBe(0);
+    expect(await count('customers')).toBe(0);
   });
 
   it('spends a code: the same one cannot sign in twice', async () => {
@@ -198,7 +203,7 @@ describe('POST /api/v1/auth/otp/verify', () => {
 
   it('keeps a closed account out, at both steps', async () => {
     await signIn();
-    await Customer.updateOne({ mobile: MOBILE }, { $set: { status: 'disabled' } });
+    await query(`UPDATE customers SET status = 'disabled' WHERE mobile = $1`, [MOBILE]);
     await allowResend();
     const blocked = await requestCode();
     expect(blocked.status).toBe(403);
@@ -227,7 +232,7 @@ describe('customer session', () => {
     expect(
       (await request(app).patch('/api/v1/auth/customer/me').set(bearer(token)).send({ mobile: '9123456780' })).status,
     ).toBe(400);
-    expect((await Customer.findOne({ mobile: MOBILE }).lean()).mobile).toBe(MOBILE);
+    expect(await count('customers', 'mobile = $1', [MOBILE])).toBe(1);
   });
 
   it('rotates the refresh cookie and stops working after signing out', async () => {
@@ -267,7 +272,7 @@ describe('customer session', () => {
       expect(res.status).toBe(401);
     }
 
-    await Customer.updateOne({ mobile: MOBILE }, { $set: { status: 'disabled' } });
+    await query(`UPDATE customers SET status = 'disabled' WHERE mobile = $1`, [MOBILE]);
     const closed = await request(app).get('/api/v1/auth/customer/me').set(bearer(token));
     expect(closed.status).toBe(401);
     expect(closed.body.error.code).toBe('TOKEN_INVALID');

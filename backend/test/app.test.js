@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApp } from '../src/app.js';
+import { isDbReady } from '../src/config/db.js';
 import { startTestDb, stopTestDb } from './db.js';
 
 const app = createApp();
@@ -20,7 +20,7 @@ describe('platform', () => {
     const res = await request(app).get('/ready');
     expect(res.status).toBe(200);
     expect(res.body.data.status).toBe('ready');
-    expect(mongoose.connection.readyState).toBe(1);
+    expect(isDbReady()).toBe(true);
   });
 
   it('unknown routes return the standard error envelope with a request id', async () => {

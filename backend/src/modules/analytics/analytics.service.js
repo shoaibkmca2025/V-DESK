@@ -81,7 +81,7 @@ function rangeStart(range, now) {
 }
 
 const percent = (part, whole) => (whole > 0 ? Math.round((part / whole) * 1000) / 10 : null);
-const toCounts = (rows) => Object.fromEntries(rows.map(({ _id, count }) => [_id, count]));
+const toCounts = (rows) => Object.fromEntries(rows.map(({ value, count }) => [value, count]));
 const sumOf = (counts, types) => types.reduce((sum, type) => sum + (counts[type] ?? 0), 0);
 
 /** Website KPIs for the admin dashboard over `range` (24h / 7d / 30d / 90d). */
@@ -97,7 +97,7 @@ export async function getKpis({ range }, now = new Date()) {
   const byType = toCounts(typeRows);
   const searches = sumOf(byType, SEARCH_TYPES);
   const noResults = byType[NO_RESULT_TYPE] ?? 0;
-  const asQueryList = (rows) => rows.map(({ _id, count }) => ({ query: _id, count }));
+  const asQueryList = (rows) => rows.map(({ value, count }) => ({ query: value, count }));
 
   return {
     range: { key: range, from: since, to: now },

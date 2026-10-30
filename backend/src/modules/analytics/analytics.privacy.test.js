@@ -29,7 +29,7 @@ describe('analytics privacy', () => {
     expect(sanitizeEventData(big)).toEqual({ truncated: true });
   });
 
-  it('refuses keys MongoDB would treat as operators or paths', () => {
+  it('refuses keys that look like database operators or paths', () => {
     expect(sanitizeEventData({ $where: 'x', 'a.b': 1, fine: true })).toEqual({ fine: true });
   });
 
