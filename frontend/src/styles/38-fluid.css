@@ -457,3 +457,59 @@
 .mobile-sticky-dock .btn--whatsapp,
 a[class*='whatsapp'] { color: var(--ui-navy) !important; }
 .floating-whatsapp-btn i { color: inherit !important; }
+
+/* ── 8. Signing in to book ──────────────────────────────────────────────────
+   The meeting-room dialog shows the account a room will be held for, or asks
+   the visitor to sign in before the form appears (roomBooking.js swaps them).
+   ──────────────────────────────────────────────────────────────────────── */
+
+.rb-account {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3, 12px);
+  padding: var(--sp-3, 12px) var(--sp-4, 16px);
+  margin-bottom: var(--sp-4, 16px);
+  background: var(--ui-navy-50, #f2f6fb);
+  border: 1px solid #dbe6f3;
+  border-radius: var(--ui-r-card, 12px);
+}
+.rb-account__avatar {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 50%;
+  background: var(--ui-surface, #fff);
+  color: var(--ui-teal-dark, #00806f);
+  font-size: 1.375rem;
+}
+.rb-account__who { display: flex; flex-direction: column; min-width: 0; }
+.rb-account__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ui-muted, #5a6b85);
+}
+.rb-account__who strong { color: var(--ui-ink, #0f2547); font-size: 1rem; }
+.rb-account__meta {
+  font-size: 0.875rem;
+  color: var(--ui-muted, #5a6b85);
+  overflow-wrap: anywhere;
+}
+
+.rb-signin { text-align: center; padding: var(--sp-5, 20px) var(--sp-4, 16px); }
+.rb-signin__icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin: 0 auto var(--sp-3, 12px);
+  border-radius: 50%;
+  background: var(--ui-navy-50, #f2f6fb);
+  color: var(--ui-navy, #081d40);
+  font-size: 1.625rem;
+}
+.rb-signin h4 { font-family: var(--ui-display); font-size: 1.25rem; color: var(--ui-ink, #0f2547); margin: 0 0 6px; }
+.rb-signin p { color: var(--ui-muted, #5a6b85); margin: 0 auto var(--sp-4, 16px); max-width: 44ch; }

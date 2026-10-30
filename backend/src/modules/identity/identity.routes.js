@@ -6,7 +6,8 @@ import { Router } from 'express';
 import { rateLimit } from '../../shared/middleware/rateLimit.js';
 import { validate } from '../../shared/middleware/validate.js';
 import * as controller from './identity.controller.js';
-import { authenticate, requireStaff } from './identity.middleware.js';
+import * as customerController from './identity.customer.controller.js';
+import { authenticate, requireCustomer, requireStaff } from './identity.middleware.js';
 import {
   changePasswordBody,
   createUserBody,
@@ -14,6 +15,9 @@ import {
   loginBody,
   mfaEnrollBody,
   mfaVerifyBody,
+  otpRequestBody,
+  otpVerifyBody,
+  updateCustomerBody,
   updateUserBody,
   userRefParams,
 } from './identity.validation.js';
@@ -35,6 +39,22 @@ identityRouter.post('/logout', controller.logout);
 // ── Signed-in user ────────────────────────────
 identityRouter.get('/me', authenticate, controller.me);
 identityRouter.post('/password', authenticate, validate({ body: changePasswordBody }), controller.changePassword);
+
+// ── Customer sign-in (phone OTP) ──────────────
+// Sending a code costs money and reaches a real phone, so the per-IP budget is tight; the per-number caps
+// in the service cover one phone being hammered from many addresses.
+const otpSendLimit = rateLimit({ name: 'sign-in codes', windowMs: 60_000, max: 5 });
+const otpCheckLimit = rateLimit({ name: 'code checks', windowMs: 60_000, max: 15 });
+
+identityRouter.post('/otp/request', otpSendLimit, validate({ body: otpRequestBody }), customerController.requestOtp);
+identityRouter.post('/otp/verify', otpCheckLimit, validate({ body: otpVerifyBody }), customerController.verifyOtp);
+
+const customer = Router();
+customer.post('/refresh', refreshLimit, customerController.refreshCustomer);
+customer.post('/logout', customerController.logoutCustomer);
+customer.get('/me', requireCustomer, customerController.customerMe);
+customer.patch('/me', requireCustomer, validate({ body: updateCustomerBody }), customerController.updateCustomerMe);
+identityRouter.use('/customer', customer);
 
 // ── Staff user management ─────────────────────
 const users = Router();

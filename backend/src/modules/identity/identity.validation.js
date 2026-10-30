@@ -3,7 +3,14 @@
  * applied with `validate({ body, query, params })` in identity.routes.js.
  */
 import { z } from 'zod';
-import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, STAFF_ROLES, USER_STATUSES } from './identity.constants.js';
+import {
+  MOBILE_PATTERN,
+  OTP_LENGTH,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  STAFF_ROLES,
+  USER_STATUSES,
+} from './identity.constants.js';
 
 const email = z.string().trim().toLowerCase().max(254).email('Enter a valid email');
 /** Never trimmed: leading/trailing spaces are part of a password. */
@@ -63,3 +70,44 @@ export const listUsersQuery = z.object({
   cursor: z.string().trim().min(1).max(500).optional(),
   limit: z.coerce.number().int().min(1).max(100).default(25),
 });
+
+// ──────────────────────────────────────────────
+// Customers (phone OTP)
+// ──────────────────────────────────────────────
+
+/** Forms send '' for untouched inputs; treat that the same as "not sent". */
+const blankToUndefined = (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value);
+
+/** Stored as the last 10 digits, so '+91 98765 43210' and '9876543210' are one account. */
+const mobile = z
+  .string()
+  .trim()
+  .max(20)
+  .transform((value) => value.replace(/[\s()-]/g, ''))
+  .refine((value) => MOBILE_PATTERN.test(value), 'Enter a valid 10-digit Indian mobile number')
+  .transform((value) => value.slice(-10));
+
+const optionalEmail = z.preprocess(blankToUndefined, email.optional());
+const optionalCompany = z.preprocess(blankToUndefined, z.string().trim().max(200).optional());
+const customerName = z.string().trim().min(1, 'Name is required').max(120);
+
+export const otpRequestBody = z.object({ mobile });
+
+/** `name` is only needed the first time a number signs in — that request is the registration. */
+export const otpVerifyBody = z.object({
+  mobile,
+  code: z.preprocess(
+    (value) => (typeof value === 'string' ? value.replace(/\s/g, '') : value),
+    z.string().regex(new RegExp(String.raw`^\d{${OTP_LENGTH}}$`), `Enter the ${OTP_LENGTH}-digit code we sent you`),
+  ),
+  name: z.preprocess(blankToUndefined, customerName.optional()),
+  email: optionalEmail,
+  company: optionalCompany,
+});
+
+/** Body for PATCH /api/v1/auth/customer/me — the customer's own details, never the mobile number. */
+export const updateCustomerBody = z
+  .object({ name: customerName.optional(), email: optionalEmail, company: optionalCompany })
+  .refine((body) => Object.values(body).some((value) => value !== undefined), {
+    message: 'Send at least one of name, email or company',
+  });

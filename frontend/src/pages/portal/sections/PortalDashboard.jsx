@@ -1,19 +1,24 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { Button, Section } from '@/components/ui/index.js';
 import { GST_RATE } from '@/data/constants.js';
+import { signOut } from '@/features/auth/session.js';
+import { useCustomer } from '@/features/auth/useCustomer.js';
+import { cancelBooking, fetchMyBookings } from '@/features/bookings/bookingApi.js';
 import { getBookings, setBookingState } from '@/features/bookings/bookingStore.js';
 import { openTaxInvoiceModal } from '@/features/checkout/taxInvoice.js';
 import { openMeetingBookingModal } from '@/features/meetingRooms/roomBooking.js';
 import { showToast } from '@/features/ui/toast.js';
+import { isApiEnabled } from '@/lib/api.js';
 import { readJson } from '@/lib/storage.js';
 
 /**
  * Customer dashboard.
  *
- * It answers four questions in order: is my address active, is anything waiting for me, what can
- * I download, and what have I booked or paid. Everything here is the account's own data — the
- * service, documents and invoices are the demo account until customer sign-in exists on the API.
+ * It answers four questions in order: who am I signed in as and is my address active, is anything waiting for
+ * me, what can I download, and what have I booked or paid. The account and the bookings are this customer's
+ * own, read from the API. The service, documents and invoices are still sample content — the subscription,
+ * document-vault and billing endpoints are not built yet — and the page says so rather than implying otherwise.
  */
 
 const SERVICE = {
@@ -39,6 +44,42 @@ const INVOICES = [
 
 const rupees = (value) => '₹' + Math.round(value).toLocaleString('en-IN');
 
+/** The API's booking statuses, in the words a customer uses. */
+const BOOKING_LABELS = {
+  HELD: ['On hold', 'is-warn'],
+  CONFIRMED: ['Confirmed', 'is-good'],
+  COMPLETED: ['Finished', ''],
+  CANCELLED: ['Cancelled', ''],
+  EXPIRED: ['Released', ''],
+};
+
+/** One row of the bookings table, from either the API or this browser's own store. */
+function bookingRow(booking) {
+  if (booking.status) {
+    const [label, tone] = BOOKING_LABELS[booking.status] ?? [booking.status, ''];
+    return {
+      ref: booking.ref,
+      room: booking.room,
+      hub: booking.hub,
+      when: `${booking.date} · ${booking.slot}`,
+      label,
+      tone,
+      cancellable: booking.status === 'HELD',
+    };
+  }
+  const state = booking.state ?? 'hold';
+  const done = state === 'completed' || state === 'past';
+  return {
+    ref: booking.ref,
+    room: booking.room,
+    hub: booking.hub,
+    when: `${booking.date} · ${booking.slot}`,
+    label: done ? 'Finished' : state === 'confirmed' ? 'Confirmed' : 'On hold',
+    tone: done ? '' : state === 'confirmed' ? 'is-good' : 'is-warn',
+    cancellable: !done && state !== 'cancelled',
+  };
+}
+
 function Stat({ label, value, tone, hint }) {
   return (
     <div className="ui-portal-stat">
@@ -50,10 +91,24 @@ function Stat({ label, value, tone, hint }) {
 }
 
 export default function PortalDashboard() {
-  const [bookings, setBookings] = useState(() => getBookings());
+  // A fresh tab has no token but may still have the refresh cookie, which `useCustomer` asks about once.
+  const { customer, ready } = useCustomer();
+  const [apiBookings, setApiBookings] = useState(null);
+  const [localBookings, setLocalBookings] = useState(() => getBookings());
   const orders = useMemo(() => readJson('VDESK_ORDERS', []), []);
 
-  const visible = bookings.filter((booking) => booking.state !== 'cancelled');
+  const loadBookings = useCallback(async () => {
+    if (!customer) return;
+    setApiBookings(await fetchMyBookings({ limit: 25 }));
+  }, [customer]);
+
+  useEffect(() => {
+    loadBookings();
+  }, [loadBookings]);
+
+  const live = Array.isArray(apiBookings);
+  const rows = (live ? apiBookings : localBookings.filter((booking) => booking.state !== 'cancelled')).map(bookingRow);
+
   const invoices = [
     ...INVOICES,
     ...orders.map((order) => ({
@@ -64,10 +119,52 @@ export default function PortalDashboard() {
     })),
   ];
 
-  function cancel(ref) {
+  async function cancel(ref) {
+    if (live) {
+      try {
+        await cancelBooking(ref);
+        showToast('Booking cancelled', `${ref} has been released.`, 'info');
+      } catch (error) {
+        showToast('Could not cancel', error.message, 'warning');
+      }
+      loadBookings();
+      return;
+    }
     setBookingState(ref, 'cancelled');
-    setBookings(getBookings());
+    setLocalBookings(getBookings());
     showToast('Booking cancelled', `${ref} has been released.`, 'info');
+  }
+
+  async function leave() {
+    await signOut();
+    setApiBookings(null);
+  }
+
+  // Nobody is signed in: the portal is this customer's own data, so there is nothing to show until they are.
+  if (ready && !customer) {
+    return (
+      <Section tone="tint">
+        <div className="ui-card ui-signin">
+          <h2>Sign in to your account</h2>
+          <p>
+            Your documents, bookings and invoices are tied to your mobile number. Signing in takes one OTP — and
+            creates your account if this is your first visit.
+          </p>
+          <div className="ui-actions">
+            <Link className="ui-btn ui-btn--primary" to="/login?next=/portal">
+              Sign in
+            </Link>
+            <Link className="ui-btn ui-btn--outline" to="/register?next=/portal">
+              Create an account
+            </Link>
+          </div>
+        </div>
+      </Section>
+    );
+  }
+
+  if (!ready) {
+    return <div className="ui-route-loading">Checking your session…</div>;
   }
 
   return (
@@ -78,8 +175,12 @@ export default function PortalDashboard() {
           <div className="ui-portal-head__row">
             <div>
               <span className="ui-portal-head__eyebrow">Your account</span>
-              <h1 className="ui-portal-head__title">Arjun Mehta</h1>
-              <p className="ui-portal-head__meta">Apex Dynamics Technologies LLP · Account VDESK-MCA-8921</p>
+              <h1 className="ui-portal-head__title">{customer.name}</h1>
+              <p className="ui-portal-head__meta">
+                {[customer.company, customer.mobile && `+91 ${customer.mobile}`, customer.ref]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </p>
             </div>
             <div className="ui-actions">
               <Button variant="outline" icon="ph-presentation" onClick={() => openMeetingBookingModal()}>
@@ -88,9 +189,19 @@ export default function PortalDashboard() {
               <Button
                 variant="primary"
                 icon="ph-receipt"
-                onClick={() => openTaxInvoiceModal({ invoiceNo: invoices[0].no, item: invoices[0].item, amount: Math.round(invoices[0].taxable * (1 + GST_RATE)), city: 'Mumbai (BKC)' })}
+                onClick={() =>
+                  openTaxInvoiceModal({
+                    invoiceNo: invoices[0].no,
+                    item: invoices[0].item,
+                    amount: Math.round(invoices[0].taxable * (1 + GST_RATE)),
+                    city: 'Mumbai (BKC)',
+                  })
+                }
               >
                 Latest invoice
+              </Button>
+              <Button variant="ghost" onClick={leave}>
+                Sign out
               </Button>
             </div>
           </div>
@@ -121,13 +232,25 @@ export default function PortalDashboard() {
               {SERVICE.address} · {SERVICE.plan}
             </p>
             <div className="ui-actions">
-              <Button variant="primary" icon="ph-download-simple" onClick={() => showToast('Preparing download', 'Your rent agreement will download shortly.', 'info')}>
+              <Button
+                variant="primary"
+                icon="ph-download-simple"
+                onClick={() => showToast('Preparing download', 'Your rent agreement will download shortly.', 'info')}
+              >
                 Rent agreement
               </Button>
-              <Button variant="outline" icon="ph-download-simple" onClick={() => showToast('Preparing download', 'Your owner NOC will download shortly.', 'info')}>
+              <Button
+                variant="outline"
+                icon="ph-download-simple"
+                onClick={() => showToast('Preparing download', 'Your owner NOC will download shortly.', 'info')}
+              >
                 Owner NOC
               </Button>
-              <Button variant="outline" icon="ph-download-simple" onClick={() => showToast('Preparing download', 'Your electricity bill will download shortly.', 'info')}>
+              <Button
+                variant="outline"
+                icon="ph-download-simple"
+                onClick={() => showToast('Preparing download', 'Your electricity bill will download shortly.', 'info')}
+              >
                 Electricity bill
               </Button>
             </div>
@@ -164,7 +287,11 @@ export default function PortalDashboard() {
               </div>
               <h3>{title}</h3>
               <p>{text}</p>
-              <button type="button" className="ui-card__link" onClick={() => showToast('Preparing download', `${title} will download shortly.`, 'info')}>
+              <button
+                type="button"
+                className="ui-card__link"
+                onClick={() => showToast('Preparing download', `${title} will download shortly.`, 'info')}
+              >
                 Download PDF <i className="ph-bold ph-arrow-right" />
               </button>
             </div>
@@ -173,7 +300,7 @@ export default function PortalDashboard() {
       </Section>
 
       <Section tone="tint" tight kicker="Bookings" title="Your meeting rooms" align="left">
-        {visible.length === 0 ? (
+        {rows.length === 0 ? (
           <div className="ui-card ui-empty">
             <h3>No rooms booked</h3>
             <p>Your plan includes {SERVICE.meetingCreditsHours} hours of meeting room time this month.</p>
@@ -195,42 +322,45 @@ export default function PortalDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {visible.map((booking) => {
-                  const state = booking.state ?? 'hold';
-                  const done = state === 'completed' || state === 'past';
-                  return (
-                  <tr key={booking.ref}>
+                {rows.map((row) => (
+                  <tr key={row.ref}>
                     <td>
-                      <strong>{booking.room}</strong>
+                      <strong>{row.room}</strong>
                       <br />
                       <span className="ui-table__sub">
-                        {booking.hub} · {booking.ref}
+                        {row.hub} · {row.ref}
                       </span>
                     </td>
+                    <td>{row.when}</td>
                     <td>
-                      {booking.date} · {booking.slot}
-                    </td>
-                    <td>
-                      <span className={`ui-badge ${done ? '' : state === 'confirmed' ? 'is-good' : 'is-warn'}`}>
-                        {done ? 'Finished' : state === 'confirmed' ? 'Confirmed' : 'On hold'}
-                      </span>
+                      <span className={`ui-badge ${row.tone}`}>{row.label}</span>
                     </td>
                     <td className="ui-table__actions">
-                      {done ? (
-                        <span className="ui-table__sub">—</span>
-                      ) : (
-                        <button type="button" className="ui-btn ui-btn--ghost ui-btn--sm" onClick={() => cancel(booking.ref)}>
+                      {row.cancellable ? (
+                        <button
+                          type="button"
+                          className="ui-btn ui-btn--ghost ui-btn--sm"
+                          onClick={() => cancel(row.ref)}
+                        >
                           Cancel
                         </button>
+                      ) : (
+                        <span className="ui-table__sub">—</span>
                       )}
                     </td>
                   </tr>
-                  );
-                })}
+                ))}
               </tbody>
             </table>
           </div>
         )}
+        <p className="ui-note">
+          {live
+            ? 'These are the bookings on your account.'
+            : isApiEnabled()
+              ? 'Showing the bookings saved in this browser.'
+              : 'This build has no API connected, so bookings are kept in this browser only.'}
+        </p>
       </Section>
 
       <Section tone="white" tight kicker="Billing" title="Invoices and receipts" align="left">
@@ -266,7 +396,14 @@ export default function PortalDashboard() {
                       <button
                         type="button"
                         className="ui-btn ui-btn--outline ui-btn--sm"
-                        onClick={() => openTaxInvoiceModal({ invoiceNo: invoice.no, item: invoice.item, amount: total, city: 'Mumbai (BKC)' })}
+                        onClick={() =>
+                          openTaxInvoiceModal({
+                            invoiceNo: invoice.no,
+                            item: invoice.item,
+                            amount: total,
+                            city: 'Mumbai (BKC)',
+                          })
+                        }
                       >
                         View
                       </button>
@@ -277,7 +414,10 @@ export default function PortalDashboard() {
             </tbody>
           </table>
         </div>
-        <p className="ui-note">GSTIN {SERVICE.gstin} · every invoice is eligible for input tax credit.</p>
+        <p className="ui-note">
+          GSTIN {SERVICE.gstin} · every invoice is eligible for input tax credit. Your service, documents and
+          invoices are sample data for now — those parts of the API are still being built.
+        </p>
       </Section>
     </>
   );

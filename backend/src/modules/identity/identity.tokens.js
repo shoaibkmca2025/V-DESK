@@ -2,11 +2,18 @@
  * Credentials: argon2id password hashes, HS256 access/MFA tokens (jose) and opaque refresh tokens.
  * Kept apart from the service so the rules there read as rules, not crypto plumbing.
  */
-import { createHash, randomBytes } from 'node:crypto';
+import { createHash, randomBytes, randomInt } from 'node:crypto';
 import argon2 from 'argon2';
 import { jwtVerify, SignJWT } from 'jose';
 import { env } from '../../config/env.js';
-import { ACCESS_TOKEN_TTL_SECONDS, JWT_AUDIENCE, JWT_ISSUER, MFA_TOKEN_TTL_SECONDS } from './identity.constants.js';
+import {
+  ACCESS_TOKEN_TTL_SECONDS,
+  CUSTOMER_ACCESS_TOKEN_TTL_SECONDS,
+  JWT_AUDIENCE,
+  JWT_ISSUER,
+  MFA_TOKEN_TTL_SECONDS,
+  OTP_LENGTH,
+} from './identity.constants.js';
 
 // ── Passwords ─────────────────────────────────
 
@@ -51,6 +58,11 @@ export function signMfaToken(user) {
   return sign({ typ: 'mfa' }, user.ref, MFA_TOKEN_TTL_SECONDS);
 }
 
+/** Portal session token. `typ: 'customer'` is why it can never be used on a staff route, and vice versa. */
+export function signCustomerToken(customer) {
+  return sign({ typ: 'customer' }, customer.ref, CUSTOMER_ACCESS_TOKEN_TTL_SECONDS);
+}
+
 /** Returns the user ref, or null for anything expired, tampered with or of the wrong type. */
 export async function verifyToken(token, typ) {
   try {
@@ -74,4 +86,19 @@ export function generateRefreshToken() {
 
 export function hashRefreshToken(token) {
   return createHash('sha256').update(token).digest('hex');
+}
+
+// ── Phone OTP ─────────────────────────────────
+
+/** A uniformly random 6-digit code — randomInt, never Math.random. */
+export function generateOtpCode() {
+  return String(randomInt(0, 10 ** OTP_LENGTH)).padStart(OTP_LENGTH, '0');
+}
+
+/**
+ * Codes are stored hashed, peppered with JWT_SECRET and bound to the mobile number: a leaked database is
+ * not a list of working codes, and a hash lifted from one row cannot be replayed against another number.
+ */
+export function hashOtp(mobile, code) {
+  return createHash('sha256').update(`${mobile}:${code}:${env.JWT_SECRET}`).digest('hex');
 }

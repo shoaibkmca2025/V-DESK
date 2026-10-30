@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import Breadcrumbs from '@/components/page/Breadcrumbs.jsx';
 import PageHero from '@/components/page/PageHero.jsx';
+import { useCustomer } from '@/features/auth/useCustomer.js';
+import { cancelBooking, fetchMyBookings } from '@/features/bookings/bookingApi.js';
 import { getBookings, setBookingState } from '@/features/bookings/bookingStore.js';
 import { openMeetingBookingModal } from '@/features/meetingRooms/roomBooking.js';
 import { showToast } from '@/features/ui/toast.js';
@@ -13,18 +15,102 @@ const TABS = [
   ['cancelled', 'Cancelled', (b) => b.state === 'cancelled'],
 ];
 
-/** /bookings — meeting room & workspace reservations (PRD §45, §64 bottom-nav "Bookings"). */
+/** The API's statuses, in the states this page's tabs and buttons are written around. */
+const API_STATE = {
+  HELD: 'hold',
+  CONFIRMED: 'confirmed',
+  COMPLETED: 'completed',
+  CANCELLED: 'cancelled',
+  EXPIRED: 'cancelled',
+};
+
+/** An API booking in the shape of a stored one (features/bookings/bookingStore.js), so one row renders both. */
+const fromApi = (booking) => ({
+  ref: booking.ref,
+  room: booking.room,
+  hub: booking.hub,
+  date: booking.date,
+  slot: booking.slot,
+  duration: booking.duration,
+  attendees: booking.attendees,
+  totalAmount: Math.round((booking.pricing?.total_paise ?? 0) / 100),
+  state: API_STATE[booking.status] ?? 'hold',
+});
+
+/**
+ * /bookings — meeting room & workspace reservations (PRD §45, §64 bottom-nav "Bookings").
+ *
+ * Bookings belong to an account, so this page asks who is signed in first. Signed in, it shows the
+ * reservations the API holds for them; on a build with no API it falls back to this browser's own store.
+ */
 export default function BookingsPage() {
-  const [bookings, setBookings] = useState(getBookings);
+  const { customer, ready } = useCustomer();
+  const [apiBookings, setApiBookings] = useState(null);
+  const [stored, setStored] = useState(getBookings);
   const [tab, setTab] = useState('upcoming');
+
+  const load = useCallback(async () => {
+    if (!customer) return;
+    const mine = await fetchMyBookings({ limit: 50 });
+    setApiBookings(mine ? mine.map(fromApi) : null);
+  }, [customer]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const live = Array.isArray(apiBookings);
+  const bookings = live ? apiBookings : stored;
   const filter = TABS.find(([key]) => key === tab)[2];
   const list = bookings.filter(filter);
 
-  function cancel(ref) {
+  async function cancel(ref) {
     if (!window.confirm('Cancel this reservation? Refunds are processed within 5–7 working days.')) return;
+    if (live) {
+      try {
+        await cancelBooking(ref);
+        showToast('Cancellation Requested', `Booking ${ref} moved to cancelled; refund initiated.`, 'info');
+      } catch (error) {
+        showToast('Could not cancel', error.message, 'warning');
+      }
+      load();
+      return;
+    }
     setBookingState(ref, 'cancelled');
-    setBookings(getBookings());
+    setStored(getBookings());
     showToast('Cancellation Requested', `Booking ${ref} moved to cancelled; refund initiated.`, 'info');
+  }
+
+  if (!ready) {
+    return <div className="ui-route-loading">Checking your session…</div>;
+  }
+
+  // Signed out there is nothing to list: a reservation is held against an account, not against a browser.
+  if (!customer) {
+    return (
+      <main id="main-content" className="ui-page">
+        <Breadcrumbs trail={[{ label: 'Client Portal', to: '/portal' }, { label: 'My Bookings' }]} />
+        <section className="section" style={{ padding: '56px 0', background: '#F8FAFC' }}>
+          <div className="container" style={{ maxWidth: '640px' }}>
+            <div className="ui-card ui-signin">
+              <h2>Sign in to see your bookings</h2>
+              <p>
+                Meeting rooms are held against your V-DESK account for ten minutes. Sign in with your mobile
+                number to see, hold or cancel a reservation.
+              </p>
+              <div className="ui-actions">
+                <Link className="ui-btn ui-btn--primary" to="/login?next=/bookings">
+                  Sign in
+                </Link>
+                <Link className="ui-btn ui-btn--outline" to="/meeting-rooms">
+                  Browse meeting rooms
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
   }
 
   return (

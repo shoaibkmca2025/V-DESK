@@ -53,7 +53,8 @@ function assertConfigured() {
 }
 
 const invalidCredentials = () => unauthorized('INVALID_CREDENTIALS', 'Email or password is incorrect');
-const sessionEnded = () => unauthorized('REFRESH_INVALID', 'Your session has ended. Please sign in again.');
+/** Shared with the customer surface, so a dead session reads the same whoever is signing in. */
+export const sessionEnded = () => unauthorized('REFRESH_INVALID', 'Your session has ended. Please sign in again.');
 
 function assertNotLocked(user, now) {
   if (user.lockedUntil && user.lockedUntil > now) {
@@ -163,11 +164,14 @@ export async function verifyMfa({ mfaToken, code }) {
 // Sessions
 // ──────────────────────────────────────────────
 
-/** Trades a refresh token for a new one plus a new access token. */
-export async function refreshSession(refreshToken) {
-  assertConfigured();
+/**
+ * Checks a presented refresh token and spends it, returning the sign-in it belonged to. Exported because the
+ * customer surface rotates tokens exactly the same way (identity.customer.service.js) — one rotation rule, one
+ * reuse-detection rule, one collection.
+ * @returns {Promise<{ subjectRef: string, family: string }>}
+ */
+export async function consumeRefreshToken(refreshToken, now) {
   if (!refreshToken) throw sessionEnded();
-  const now = new Date();
   const tokenHash = hashRefreshToken(refreshToken);
   const stored = await repo.findRefreshToken(tokenHash);
   if (!stored || stored.expiresAt <= now) throw sessionEnded();
@@ -181,10 +185,17 @@ export async function refreshSession(refreshToken) {
   }
   // Only one of several parallel refreshes with the same token wins the rotation.
   if (!(await repo.revokeRefreshToken(tokenHash, now))) throw sessionEnded();
+  return { subjectRef: stored.userRef, family: stored.family };
+}
 
-  const user = await repo.findUserByRef(stored.userRef);
+/** Trades a refresh token for a new one plus a new access token. */
+export async function refreshSession(refreshToken) {
+  assertConfigured();
+  const now = new Date();
+  const { subjectRef, family } = await consumeRefreshToken(refreshToken, now);
+  const user = await repo.findUserByRef(subjectRef);
   if (!user || user.status !== 'active') throw sessionEnded();
-  return startSession(user, now, stored.family);
+  return startSession(user, now, family);
 }
 
 export async function logout(refreshToken) {

@@ -23,18 +23,25 @@ const later = (seconds) => new Date(NOW.getTime() + seconds * 1000);
 let seq = 0;
 const nextKey = () => `key-${++seq}`;
 
-/** A validated hold body, as the route would hand it to the service. */
-function body(overrides = {}) {
-  return holdBody.parse({
-    centreRef: 'CTR-NSK-001',
-    room: 'Conference Room',
-    date: TOMORROW,
-    startTime: '14:00',
-    duration: 2,
-    attendees: 6,
-    customer: { name: 'Priya Kulkarni', company: 'Zenith D2C', mobile: '98765 43210', email: 'priya@zenith.in' },
-    ...overrides,
-  });
+/** The signed-in customer the controller passes in; `customer` overrides below change the account, not the body. */
+const ACCOUNT = { name: 'Priya Kulkarni', company: 'Zenith D2C', mobile: '9876543210', email: 'priya@zenith.in' };
+const CUSTOMER_REF = 'CUS-TESTER01';
+
+/** A validated hold body plus the signed-in customer, exactly as the route and controller hand it over. */
+function body({ customer, customerRef, ...overrides } = {}) {
+  return {
+    ...holdBody.parse({
+      centreRef: 'CTR-NSK-001',
+      room: 'Conference Room',
+      date: TOMORROW,
+      startTime: '14:00',
+      duration: 2,
+      attendees: 6,
+      ...overrides,
+    }),
+    customerRef: customerRef ?? CUSTOMER_REF,
+    customer: { ...ACCOUNT, ...customer },
+  };
 }
 
 const hold = (overrides, key = nextKey(), now = NOW) => service.holdBooking(body(overrides), key, now);
@@ -118,20 +125,23 @@ describe('hold validation (schema)', () => {
     expect(issues({ duration: 12 })).toBe(false);
     expect(issues({ duration: 1.5 })).toBe(false);
     expect(issues({ attendees: 0 })).toBe(false);
-    expect(issues({ customer: { name: 'A', mobile: '12345' } })).toBe(false);
-    expect(issues({ customer: { name: '', mobile: '9876543210' } })).toBe(false);
+    expect(issues({ room: '' })).toBe(false);
+    expect(issues({ company: 'C'.repeat(201) })).toBe(false);
   });
 
-  it('normalises the mobile to 10 digits and drops client prices', () => {
+  it('parses the start hour and drops client-sent prices and identity', () => {
     const parsed = holdBody.parse({
       ...body(),
       startTime: '14:00',
       totalAmount: 1,
-      customer: { name: 'A', mobile: '+91 98765-43210' },
+      customer: { name: 'Someone Else', mobile: '9123456780' },
+      customerRef: 'CUS-SOMEONE',
     });
-    expect(parsed.customer.mobile).toBe('9876543210');
     expect(parsed.startHour).toBe(14);
     expect(parsed.totalAmount).toBeUndefined();
+    // Who is booking comes from the session, so the schema throws away any identity in the request.
+    expect(parsed.customer).toBeUndefined();
+    expect(parsed.customerRef).toBeUndefined();
   });
 });
 

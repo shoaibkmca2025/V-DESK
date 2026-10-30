@@ -1,12 +1,19 @@
 import {
   cancelRoomBookingHold,
+  goToSignIn,
   handleRoomBookingHold,
   triggerBookingCheckout,
 } from '@/features/meetingRooms/roomBooking.js';
 import { closeModal, closeModalOnBackdrop } from '@/features/modals/modalManager.js';
 import { showToast } from '@/features/ui/toast.js';
 
-/** Meeting room booking flow (summary → hold → confirmed pass). */
+/**
+ * Meeting room booking flow (summary → hold → confirmed pass).
+ *
+ * Who is booking comes from the signed-in account, so this dialog shows that account rather than asking for
+ * a name and number again; `roomBooking.js` fills `#rbAccount*` in and swaps the form for `#rbSignInRequired`
+ * when nobody is signed in.
+ */
 export default function MeetingRoomBookingModal() {
   return (
     <div
@@ -61,51 +68,40 @@ export default function MeetingRoomBookingModal() {
                 <span className="price-gst">Includes 18% GST</span>
               </div>
             </div>
+            <div className="rb-signin" id="rbSignInRequired" style={{ display: 'none', marginTop: '18px' }}>
+              <div className="rb-signin__icon">
+                <i className="ph-bold ph-lock-key" />
+              </div>
+              <h4>Sign in to hold this room</h4>
+              <p>
+                Rooms are held against your V-DESK account for ten minutes, so we need to know who the booking
+                is for. It takes one OTP.
+              </p>
+              <button type="button" className="btn btn--primary btn--block btn--lg" onClick={() => goToSignIn()}>
+                <i className="ph-bold ph-sign-in" />
+                Sign in or register →
+              </button>
+            </div>
             <form
               id="roomBookingUserForm"
               onSubmit={(event) => handleRoomBookingHold(event)}
-              style={{ marginTop: '18px' }}
+              style={{ marginTop: '18px', display: 'none' }}
             >
-              <div className="form-row-2">
-                <div className="form-field">
-                  <label className="form-label" htmlFor="rbName">
-                    Full Name *
-                  </label>
-                  <input type="text" id="rbName" className="form-input" placeholder="e.g. Vikramaditya Roy" required />
+              <div className="rb-account">
+                <div className="rb-account__avatar">
+                  <i className="ph-bold ph-user-circle" />
                 </div>
-                <div className="form-field">
-                  <label className="form-label" htmlFor="rbCompany">
-                    Company / Organization
-                  </label>
-                  <input
-                    type="text"
-                    id="rbCompany"
-                    className="form-input"
-                    placeholder="e.g. Acme Innovations"
-                   
-                  />
+                <div className="rb-account__who">
+                  <span className="rb-account__label">Booking as</span>
+                  <strong id="rbAccountName">Your account</strong>
+                  <span className="rb-account__meta" id="rbAccountMeta" />
                 </div>
               </div>
-              <div className="form-row-2">
-                <div className="form-field">
-                  <label className="form-label" htmlFor="rbMobile">
-                    WhatsApp / Mobile No. *
-                  </label>
-                  <input
-                    type="tel"
-                    id="rbMobile"
-                    className="form-input"
-                    placeholder="10-digit mobile number"
-                    pattern={'[0-9]{10}'}
-                    required
-                  />
-                </div>
-                <div className="form-field">
-                  <label className="form-label" htmlFor="rbEmail">
-                    Business Email *
-                  </label>
-                  <input type="email" id="rbEmail" className="form-input" placeholder="name@company.com" required />
-                </div>
+              <div className="form-field">
+                <label className="form-label" htmlFor="rbCompany">
+                  Company / Organization this booking is for
+                </label>
+                <input type="text" id="rbCompany" className="form-input" placeholder="e.g. Acme Innovations" />
               </div>
               <div className="room-amenities-check">
                 <span>

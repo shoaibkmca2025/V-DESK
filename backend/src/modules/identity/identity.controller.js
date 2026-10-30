@@ -1,28 +1,15 @@
 /**
- * Identity controller — reads `req.validated`, calls identity.service.js, sends `{ data, meta? }`.
- * Also owns the refresh-token cookie, which is HTTP plumbing rather than a business rule.
+ * Identity controller (staff) — reads `req.validated`, calls identity.service.js, sends `{ data, meta? }`.
+ * The customer surface has its own controller; both set their refresh cookie through identity.cookies.js.
  */
-import { env } from '../../config/env.js';
 import { REFRESH_COOKIE, REFRESH_COOKIE_PATH } from './identity.constants.js';
+import { cookieOptions as cookieOptionsFor, readCookie } from './identity.cookies.js';
 import * as identityService from './identity.service.js';
 
 // ── Refresh cookie (rules.md §19: httpOnly, Secure, SameSite=Strict) ──
 
-function readRefreshCookie(req) {
-  for (const part of (req.get('cookie') ?? '').split(';')) {
-    const [name, ...value] = part.trim().split('=');
-    if (name === REFRESH_COOKIE) return value.join('=');
-  }
-  return undefined;
-}
-
-const cookieOptions = () => ({
-  httpOnly: true,
-  // Browsers drop Secure cookies on plain-http origins other than localhost, so local tools can't use them.
-  secure: env.NODE_ENV === 'production',
-  sameSite: 'strict',
-  path: REFRESH_COOKIE_PATH,
-});
+const readRefreshCookie = (req) => readCookie(req, REFRESH_COOKIE);
+const cookieOptions = () => cookieOptionsFor(REFRESH_COOKIE_PATH);
 
 /** Puts the refresh token in its cookie and returns the rest of the session for the JSON body. */
 function sendSession(res, { refreshToken, refreshExpiresAt, ...session }) {

@@ -8,6 +8,7 @@ import request from 'supertest';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createApp } from '../../app.js';
 import { clearTestDb, startTestDb, stopTestDb } from '../../../test/db.js';
+import { customerSession } from '../../../test/customer.js';
 import { ADMIN_KEY, staffSession } from '../../../test/staff.js';
 import { Centre } from '../catalog/catalog.model.js';
 import { HOLD_SECONDS } from './booking.constants.js';
@@ -17,6 +18,7 @@ import { addDays, istDate } from './booking.time.js';
 const app = createApp();
 const date = () => addDays(istDate(new Date()), 1);
 
+/** The signed-in customer every hold below is made by; contact details come from this account, not the body. */
 const CUSTOMER = { name: 'Priya Kulkarni', company: 'Zenith D2C', mobile: '9876543210', email: 'priya@zenith.in' };
 const holdRequest = (overrides = {}) => ({
   centreRef: 'ctr-nsk-001',
@@ -25,13 +27,15 @@ const holdRequest = (overrides = {}) => ({
   startTime: '14:00',
   duration: 2,
   attendees: 6,
-  customer: CUSTOMER,
   ...overrides,
 });
 
+/** Signed in as CUSTOMER, created fresh for each test (clearTestDb empties the accounts too). */
+let customer;
+
 let seq = 0;
-const postHold = (body = holdRequest(), key = `route-key-${++seq}`) =>
-  request(app).post('/api/v1/bookings/hold').set('Idempotency-Key', key).send(body);
+const postHold = (body = holdRequest(), key = `route-key-${++seq}`, auth = customer.auth) =>
+  request(app).post('/api/v1/bookings/hold').set('Idempotency-Key', key).set(auth).send(body);
 const availability = (query) =>
   request(app)
     .get('/api/v1/bookings/availability')
@@ -45,8 +49,8 @@ async function heldRef(overrides) {
 }
 
 beforeAll(startTestDb);
-beforeEach(() =>
-  Centre.create({
+beforeEach(async () => {
+  await Centre.create({
     ref: 'CTR-NSK-001',
     cityRef: 'CITY-NSK',
     city: 'Nashik',
@@ -54,8 +58,9 @@ beforeEach(() =>
     fullName: 'V-DESK Headquarters — College Road',
     address: 'College Road, Nashik',
     services: ['Virtual Office', 'Meeting Rooms'],
-  }),
-);
+  });
+  customer = await customerSession(app, CUSTOMER);
+});
 afterEach(async () => {
   vi.useRealTimers();
   await clearTestDb();
@@ -117,7 +122,7 @@ describe('POST /api/v1/bookings/hold', () => {
   });
 
   it('needs an Idempotency-Key and replays it', async () => {
-    const missing = await request(app).post('/api/v1/bookings/hold').send(holdRequest());
+    const missing = await request(app).post('/api/v1/bookings/hold').set(customer.auth).send(holdRequest());
     expect(missing.status).toBe(400);
     expect(missing.body.error.code).toBe('IDEMPOTENCY_KEY_REQUIRED');
 
@@ -152,8 +157,8 @@ describe('POST /api/v1/bookings/hold', () => {
       { attendees: 0 },
       { startTime: '14:30' },
       { date: 'tomorrow' },
-      { customer: { name: 'A', mobile: '12345' } },
-      { customer: undefined },
+      { room: '' },
+      { company: 'C'.repeat(201) },
     ]) {
       const res = await postHold(holdRequest(bad));
       expect(res.status).toBe(400);
@@ -164,11 +169,12 @@ describe('POST /api/v1/bookings/hold', () => {
   });
 
   it('answers 409 SLOT_UNAVAILABLE for overlapping and parallel holds', async () => {
-    const results = await Promise.all(
-      ['9000000001', '9000000002', '9000000003', '9000000004'].map((mobile) =>
-        postHold(holdRequest({ customer: { name: 'Racer', mobile } })),
-      ),
-    );
+    // Four different accounts, so the per-account hold cap is not what refuses them.
+    const racers = [];
+    for (const mobile of ['9000000001', '9000000002', '9000000003', '9000000004']) {
+      racers.push(await customerSession(app, { mobile, name: 'Racer' }));
+    }
+    const results = await Promise.all(racers.map((racer) => postHold(holdRequest(), undefined, racer.auth)));
     expect(results.map((r) => r.status).sort()).toEqual([201, 409, 409, 409]);
     for (const res of results.filter((r) => r.status === 409)) expect(res.body.error.code).toBe('SLOT_UNAVAILABLE');
     expect(await BookingSlot.countDocuments()).toBe(2);
@@ -182,12 +188,42 @@ describe('POST /api/v1/bookings/hold', () => {
   });
 
   it('frees the hours once the hold lapses', async () => {
+    const next = await customerSession(app, { mobile: '9123456780', name: 'Next' });
     vi.useFakeTimers({ toFake: ['Date'] });
     const ref = await heldRef();
     vi.advanceTimersByTime(HOLD_SECONDS * 1000);
     expect((await request(app).get(`/api/v1/bookings/${ref}`)).body.data.status).toBe('EXPIRED');
     expect((await availability()).body.data.slots.every((s) => s.available)).toBe(true);
-    expect((await postHold(holdRequest({ customer: { name: 'Next', mobile: '9123456780' } }))).status).toBe(201);
+    expect((await postHold(holdRequest(), undefined, next.auth)).status).toBe(201);
+  });
+
+  it('needs a signed-in customer; a staff token is not one', async () => {
+    const staff = await staffSession(app, 'OPS_ADMIN');
+    const anonymous = await request(app)
+      .post('/api/v1/bookings/hold')
+      .set('Idempotency-Key', 'no-session')
+      .send(holdRequest());
+    expect(anonymous.status).toBe(401);
+    expect(anonymous.body.error.code).toBe('AUTH_REQUIRED');
+
+    const asStaff = await postHold(holdRequest(), 'staff-token', staff.auth);
+    expect(asStaff.status).toBe(401);
+    expect(asStaff.body.error.code).toBe('TOKEN_INVALID');
+    expect(await Booking.countDocuments()).toBe(0);
+  });
+
+  it('books in the name on the account, whatever the body says', async () => {
+    const ref = await heldRef({ company: 'Zenith Labs LLP' });
+    const stored = await Booking.findOne({ ref }).lean();
+    expect(stored.customerRef).toBe(customer.ref);
+    expect(stored.customer).toMatchObject({
+      name: CUSTOMER.name,
+      mobile: CUSTOMER.mobile,
+      email: CUSTOMER.email,
+      // The one detail a booking may set for itself: who it is for.
+      company: 'Zenith Labs LLP',
+    });
+    expect(stored.history[0].actor).toBe(customer.ref);
   });
 });
 
@@ -282,6 +318,22 @@ describe('public booking ref', () => {
         expect(raw).not.toContain(secret);
       }
     }
+  });
+});
+
+describe('GET /api/v1/bookings/mine', () => {
+  it('lists only the bookings of the signed-in customer, newest first and without contact details', async () => {
+    const other = await customerSession(app, { mobile: '9123456781', name: 'Someone Else' });
+    const mine = [await heldRef({ startTime: '09:00', duration: 1 }), await heldRef({ startTime: '11:00' })];
+    expect((await postHold(holdRequest({ startTime: '16:00', duration: 1 }), undefined, other.auth)).status).toBe(201);
+
+    const res = await request(app).get('/api/v1/bookings/mine').set(customer.auth);
+    expect(res.status).toBe(200);
+    expect(res.body.data.map((booking) => booking.ref)).toEqual([...mine].reverse());
+    expect(res.body.data[0].customer).toBeUndefined();
+    expect(JSON.stringify(res.body)).not.toContain(CUSTOMER.mobile);
+
+    expect((await request(app).get('/api/v1/bookings/mine')).status).toBe(401);
   });
 });
 

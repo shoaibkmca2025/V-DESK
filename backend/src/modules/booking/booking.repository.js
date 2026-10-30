@@ -60,6 +60,15 @@ export async function findBookings({ status, centreRef, date, after, limit }) {
  * Moves a booking to `to` only if it is still in `from` (and, when given, its hold hasn't lapsed) — two people
  * confirming and cancelling at once can't both win. Returns the updated booking, or null if it changed meanwhile.
  */
+/** One customer's bookings, newest first; same cursor shape as findBookings. */
+export async function findBookingsForCustomer({ customerRef, after, limit }) {
+  const filter = { ...notDeleted, customerRef, ...(after && olderThan(after)) };
+  return Booking.find(filter)
+    .sort({ createdAt: -1, ref: -1 })
+    .limit(limit + 1)
+    .lean();
+}
+
 export async function updateBookingStatus(ref, from, to, entry, { unexpiredAt } = {}) {
   return Booking.findOneAndUpdate(
     { ref, status: from, ...notDeleted, ...(unexpiredAt && { expiresAt: { $gt: unexpiredAt } }) },

@@ -11,7 +11,6 @@ import {
   LIST_DEFAULT_LIMIT,
   LIST_MAX_LIMIT,
   MAX_DURATION_HOURS,
-  MOBILE_PATTERN,
   STAFF_STATUS_CHANGES,
 } from './booking.constants.js';
 import { isCalendarDate } from './booking.time.js';
@@ -42,21 +41,12 @@ export const holdBody = z
     /** Hours booked — the client's `duration`. */
     duration: int(1, MAX_DURATION_HOURS),
     attendees: int(1, 100),
-    customer: z.object({
-      name: z.string().trim().min(1, 'Name is required').max(120),
-      company: optionalText(200),
-      mobile: z
-        .string()
-        .trim()
-        .max(20)
-        .transform((v) => v.replace(/[\s()-]/g, ''))
-        .refine((v) => MOBILE_PATTERN.test(v), 'Enter a valid 10-digit Indian mobile number')
-        .transform((v) => v.slice(-10)),
-      email: z.preprocess(
-        blankToUndefined,
-        z.string().trim().toLowerCase().max(254).email('Enter a valid email').optional(),
-      ),
-    }),
+    /*
+     * Who is booking is never sent: the route needs a signed-in customer and the controller takes the name,
+     * mobile and email from that account. Only the company this booking is for can be given per booking —
+     * the same person books for more than one entity.
+     */
+    company: optionalText(200),
   })
   .transform(({ startTime, ...rest }) => ({ ...rest, startHour: Number(startTime.slice(0, 2)) }));
 
@@ -67,6 +57,12 @@ export const bookingRefParams = z.object({
 /** Body for PATCH /api/v1/bookings/:ref/status (staff). */
 export const staffStatusBody = z.object({
   status: z.enum(STAFF_STATUS_CHANGES),
+});
+
+/** Query for GET /api/v1/bookings/mine (the signed-in customer). */
+export const myBookingsQuery = z.object({
+  cursor: z.string().trim().min(1).max(500).optional(),
+  limit: int(1, LIST_MAX_LIMIT).default(LIST_DEFAULT_LIMIT),
 });
 
 /** Query for GET /api/v1/bookings (staff). */

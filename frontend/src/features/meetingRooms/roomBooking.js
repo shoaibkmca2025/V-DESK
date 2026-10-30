@@ -1,4 +1,5 @@
 import { GST_RATE } from '@/data/constants.js';
+import { getCustomer, restoreSession, signInPath } from '@/features/auth/session.js';
 import { addBooking } from '@/features/bookings/bookingStore.js';
 import { holdBooking } from '@/features/bookings/bookingApi.js';
 import { liveCentreRef } from '@/features/catalog/catalogApi.js';
@@ -11,6 +12,10 @@ import { onPageExit } from '@/lib/pageScope.js';
 /*
  * Meeting room scheduler (PRD §34–35).
  * Booking state machine: available → hold (10 min lock) → confirmed (after payment).
+ *
+ * A hold takes a real room out of circulation, so it belongs to an account: the visitor signs in first, and
+ * the name, number and email on the booking are the ones on that account (the API will not take them from
+ * the request). Only the company the booking is for is asked here.
  */
 
 const HOLD_SECONDS = 599;
@@ -88,15 +93,40 @@ function setBookingStep(step) {
   }
 }
 
+const setText = (id, text) => {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+};
+
+/**
+ * Shows either the booking form or the "sign in first" panel, and names the account the room will be held
+ * for, so nobody fills in a form only to be turned away at the end.
+ */
+function renderAccount() {
+  const customer = getCustomer();
+  const form = document.getElementById('roomBookingUserForm');
+  const prompt = document.getElementById('rbSignInRequired');
+  if (form) form.style.display = customer ? 'block' : 'none';
+  if (prompt) prompt.style.display = customer ? 'none' : 'block';
+  if (!customer) return;
+
+  setText('rbAccountName', customer.name);
+  setText('rbAccountMeta', [customer.mobile && `+91 ${customer.mobile}`, customer.email].filter(Boolean).join(' · '));
+  const company = document.getElementById('rbCompany');
+  if (company && !company.value) company.value = customer.company ?? '';
+}
+
+/** Sends the visitor to sign in and back to the page they were booking from. */
+export function goToSignIn() {
+  closeModal('meetingRoomBookingModal');
+  globalThis.location.assign(signInPath());
+}
+
 export function openMeetingBookingModal() {
   calculateMrPrice();
   const modal = document.getElementById('meetingRoomBookingModal');
   if (!modal) return;
 
-  const setText = (id, text) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = text;
-  };
   setText('rbSelectedRoom', activeRoomBooking.room);
   setText('rbSelectedHub', activeRoomBooking.hub);
   const slotEl = document.getElementById('rbSelectedSlot');
@@ -107,6 +137,9 @@ export function openMeetingBookingModal() {
   setText('rbTotalPrice', `₹${activeRoomBooking.totalAmount.toLocaleString('en-IN')}`);
 
   setBookingStep(1);
+  renderAccount();
+  // A fresh tab may still have a valid refresh cookie, so the panel is drawn again once that is known.
+  restoreSession().then(renderAccount);
   openActiveModal('meetingRoomBookingModal');
 }
 
@@ -154,12 +187,17 @@ function bookingDate() {
 
 export function handleRoomBookingHold(e) {
   if (e) e.preventDefault();
-  const valueOf = (id, fallback) => document.getElementById(id)?.value || fallback;
+  const customer = getCustomer();
+  if (!customer) {
+    showToast('Sign in to hold a room', 'Rooms are held against your account, so we need you signed in.', 'info');
+    goToSignIn();
+    return;
+  }
   activeRoomBooking.customer = {
-    name: valueOf('rbName', 'Guest User'),
-    company: valueOf('rbCompany', ''),
-    mobile: valueOf('rbMobile', '9876543210'),
-    email: valueOf('rbEmail', 'user@company.com'),
+    name: customer.name,
+    company: document.getElementById('rbCompany')?.value || customer.company || '',
+    mobile: customer.mobile,
+    email: customer.email,
   };
   activeRoomBooking.state = 'hold';
   activeRoomBooking.ref = 'BK-' + Date.now().toString(36).toUpperCase();
@@ -181,15 +219,7 @@ function holdOnServer() {
   if (!centreRef || !startTime) return;
 
   const { room, duration, attendees, customer } = activeRoomBooking;
-  holdBooking({
-    centreRef,
-    room,
-    date: bookingDate(),
-    startTime,
-    duration,
-    attendees,
-    customer: { name: customer.name, company: customer.company, mobile: customer.mobile, email: customer.email },
-  })
+  holdBooking({ centreRef, room, date: bookingDate(), startTime, duration, attendees, company: customer.company })
     .then((booking) => {
       if (booking?.ref) activeRoomBooking.ref = booking.ref;
     })
@@ -197,6 +227,13 @@ function holdOnServer() {
       if (error.code === 'SLOT_UNAVAILABLE') {
         cancelRoomBookingHold();
         showToast('That slot has just gone', error.message, 'warning');
+        return;
+      }
+      if (error.status === 401) {
+        // The session ran out between opening the form and submitting it.
+        cancelRoomBookingHold();
+        showToast('Please sign in again', 'Your session has expired, so the room was not held.', 'warning');
+        goToSignIn();
         return;
       }
       if (error.status === 409 || error.status === 422 || error.status === 400) {
@@ -229,10 +266,6 @@ function openConfirmedBookingPass() {
   const { customer, ...record } = activeRoomBooking;
   addBooking({ ...record, ref: bookingId, host: customer?.name || 'Authorized Guest' });
 
-  const setText = (id, text) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = text;
-  };
   setText('passBookingId', bookingId);
   setText('passRoomName', activeRoomBooking.room);
   setText('passCentreName', activeRoomBooking.hub);

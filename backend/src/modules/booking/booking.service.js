@@ -226,6 +226,9 @@ async function reserveSlots(booking, now) {
 
 /**
  * Holds a room for HOLD_SECONDS at the server-computed price.
+ *
+ * `body.customer` and `body.customerRef` are the signed-in customer's own details, put there by the
+ * controller — they are never read from the request, so nobody can hold a room in someone else's name.
  * @returns {Promise<{ booking: object, created: boolean }>} created=false when the key was replayed
  */
 export async function holdBooking(body, idempotencyKey, now = new Date()) {
@@ -239,7 +242,7 @@ export async function holdBooking(body, idempotencyKey, now = new Date()) {
   const replay = await findReplay(idempotencyKey, requestHash);
   if (replay) return replayOf(replay, now);
 
-  const { centreRef, date, startHour, duration, attendees, customer } = body;
+  const { centreRef, date, startHour, duration, attendees, customer, customerRef } = body;
   assertBookableDate(date, now);
   assertBookableSlot(date, startHour, duration, now);
   const { centre, room, rules } = await resolveRoom(centreRef, body.room);
@@ -266,6 +269,7 @@ export async function holdBooking(body, idempotencyKey, now = new Date()) {
     startsAt: istInstant(date, startHour),
     endsAt: istInstant(date, startHour + duration),
     attendees,
+    customerRef,
     customer: {
       name: customer.name,
       company: customer.company ?? '',
@@ -274,7 +278,7 @@ export async function holdBooking(body, idempotencyKey, now = new Date()) {
     },
     pricing,
     expiresAt: new Date(now.getTime() + HOLD_SECONDS * 1000),
-    history: [{ status: 'HELD', at: now, actor: 'public' }],
+    history: [{ status: 'HELD', at: now, actor: customerRef }],
     idempotencyKey,
     requestHash,
   });
@@ -326,6 +330,13 @@ export async function getPass(ref) {
 }
 
 /** Staff list, newest first, with contact details and the status timeline. */
+/** The signed-in customer's own bookings, newest first — the portal's list, with no contact details in it. */
+export async function listBookingsForCustomer(customerRef, { cursor, limit }, now = new Date()) {
+  const after = cursor ? decodeCursor(cursor) : undefined;
+  const { items, nextCursor } = toPage(await repo.findBookingsForCustomer({ customerRef, after, limit }), limit);
+  return { bookings: items.map((doc) => mapBooking(doc, now)), nextCursor };
+}
+
 export async function listBookings({ status, centreRef, date, cursor, limit }, now = new Date()) {
   const after = cursor ? decodeCursor(cursor) : undefined;
   const { items, nextCursor } = toPage(await repo.findBookings({ status, centreRef, date, after, limit }), limit);

@@ -35,7 +35,9 @@ const bookingSchema = new Schema(
     startsAt: { type: Date, required: true },
     endsAt: { type: Date, required: true },
     attendees: { type: Number, required: true },
-    /** Guest contact details. PII: never logged, never in the public view (rules.md §21). */
+    /** The signed-in customer who booked it (identity's `customers`), so the portal can list their own. */
+    customerRef: { type: String, required: true },
+    /** Contact details, copied from the account at hold time. PII: never logged, never in the public view (rules.md §21). */
     customer: {
       name: { type: String, required: true },
       company: { type: String, default: '' },
@@ -71,6 +73,8 @@ bookingSchema.index({ deletedAt: 1, createdAt: -1, ref: -1 });
 bookingSchema.index({ deletedAt: 1, centreRef: 1, date: 1 });
 /** Per-mobile active-hold count. */
 bookingSchema.index({ 'customer.mobile': 1, status: 1, expiresAt: 1 });
+/** One customer's own bookings, newest first. */
+bookingSchema.index({ customerRef: 1, createdAt: -1, ref: -1 });
 
 // ──────────────────────────────────────────────
 // Reserved room-hour

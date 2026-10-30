@@ -5,9 +5,11 @@
  *   requirePermission(p)   403 unless req.user's role holds permission p (identity.constants.js PERMISSIONS)
  *   requireStaff(p)        both of the above — or, while the admin console still uses it, the legacy
  *                          x-admin-key, which keeps full access until it is retired
+ *   requireCustomer        Bearer customer token → req.customer + req.actor (the customer's ref)
  */
 import { forbidden, unauthorized } from '../../shared/errors/AppError.js';
 import { requireAdminKey } from '../../shared/middleware/requireAdminKey.js';
+import { authenticateCustomerToken } from './identity.customer.service.js';
 import { hasPermission } from './identity.mapper.js';
 import { authenticateAccessToken } from './identity.service.js';
 
@@ -38,4 +40,16 @@ export function requireStaff(permission) {
     if (!req.get('authorization')) return requireAdminKey(req, res, next);
     await authenticate(req, res, (err) => (err ? next(err) : checkPermission(req, res, next)));
   };
+}
+
+/**
+ * The portal guard. A staff access token is refused here and a customer token is refused by `authenticate`:
+ * the two surfaces share a signing secret but not a token type, so neither can borrow the other's routes.
+ */
+export async function requireCustomer(req, _res, next) {
+  const token = bearerToken(req);
+  if (!token) return next(unauthorized('AUTH_REQUIRED', 'Please sign in to continue'));
+  req.customer = await authenticateCustomerToken(token);
+  req.actor = req.customer.ref;
+  next();
 }
