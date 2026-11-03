@@ -88,14 +88,18 @@ database; the two cannot collide, because every claim takes one row with `FOR UP
 
 ```bash
 cd frontend
-VITE_API_URL="https://vdesk-api.shoaibk-mca2024.workers.dev/api/v1" npm run build
-npx wrangler deploy
+npm run cf:deploy        # = npm run build && npx wrangler deploy
 ```
 
-`VITE_API_URL` is baked into the bundle at build time and **must end in `/api/v1`**. Built without it, the
-site still works — every feature falls back to the data bundled in the build and to `localStorage` — which
-is a useful way to ship the marketing site before the API is ready, and a confusing way to debug a
-deployment. Check it landed:
+`VITE_API_URL` is baked into the bundle at build time. It lives in **`frontend/.env.production`** (committed),
+which every production build reads and which takes priority over a personal `.env.local`. The build refuses
+to finish unless the address is a public `https` URL ending in `/api/v1` (`scripts/check-api-url.js`).
+
+Why: on 30 Oct 2026 the site was built with `http://127.0.0.1:5080/api/v1` from a developer's `.env.local`.
+Every API call then failed in visitors' browsers and leads, bookings and staff sign-in quietly fell back to
+browser-only storage — the site looked fine while nothing reached the database. Redeployed with the right
+address on 3 Nov 2026. Never keep a `.env.production.local`; it would override the committed file. Check it
+landed:
 
 ```bash
 grep -ro "vdesk-api[^\"']*" dist/assets/*.js | head -1
@@ -106,7 +110,8 @@ grep -ro "vdesk-api[^\"']*" dist/assets/*.js | head -1
 1. Add the zone to the Cloudflare account, then give each Worker a route: `vdesk.in/*` for the site,
    `api.vdesk.in/*` for the API (`wrangler.jsonc` → `routes`).
 2. Set the API's `SITE_URL` and `CORS_ORIGINS` to the new site origin, and deploy it.
-3. Rebuild and deploy the site with `VITE_API_URL=https://api.vdesk.in/api/v1`.
+3. Change `VITE_API_URL` in `frontend/.env.production` to `https://api.vdesk.in/api/v1`, commit, and
+   redeploy the site (`npm run cf:deploy`).
 
 Order matters: the API has to accept the new origin before the site starts calling from it.
 
