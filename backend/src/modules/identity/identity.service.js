@@ -1,7 +1,13 @@
 /**
  * Identity service — staff sign-in, MFA, sessions and staff user management.
  *
- * Rules (docs/backend/rules.md §19–20):
+ * Rules (docs/backend/rules.md §19–20, ADR-012, ADR-013):
+ *  - Accounts start with a one-time setup code, never a password an admin chose. Signing in with the code
+ *    leads only to "choose your password" (`setupPassword`); storing that password spends the code.
+ *  - The API never receives a password. The sign-in page derives a key from it with argon2id (the slow, costly
+ *    part) and sends `passwordKey`; the API stores and checks a salted SHA-256 of that key, which takes
+ *    microseconds — so staff sign-in fits the Workers free plan. The password rules (length, letters and
+ *    numbers) can therefore only be enforced by the page.
  *  - Password → 5-minute MFA token → TOTP code → session. No staff session is ever issued without TOTP;
  *    staff who have not enrolled are sent through /mfa/enroll first.
  *  - Wrong passwords and wrong codes share one counter; MAX_FAILED_ATTEMPTS locks the account for LOCKOUT_MS.
@@ -10,7 +16,7 @@
  *  - Unknown email, disabled account and wrong password all answer the same 401 INVALID_CREDENTIALS.
  *  - Logs carry user refs only, never emails, passwords, codes or tokens (rules.md §21).
  */
-import { randomUUID } from 'node:crypto';
+import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { env } from '../../config/env.js';
 import { AppError, badRequest, conflict, notFound, unauthorized } from '../../shared/errors/AppError.js';
 import { logger } from '../../shared/lib/logger.js';
@@ -22,17 +28,24 @@ import {
   MAX_FAILED_ATTEMPTS,
   MFA_TOKEN_TTL_SECONDS,
   REFRESH_TOKEN_TTL_MS,
+  SETUP_CODE_TTL_MS,
+  SETUP_TOKEN_TTL_SECONDS,
 } from './identity.constants.js';
 import { mapUser } from './identity.mapper.js';
 import * as repo from './identity.repository.js';
 import {
   generateRefreshToken,
-  hashPassword,
+  generateSetupCode,
+  hashPasswordKey,
   hashRefreshToken,
+  hashSetupCode,
+  isLegacyPasswordHash,
   signAccessToken,
   signMfaToken,
+  signSetupToken,
   verifyAgainstDummy,
-  verifyPassword,
+  verifyPasswordKey,
+  verifySetupToken,
   verifyToken,
 } from './identity.tokens.js';
 import { decryptSecret, encryptSecret, generateTotpSecret, otpauthUrl, verifyTotp } from './identity.totp.js';
@@ -94,27 +107,75 @@ async function startSession(user, now, family = randomUUID()) {
 // Sign-in
 // ──────────────────────────────────────────────
 
+/** What follows a correct password: an MFA token, flagged with whether the user still has to enrol an app. */
+async function mfaStep(user) {
+  const mfaToken = await signMfaToken(user);
+  const next = user.mfa.enabled ? { mfaRequired: true } : { mfaEnrollmentRequired: true };
+  return { ...next, mfaToken, expiresIn: MFA_TOKEN_TTL_SECONDS };
+}
+
+const sameHash = (a, b) => a.length === b.length && timingSafeEqual(Buffer.from(a), Buffer.from(b));
+
+const passwordResetRequired = () =>
+  unauthorized(
+    'PASSWORD_RESET_REQUIRED',
+    'Your password has to be set again after a security upgrade. Ask your admin for a setup code.',
+  );
+
 /**
- * Step 1: email + password. Never returns a session — only an MFA token, flagged with whether the user
- * still has to enrol an authenticator app.
+ * Step 1: email + `passwordKey` (the key the page derived from the password), or — for an account still waiting
+ * for its first password — email + `setupCode`. Never returns a session: a password leads to an MFA token, a
+ * setup code to a setup token for POST /auth/password/setup. The code itself is spent only when the password
+ * is stored.
  */
-export async function login({ email, password }) {
+export async function login({ email, passwordKey, setupCode }) {
   assertConfigured();
   const now = new Date();
   const user = await repo.findUserByEmail(email);
   if (!user || user.status !== 'active') {
-    await verifyAgainstDummy(password);
+    verifyAgainstDummy(passwordKey);
     throw invalidCredentials();
   }
   assertNotLocked(user, now);
-  if (!(await verifyPassword(user.passwordHash, password))) {
+
+  if (setupCode !== undefined) {
+    // A code only opens an account that has no password yet; once one is set, the code is gone.
+    if (user.passwordHash || !user.setupCodeHash || !sameHash(hashSetupCode(setupCode), user.setupCodeHash)) {
+      await recordFailure(user, now);
+      throw invalidCredentials();
+    }
+    if (user.setupCodeExpiresAt <= now) {
+      throw unauthorized('SETUP_CODE_EXPIRED', 'This setup code has expired. Ask your admin for a new one.');
+    }
+    return { passwordSetupRequired: true, setupToken: await signSetupToken(user), expiresIn: SETUP_TOKEN_TTL_SECONDS };
+  }
+
+  if (isLegacyPasswordHash(user.passwordHash)) throw passwordResetRequired();
+  if (!verifyPasswordKey(user.passwordHash, passwordKey)) {
     await recordFailure(user, now);
     throw invalidCredentials();
   }
+  return mfaStep(user);
+}
 
-  const mfaToken = await signMfaToken(user);
-  const next = user.mfa.enabled ? { mfaRequired: true } : { mfaEnrollmentRequired: true };
-  return { ...next, mfaToken, expiresIn: MFA_TOKEN_TTL_SECONDS };
+/**
+ * Step 1b (first sign-in, or after an admin issued a fresh code): the staff member chooses their password.
+ * Storing it spends the setup code; then sign-in carries on exactly as after a password (MFA next).
+ */
+export async function setupPassword({ setupToken, newPasswordKey }) {
+  assertConfigured();
+  const now = new Date();
+  const claim = await verifySetupToken(setupToken);
+  const user = claim && (await repo.findUserByRef(claim.ref));
+  if (!user || user.status !== 'active') {
+    throw unauthorized('SETUP_TOKEN_INVALID', 'Please sign in with your setup code again');
+  }
+  const updated = await repo.completeSetup(user.ref, claim.codeHashPrefix, hashPasswordKey(newPasswordKey), now);
+  if (!updated) {
+    throw unauthorized('SETUP_TOKEN_INVALID', 'This setup code was already used or replaced. Sign in again.');
+  }
+  log.info({ event: 'auth.password_set', userRef: user.ref }, 'staff password set from setup code');
+  return mfaStep(updated);
 }
 
 async function userFromMfaToken(mfaToken) {
@@ -219,18 +280,22 @@ export async function getMe(ref) {
 }
 
 /** Changing your password signs out every other device. */
-export async function changePassword(ref, { currentPassword, newPassword }) {
+export async function changePassword(ref, { currentPasswordKey, newPasswordKey }) {
   const now = new Date();
   const user = await repo.findUserByRef(ref);
   if (!user) throw notFound('USER_NOT_FOUND', 'User not found');
   assertNotLocked(user, now);
-  if (!(await verifyPassword(user.passwordHash, currentPassword))) {
+  if (!user.passwordHash) {
+    throw conflict('PASSWORD_NOT_SET', 'Set your password with your setup code first (POST /auth/password/setup)');
+  }
+  if (isLegacyPasswordHash(user.passwordHash)) throw passwordResetRequired();
+  if (!verifyPasswordKey(user.passwordHash, currentPasswordKey)) {
     await recordFailure(user, now);
     throw unauthorized('INVALID_CREDENTIALS', 'Current password is incorrect');
   }
-  if (currentPassword === newPassword)
+  if (currentPasswordKey === newPasswordKey)
     throw badRequest('PASSWORD_UNCHANGED', 'Choose a password you have not used here');
-  await repo.updateUser(ref, { passwordHash: await hashPassword(newPassword) });
+  await repo.updateUser(ref, { passwordHash: hashPasswordKey(newPasswordKey) });
   await repo.revokeAllForUser(ref, now);
   log.info({ event: 'auth.password_changed', userRef: ref }, 'password changed');
 }
@@ -239,19 +304,45 @@ export async function changePassword(ref, { currentPassword, newPassword }) {
 // Staff user management (users:manage)
 // ──────────────────────────────────────────────
 
-/** `actor` is the creating user's ref, 'admin-key', or 'script' for the bootstrap admin. */
-export async function createUser({ email, name, role, password }, actor) {
+/** A fresh one-time code: the plain code (shown once, never stored) and what goes into the database. */
+function newSetupCode(now) {
+  const setupCode = generateSetupCode();
+  const setupCodeExpiresAt = new Date(now.getTime() + SETUP_CODE_TTL_MS);
+  return { setupCode, setupCodeExpiresAt, stored: { setupCodeHash: hashSetupCode(setupCode), setupCodeExpiresAt } };
+}
+
+/**
+ * Creates a staff account with a one-time setup code — returned here once, for the admin to hand over, and
+ * never retrievable again. `passwordKey` is only for scripts/create-admin.js bootstrapping the first admin
+ * (derived on that machine, as the sign-in page would). `actor` is the creating user's ref, 'admin-key', or
+ * 'script'.
+ */
+export async function createUser({ email, name, role, passwordKey }, actor) {
+  const now = new Date();
+  const code = passwordKey ? null : newSetupCode(now);
   const doc = await repo.insertUser({
     ref: generateRef('USR', 6),
     email,
     name,
     role,
-    passwordHash: await hashPassword(password),
+    ...(passwordKey ? { passwordHash: hashPasswordKey(passwordKey) } : code.stored),
     createdBy: actor,
   });
   if (!doc) throw conflict('EMAIL_TAKEN', 'A user with this email already exists');
   log.info({ event: 'user.created', userRef: doc.ref, role, actor }, 'user created');
-  return mapUser(doc);
+  return code
+    ? { ...mapUser(doc), setupCode: code.setupCode, setupCodeExpiresAt: code.setupCodeExpiresAt }
+    : mapUser(doc);
+}
+
+/**
+ * For scripts/issue-setup-code.js — a fresh setup code for the account with this email, when nobody can sign in
+ * to issue one (e.g. the only super admin, whose password predates ADR-013).
+ */
+export async function issueSetupCodeByEmail(email, actor) {
+  const user = await repo.findUserByEmail(email);
+  if (!user) throw notFound('USER_NOT_FOUND', 'No staff account has that email');
+  return updateUser(user.ref, { issueSetupCode: true }, actor);
 }
 
 export async function listUsers({ cursor, limit }) {
@@ -267,33 +358,41 @@ export async function getUser(ref) {
 }
 
 /**
- * Admin changes: name, role, status, a new temporary password, MFA reset, unlock. Anything that changes what
- * the user can do (role, disable, password, MFA reset) also ends their sessions.
+ * Admin changes: name, role, status, a fresh setup code (forgotten password), MFA reset, unlock. Anything
+ * that changes what the user can do (role, disable, new setup code, MFA reset) also ends their sessions.
+ * A fresh setup code removes the old password: the staff member signs in with the code and chooses a new one.
  */
 export async function updateUser(ref, changes, actor) {
-  const { name, role, status, password, resetMfa, unlock } = changes;
+  const { name, role, status, issueSetupCode, resetMfa, unlock } = changes;
   const user = await repo.findUserByRef(ref);
   if (!user) throw notFound('USER_NOT_FOUND', `No user found for ref '${ref}'`);
 
-  const changesAccess = (role && role !== user.role) || status === 'disabled' || resetMfa;
+  const changesAccess = (role && role !== user.role) || status === 'disabled' || resetMfa || issueSetupCode;
   if (ref === actor && changesAccess) {
-    throw conflict('CANNOT_CHANGE_OWN_ACCESS', 'Ask another super admin to change your own role, status or MFA');
+    throw conflict(
+      'CANNOT_CHANGE_OWN_ACCESS',
+      'Ask another super admin to change your own role, status, MFA or setup code (use POST /auth/password to change your password)',
+    );
   }
   const losesSuperAdmin = user.role === 'SUPER_ADMIN' && ((role && role !== 'SUPER_ADMIN') || status === 'disabled');
   if (losesSuperAdmin && user.status === 'active' && (await repo.countActiveSuperAdmins()) <= 1) {
     throw conflict('LAST_SUPER_ADMIN', 'There must always be at least one active super admin');
   }
 
+  const now = new Date();
+  const code = issueSetupCode ? newSetupCode(now) : null;
   const set = {};
   if (name) set.name = name;
   if (role) set.role = role;
   if (status) set.status = status;
-  if (password) set.passwordHash = await hashPassword(password);
+  if (code) Object.assign(set, { passwordHash: null, ...code.stored, failedAttempts: 0, lockedUntil: null });
   if (resetMfa) set.mfa = { enabled: false, secret: null, pendingSecret: null, lastStep: -1 };
   if (unlock) Object.assign(set, { failedAttempts: 0, lockedUntil: null });
 
   const updated = await repo.updateUser(ref, set);
-  if (changesAccess || password) await repo.revokeAllForUser(ref, new Date());
+  if (changesAccess) await repo.revokeAllForUser(ref, now);
   log.info({ event: 'user.updated', userRef: ref, fields: Object.keys(set), actor }, 'user updated');
-  return mapUser(updated);
+  return code
+    ? { ...mapUser(updated), setupCode: code.setupCode, setupCodeExpiresAt: code.setupCodeExpiresAt }
+    : mapUser(updated);
 }

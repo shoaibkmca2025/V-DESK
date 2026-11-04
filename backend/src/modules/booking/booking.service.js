@@ -228,8 +228,9 @@ async function reserveSlots(booking, now) {
 /**
  * Holds a room for HOLD_SECONDS at the server-computed price.
  *
- * `body.customer` and `body.customerRef` are the signed-in customer's own details, put there by the
- * controller — they are never read from the request, so nobody can hold a room in someone else's name.
+ * No account is needed (ADR-012): `body.customer` is the contact details from the booking form, and
+ * `body.customerRef` is the signed-in customer's ref when there is one, else null. A guest hold is put in a
+ * customer's name at checkout (claimBooking), when they sign in to pay.
  * @returns {Promise<{ booking: object, created: boolean }>} created=false when the key was replayed
  */
 export async function holdBooking(body, idempotencyKey, now = new Date()) {
@@ -270,7 +271,7 @@ export async function holdBooking(body, idempotencyKey, now = new Date()) {
     startsAt: istInstant(date, startHour),
     endsAt: istInstant(date, startHour + duration),
     attendees,
-    customerRef,
+    customerRef: customerRef ?? null,
     customer: {
       name: customer.name,
       company: customer.company ?? '',
@@ -279,7 +280,7 @@ export async function holdBooking(body, idempotencyKey, now = new Date()) {
     },
     pricing,
     expiresAt: new Date(now.getTime() + HOLD_SECONDS * 1000),
-    history: [{ status: 'HELD', at: now, actor: customerRef }],
+    history: [{ status: 'HELD', at: now, actor: customerRef ?? 'public' }],
     idempotencyKey,
     requestHash,
   });
@@ -414,6 +415,35 @@ export async function cancelHold(ref, now = new Date()) {
     });
   }
   return mapBooking(await changeStatus(booking, 'CANCELLED', 'public', now), now);
+}
+
+/**
+ * Checkout, after "Continue with Google": puts a guest's hold in the signed-in customer's name, so it is theirs
+ * from then on and shows in their bookings. Claiming your own booking again is a no-op. Someone else's booking,
+ * or one no longer on hold, is refused — whoever pays for a hold claims it while it is live.
+ */
+export async function claimBooking(ref, customerRef, now = new Date()) {
+  let booking = await findBookingOrThrow(ref);
+  for (let attempt = 0; attempt < 2; attempt++) {
+    if (booking.customerRef === customerRef) return mapBooking(booking, now);
+    if (booking.customerRef) {
+      throw conflict('BOOKING_ALREADY_CLAIMED', 'This booking belongs to another account');
+    }
+    const current = effectiveStatus(booking, now);
+    if (current === 'EXPIRED') throw holdExpired(booking);
+    if (current !== 'HELD') {
+      throw conflict('BOOKING_NOT_HELD', 'Only a room on hold can be added to your account', { status: current });
+    }
+    const entry = { status: 'HELD', at: now, actor: customerRef, note: 'claimed at checkout' };
+    const claimed = await repo.claimBooking(ref, customerRef, entry, now);
+    if (claimed) {
+      log.info({ event: 'booking.claimed', bookingRef: ref, customerRef }, 'guest booking claimed');
+      return mapBooking(claimed, now);
+    }
+    // Changed between the read and the write (claimed, cancelled, lapsed): decide again on what it is now.
+    booking = await findBookingOrThrow(ref);
+  }
+  throw bookingChanged();
 }
 
 /** Staff moves: CHECKED_IN, COMPLETED, CANCELLED (no refund is issued — there are no payments yet). */

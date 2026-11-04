@@ -1,7 +1,8 @@
 /**
- * Credentials: HS256 access/MFA tokens (jose), opaque refresh tokens and phone-OTP codes.
- * Kept apart from the service so the rules there read as rules, not crypto plumbing.
- * Password hashing lives in identity.password.js and is re-exported here, where its callers look for it.
+ * Credentials: HS256 access/MFA/setup tokens (jose), opaque refresh tokens and staff setup codes. Kept apart
+ * from the service so the rules there read as rules, not crypto plumbing. (Google ID tokens are checked in
+ * src/integrations/google.js.)
+ * Stored password keys live in identity.password.js and are re-exported here, where their callers look for them.
  */
 import { createHash, randomBytes, randomInt } from 'node:crypto';
 import { jwtVerify, SignJWT } from 'jose';
@@ -12,12 +13,14 @@ import {
   JWT_AUDIENCE,
   JWT_ISSUER,
   MFA_TOKEN_TTL_SECONDS,
-  OTP_LENGTH,
+  SETUP_CODE_ALPHABET,
+  SETUP_CODE_LENGTH,
+  SETUP_TOKEN_TTL_SECONDS,
 } from './identity.constants.js';
 
 // ── Passwords ─────────────────────────────────
 
-export { hashPassword, verifyPassword, verifyAgainstDummy } from './identity.password.js';
+export { hashPasswordKey, isLegacyPasswordHash, verifyAgainstDummy, verifyPasswordKey } from './identity.password.js';
 
 // ── Signed tokens ─────────────────────────────
 
@@ -48,18 +51,56 @@ export function signCustomerToken(customer) {
   return sign({ typ: 'customer' }, customer.ref, CUSTOMER_ACCESS_TOKEN_TTL_SECONDS);
 }
 
-/** Returns the user ref, or null for anything expired, tampered with or of the wrong type. */
-export async function verifyToken(token, typ) {
+/**
+ * Proof that a setup code was just entered (ADR-012). It names the code it came from (`sch`, a prefix of the
+ * code's hash), so a fresh code issued by an admin makes every earlier setup token useless.
+ */
+export function signSetupToken(user) {
+  return sign({ typ: 'setup', sch: user.setupCodeHash.slice(0, 16) }, user.ref, SETUP_TOKEN_TTL_SECONDS);
+}
+
+async function verifiedPayload(token, typ) {
   try {
     const { payload } = await jwtVerify(token, secretKey(), {
       algorithms: ['HS256'],
       issuer: JWT_ISSUER,
       audience: JWT_AUDIENCE,
     });
-    return payload.typ === typ && typeof payload.sub === 'string' ? payload.sub : null;
+    return payload.typ === typ && typeof payload.sub === 'string' ? payload : null;
   } catch {
     return null;
   }
+}
+
+/** Returns the user ref, or null for anything expired, tampered with or of the wrong type. */
+export async function verifyToken(token, typ) {
+  return (await verifiedPayload(token, typ))?.sub ?? null;
+}
+
+/** @returns {Promise<{ ref: string, codeHashPrefix: string } | null>} */
+export async function verifySetupToken(token) {
+  const payload = await verifiedPayload(token, 'setup');
+  return payload && typeof payload.sch === 'string' ? { ref: payload.sub, codeHashPrefix: payload.sch } : null;
+}
+
+// ── Setup codes ───────────────────────────────
+
+/** XXXX-XXXX-XXXX from an alphabet without look-alikes, so it survives being read out or copied by hand. */
+export function generateSetupCode() {
+  const chars = Array.from(
+    { length: SETUP_CODE_LENGTH },
+    () => SETUP_CODE_ALPHABET[randomInt(SETUP_CODE_ALPHABET.length)],
+  );
+  return chars.join('').match(/.{4}/g).join('-');
+}
+
+/**
+ * Case, spaces and dashes don't matter when typing it back. A setup code is random, so a plain SHA-256 is a
+ * safe way to store it — unlike a password a person chose, it can't be found by guessing common words.
+ */
+export function hashSetupCode(code) {
+  const normalised = String(code).toUpperCase().replace(/[\s-]/g, '');
+  return createHash('sha256').update(`setup:${normalised}`).digest('hex');
 }
 
 // ── Refresh tokens ────────────────────────────
@@ -71,19 +112,4 @@ export function generateRefreshToken() {
 
 export function hashRefreshToken(token) {
   return createHash('sha256').update(token).digest('hex');
-}
-
-// ── Phone OTP ─────────────────────────────────
-
-/** A uniformly random 6-digit code — randomInt, never Math.random. */
-export function generateOtpCode() {
-  return String(randomInt(0, 10 ** OTP_LENGTH)).padStart(OTP_LENGTH, '0');
-}
-
-/**
- * Codes are stored hashed, peppered with JWT_SECRET and bound to the mobile number: a leaked database is
- * not a list of working codes, and a hash lifted from one row cannot be replayed against another number.
- */
-export function hashOtp(mobile, code) {
-  return createHash('sha256').update(`${mobile}:${code}:${env.JWT_SECRET}`).digest('hex');
 }

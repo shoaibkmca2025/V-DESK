@@ -24,6 +24,11 @@ export async function login(req, res) {
   res.json({ data: await identityService.login(req.validated.body) });
 }
 
+/** POST /api/v1/auth/password/setup — first password from a setup code; answers like login (MFA next). */
+export async function setupPassword(req, res) {
+  res.json({ data: await identityService.setupPassword(req.validated.body) });
+}
+
 /** POST /api/v1/auth/mfa/enroll — new TOTP secret + otpauth:// URL for the authenticator app. */
 export async function enrollMfa(req, res) {
   res.json({ data: await identityService.enrollMfa(req.validated.body) });

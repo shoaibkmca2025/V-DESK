@@ -147,15 +147,12 @@ export default function PortalDashboard() {
         <div className="ui-card ui-signin">
           <h2>Sign in to your account</h2>
           <p>
-            Your documents, bookings and invoices are tied to your mobile number. Signing in takes one OTP — and
-            creates your account if this is your first visit.
+            Your bookings and invoices are kept in the account you signed in with at checkout. Continue with the same
+            Google account to see them.
           </p>
           <div className="ui-actions">
             <Link className="ui-btn ui-btn--primary" to="/login?next=/portal">
-              Sign in
-            </Link>
-            <Link className="ui-btn ui-btn--outline" to="/register?next=/portal">
-              Create an account
+              Sign in with Google
             </Link>
           </div>
         </div>

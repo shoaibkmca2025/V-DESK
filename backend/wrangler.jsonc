@@ -24,8 +24,7 @@
   },
 
   "vars": {
-    // Without this the API behaves as a development server: it would answer /auth/otp/request with the
-    // code it was supposed to text, and leave `Secure` off the refresh cookie.
+    // Without this the API behaves as a development server: it would leave `Secure` off the refresh cookies.
     "NODE_ENV": "production",
     "LOG_LEVEL": "info",
     // Rate limits must see the visitor's address, not Cloudflare's.
@@ -33,6 +32,9 @@
     // Set to the deployed site once it has a domain; sitemap.xml needs it.
     "SITE_URL": "https://vdesk.shoaibk-mca2024.workers.dev",
     "CORS_ORIGINS": "https://vdesk.shoaibk-mca2024.workers.dev,http://localhost:5173,http://localhost:4173",
+    // "Continue with Google" for customers (ADR-012): add the OAuth client ID here once it exists — it is public,
+    // and the same value as the website's VITE_GOOGLE_CLIENT_ID. Until then POST /auth/google answers 503.
+    // "GOOGLE_CLIENT_ID": "….apps.googleusercontent.com",
   },
 
   // JWT_SECRET, MFA_ENCRYPTION_KEY and ADMIN_API_KEY are secrets, not vars:

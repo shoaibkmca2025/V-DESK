@@ -53,8 +53,23 @@ export const REFRESH_COOKIE_PATH = '/api/v1/auth';
 export const MAX_FAILED_ATTEMPTS = 5;
 export const LOCKOUT_MS = 15 * 60 * 1000;
 
+/**
+ * The password rule (ADR-012). The API never sees a password (ADR-013) — only the key derived from it — so the
+ * sign-in page enforces this (frontend features/auth/staffSession.js `passwordProblem`); kept here as the record.
+ */
 export const PASSWORD_MIN_LENGTH = 12;
 export const PASSWORD_MAX_LENGTH = 128;
+
+/**
+ * One-time setup codes (ADR-012): what a super admin hands a new staff member instead of a password.
+ * 12 characters from an alphabet without look-alikes (no 0/O, 1/I/L), shown as XXXX-XXXX-XXXX — about 58 bits,
+ * and the shared lockout allows 5 wrong tries, so guessing is hopeless. Valid until used or 72 hours.
+ */
+export const SETUP_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+export const SETUP_CODE_LENGTH = 12;
+export const SETUP_CODE_TTL_MS = 72 * 60 * 60 * 1000;
+/** Issued once the setup code checks out; long enough to choose a password. */
+export const SETUP_TOKEN_TTL_SECONDS = 15 * 60;
 
 export const TOTP_ISSUER = 'V-DESK';
 export const TOTP_DIGITS = 6;
@@ -66,28 +81,20 @@ export const JWT_ISSUER = 'vdesk-api';
 export const JWT_AUDIENCE = 'vdesk';
 
 // ──────────────────────────────────────────────
-// Customers (phone OTP — ADR-009)
+// Customers (Google sign-in at checkout — ADR-012)
 // ──────────────────────────────────────────────
 
 export const CUSTOMER_STATUSES = ['active', 'disabled'];
 
-/** An Indian mobile, with or without +91 — the same shape booking and crm accept. */
+/** An Indian mobile, with or without +91 — the same shape booking and crm accept. Contact data, not identity. */
 export const MOBILE_PATTERN = /^(\+?91)?[6-9]\d{9}$/;
 
-/** Customers sign in on their phone and stay signed in far longer than staff do. */
+/** Customers stay signed in far longer than staff do. */
 export const CUSTOMER_ACCESS_TOKEN_TTL_SECONDS = 60 * 60;
 export const CUSTOMER_REFRESH_TOKEN_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 /** Its own cookie, so a staff member using the portal in the same browser keeps both sessions. */
 export const CUSTOMER_REFRESH_COOKIE = 'vd_crt';
 export const CUSTOMER_REFRESH_COOKIE_PATH = '/api/v1/auth/customer';
 
-export const OTP_LENGTH = 6;
-export const OTP_TTL_MS = 5 * 60 * 1000;
-/** Wrong codes for one challenge; the next request starts a fresh one. */
-export const OTP_MAX_ATTEMPTS = 5;
-/** Stops "resend" being a free SMS button: a gap between sends, and a ceiling per window. */
-export const OTP_RESEND_MS = 30 * 1000;
-export const OTP_SEND_WINDOW_MS = 30 * 60 * 1000;
-export const OTP_MAX_SENDS_PER_WINDOW = 5;
-/** Staff write the wording; no template → nothing is queued (notifications.notifyIfConfigured). */
-export const OTP_TEMPLATE_KEY = 'customer.otp';
+/** Google ID tokens are around 1 KB; anything far larger is not one. */
+export const GOOGLE_CREDENTIAL_MAX_LENGTH = 4096;

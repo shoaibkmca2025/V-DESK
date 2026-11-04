@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton.jsx';
 import Breadcrumbs from '@/components/page/Breadcrumbs.jsx';
 import { GST_RATE } from '@/data/constants.js';
 import { trackSearchEvent } from '@/features/analytics/telemetry.js';
+import { useCustomer } from '@/features/auth/useCustomer.js';
 import { openTaxInvoiceModal } from '@/features/checkout/taxInvoice.js';
 import { showToast } from '@/features/ui/toast.js';
+import { isApiEnabled } from '@/lib/api.js';
 import { rawStyle } from '@/lib/domRefs.js';
 import { readJson, writeJson } from '@/lib/storage.js';
 
@@ -16,7 +19,12 @@ const METHODS = [
 
 const rupees = (n) => '₹' + Math.round(n).toLocaleString('en-IN');
 
-/** /checkout?item=&amount=&city=&hub= — standalone checkout (PRD §48). Amount is GST-inclusive. */
+/**
+ * /checkout?item=&amount=&city=&hub= — standalone checkout (PRD §48). Amount is GST-inclusive.
+ *
+ * Paying is the one step that needs an account (ADR-012), so the payment options appear once the customer has
+ * continued with Google. Payment itself is simulated — test mode, no money is taken — until a gateway is live.
+ */
 export default function CheckoutPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -30,21 +38,23 @@ export default function CheckoutPage() {
   const [method, setMethod] = useState('upi');
   const [processing, setProcessing] = useState(false);
   const [done, setDone] = useState(null);
+  const { customer, ready } = useCustomer();
+  const needsSignIn = isApiEnabled() && !customer;
 
   function pay(label) {
-    if (processing) return;
+    if (processing || needsSignIn) return;
     setProcessing(true);
-    showToast('Processing Payment...', `Verifying transaction via ${label}`, 'info');
+    showToast('Processing test payment…', `Simulating ${label} — no money is taken.`, 'info');
     trackSearchEvent('checkout_started', { amount, item });
     setTimeout(() => {
       const invoiceNo = 'INV-2026-' + Math.floor(1000 + Math.random() * 9000);
       const orders = readJson('VDESK_ORDERS', []);
-      orders.unshift({ ref: 'ORD-' + Date.now().toString(36).toUpperCase(), invoiceNo, item, city, hub, amount, method: label, status: 'SUCCESS', createdAt: new Date().toISOString() });
+      orders.unshift({ ref: 'ORD-' + Date.now().toString(36).toUpperCase(), invoiceNo, item, city, hub, amount, method: label, status: 'TEST', customerRef: customer?.ref ?? null, createdAt: new Date().toISOString() });
       writeJson('VDESK_ORDERS', orders);
       trackSearchEvent('payment_success', { method: label, amount });
       setProcessing(false);
       setDone({ invoiceNo });
-      showToast('Payment Successful! ✓', 'Your GST tax invoice is ready.', 'success');
+      showToast('Test payment complete ✓', 'No money was taken. Your GST invoice preview is ready.', 'success');
     }, 1200);
   }
 
@@ -68,9 +78,9 @@ export default function CheckoutPage() {
           {done ? (
             <div style={{ background: '#FFFFFF', border: '1px solid #ECDFC9', borderRadius: '16px', padding: '40px', textAlign: 'center' }}>
               <i className="ph-bold ph-check-circle" style={{ fontSize: '3rem', color: '#10B981' }} />
-              <h2 style={{ color: '#2B1A0C', margin: '12px 0 6px' }}>Payment Successful</h2>
+              <h2 style={{ color: '#2B1A0C', margin: '12px 0 6px' }}>Test payment complete</h2>
               <p style={{ color: '#8A7560', margin: '0 0 6px' }}>
-                Invoice <strong>{done.invoiceNo}</strong> • {rupees(amount)} paid for {item}
+                Invoice <strong>{done.invoiceNo}</strong> • {rupees(amount)} for {item} — test mode, no money was taken
               </p>
               <p style={{ color: '#8A7560', maxWidth: '520px', margin: '0 auto 22px' }}>Next step: complete Digital KYC so we can issue your documents. Activation is confirmed once payment and KYC are both complete.</p>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -86,8 +96,24 @@ export default function CheckoutPage() {
               </div>
             </div>
           ) : (
+            <>
+            <p className="chk-testmode" role="note">
+              <i className="ph-bold ph-flask" /> <strong>Test mode — no money is taken.</strong> Payments are simulated until our payment gateway is connected.
+            </p>
             <div className="checkout-layout" style={{ display: 'grid', gridTemplateColumns: '1fr minmax(280px, 360px)', gap: '24px', alignItems: 'start' }}>
               <div className="checkout-methods" style={{ background: '#FFFFFF', border: '1px solid #ECDFC9', borderRadius: '16px', padding: '24px' }}>
+                {needsSignIn ? (
+                  <div className="chk-gate">
+                    <div className="rb-signin__icon">
+                      <i className="ph-bold ph-user-circle" />
+                    </div>
+                    <h4>Sign in to pay</h4>
+                    <p>Your order and invoice are kept in your V-DESK account. Continue with Google — no form, no password.</p>
+                    {ready ? <GoogleSignInButton onSignedIn={(signedIn) => showToast('Signed in ✓', `Welcome, ${signedIn.name}.`, 'success')} /> : <p className="ui-note">Checking your sign-in…</p>}
+                  </div>
+                ) : (
+                <>
+                {customer && <p className="chk-payer">Paying as {customer.name}{customer.email ? ` · ${customer.email}` : ''}</p>}
                 <div className="checkout-tabs">
                   {METHODS.map(([key, icon, label]) => (
                     <button key={key} type="button" className={method === key ? 'pay-tab active' : 'pay-tab'} onClick={() => setMethod(key)}>
@@ -153,6 +179,8 @@ export default function CheckoutPage() {
                     </button>
                   </div>
                 )}
+                </>
+                )}
                 <p style={{ fontSize: '0.78rem', color: '#8A7560', marginTop: '16px' }}>
                   <i className="ph-bold ph-shield-check" style={{ color: '#10B981' }} /> Payments are processed by a PCI-DSS compliant gateway. V-DESK never stores card details. By paying you accept the <Link to="/legal/terms">Terms</Link> and <Link to="/legal/refund-policy">Refund Policy</Link>.
                 </p>
@@ -186,6 +214,7 @@ export default function CheckoutPage() {
                 </ul>
               </aside>
             </div>
+            </>
           )}
         </div>
       </section>

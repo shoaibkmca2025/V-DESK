@@ -11,12 +11,12 @@ import { authenticate, requireCustomer, requireStaff } from './identity.middlewa
 import {
   changePasswordBody,
   createUserBody,
+  googleSignInBody,
   listUsersQuery,
   loginBody,
   mfaEnrollBody,
   mfaVerifyBody,
-  otpRequestBody,
-  otpVerifyBody,
+  setupPasswordBody,
   updateCustomerBody,
   updateUserBody,
   userRefParams,
@@ -31,6 +31,7 @@ const refreshLimit = rateLimit({ name: 'session refresh', windowMs: 60_000, max:
 
 // ── Sign-in & sessions ────────────────────────
 identityRouter.post('/login', signInLimit, validate({ body: loginBody }), controller.login);
+identityRouter.post('/password/setup', signInLimit, validate({ body: setupPasswordBody }), controller.setupPassword);
 identityRouter.post('/mfa/enroll', signInLimit, validate({ body: mfaEnrollBody }), controller.enrollMfa);
 identityRouter.post('/mfa/verify', signInLimit, validate({ body: mfaVerifyBody }), controller.verifyMfa);
 identityRouter.post('/refresh', refreshLimit, controller.refresh);
@@ -40,14 +41,8 @@ identityRouter.post('/logout', controller.logout);
 identityRouter.get('/me', authenticate, controller.me);
 identityRouter.post('/password', authenticate, validate({ body: changePasswordBody }), controller.changePassword);
 
-// ── Customer sign-in (phone OTP) ──────────────
-// Sending a code costs money and reaches a real phone, so the per-IP budget is tight; the per-number caps
-// in the service cover one phone being hammered from many addresses.
-const otpSendLimit = rateLimit({ name: 'sign-in codes', windowMs: 60_000, max: 5 });
-const otpCheckLimit = rateLimit({ name: 'code checks', windowMs: 60_000, max: 15 });
-
-identityRouter.post('/otp/request', otpSendLimit, validate({ body: otpRequestBody }), customerController.requestOtp);
-identityRouter.post('/otp/verify', otpCheckLimit, validate({ body: otpVerifyBody }), customerController.verifyOtp);
+// ── Customer sign-in (Google, at checkout — ADR-012) ──
+identityRouter.post('/google', signInLimit, validate({ body: googleSignInBody }), customerController.signInWithGoogle);
 
 const customer = Router();
 customer.post('/refresh', refreshLimit, customerController.refreshCustomer);

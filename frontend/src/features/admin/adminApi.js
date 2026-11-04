@@ -76,3 +76,30 @@ export async function downloadLeadsCsv() {
   link.remove();
   URL.revokeObjectURL(href);
 }
+
+// ── Staff accounts (users:manage — super admins) ──
+// A new account, or a forgotten password, gets a one-time setup code instead of a password (ADR-012). The API
+// returns the code once, in the reply to the call that made it; the console shows it and never stores it.
+
+export async function fetchStaffUsers({ limit = 100 } = {}) {
+  if (!isApiEnabled()) return null;
+  try {
+    return await api.get('/auth/users', { query: { limit }, headers: staffHeaders() });
+  } catch {
+    return null;
+  }
+}
+
+/** `{ email, name, role }` → the new user, with `setupCode` and `setupCodeExpiresAt`. Throws the API's answer. */
+export async function createStaffUser({ email, name, role }) {
+  return api.post('/auth/users', { body: { email, name, role }, headers: staffHeaders() });
+}
+
+/** A fresh setup code: the old password and code stop working, and the person's sessions end. */
+export async function issueStaffSetupCode(ref) {
+  return api.patch(`/auth/users/${ref}`, { body: { issueSetupCode: true }, headers: staffHeaders() });
+}
+
+export async function setStaffStatus(ref, status) {
+  return api.patch(`/auth/users/${ref}`, { body: { status }, headers: staffHeaders() });
+}

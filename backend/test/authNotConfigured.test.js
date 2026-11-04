@@ -7,7 +7,7 @@ vi.mock('../src/config/env.js', () => ({ env: { NODE_ENV: 'test', LOG_LEVEL: 'si
 describe('identity without secrets configured', () => {
   it('refuses sign-in with 503 AUTH_NOT_CONFIGURED instead of signing with an empty key', async () => {
     expect(isAuthConfigured()).toBe(false);
-    await expect(login({ email: 'a@vdesk.in', password: 'whatever' })).rejects.toMatchObject({
+    await expect(login({ email: 'a@vdesk.in', passwordKey: 'k'.repeat(43) })).rejects.toMatchObject({
       status: 503,
       code: 'AUTH_NOT_CONFIGURED',
     });

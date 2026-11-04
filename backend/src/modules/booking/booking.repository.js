@@ -112,6 +112,20 @@ export async function findBookingsForCustomer({ customerRef, after, limit }) {
 }
 
 /**
+ * Puts a guest hold in a customer's name — only while it has no customer and its hold is still live, so two
+ * accounts racing for one booking cannot both get it. Returns the booking, or null if either condition failed.
+ */
+export async function claimBooking(ref, customerRef, entry, now) {
+  return row(
+    `UPDATE bookings SET customer_ref = $2, history = history || $3::jsonb
+      WHERE ref = $1 AND deleted_at IS NULL AND customer_ref IS NULL
+        AND status = 'HELD' AND expires_at > $4
+      RETURNING ${BOOKING_COLUMNS}`,
+    [ref, customerRef, JSON.stringify([entry]), now],
+  );
+}
+
+/**
  * Moves a booking to `to` only if it is still in `from` (and, when given, its hold hasn't lapsed) — two
  * people confirming and cancelling at once can't both win. Returns the updated booking, or null if it
  * changed meanwhile.

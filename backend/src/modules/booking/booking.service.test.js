@@ -24,24 +24,32 @@ const insertCentres = (centres) => Promise.all(centres.map((centre) => insert('c
 let seq = 0;
 const nextKey = () => `key-${++seq}`;
 
-/** The signed-in customer the controller passes in; `customer` overrides below change the account, not the body. */
+/** The contact details on the form; `customer` overrides below change who is booking. */
 const ACCOUNT = { name: 'Priya Kulkarni', company: 'Zenith D2C', mobile: '9876543210', email: 'priya@zenith.in' };
 const CUSTOMER_REF = 'CUS-TESTER01';
 
-/** A validated hold body plus the signed-in customer, exactly as the route and controller hand it over. */
+/** A hold request as the website sends it. */
+const request = (overrides) => ({
+  centreRef: 'CTR-NSK-001',
+  room: 'Conference Room',
+  date: TOMORROW,
+  startTime: '14:00',
+  duration: 2,
+  attendees: 6,
+  ...ACCOUNT,
+  ...overrides,
+});
+
+/**
+ * A validated hold body as the controller hands it over: contact details folded into `customer`, plus the
+ * signed-in customer's ref (`customerRef: null` for a guest).
+ */
 function body({ customer, customerRef, ...overrides } = {}) {
+  const { name, mobile, email, company, ...details } = holdBody.parse(request(overrides));
   return {
-    ...holdBody.parse({
-      centreRef: 'CTR-NSK-001',
-      room: 'Conference Room',
-      date: TOMORROW,
-      startTime: '14:00',
-      duration: 2,
-      attendees: 6,
-      ...overrides,
-    }),
-    customerRef: customerRef ?? CUSTOMER_REF,
-    customer: { ...ACCOUNT, ...customer },
+    ...details,
+    customerRef: customerRef === undefined ? CUSTOMER_REF : customerRef,
+    customer: { name, mobile, email: email ?? '', company: company ?? '', ...customer },
   };
 }
 
@@ -135,9 +143,14 @@ describe('booking time helpers', () => {
 });
 
 describe('hold validation (schema)', () => {
-  const issues = (overrides) => holdBody.safeParse({ ...body(), startTime: '14:00', ...overrides }).success;
+  const issues = (overrides) => holdBody.safeParse({ ...request(), ...overrides }).success;
 
   it('rejects malformed dates, off-the-hour times, bad durations, attendees and mobiles', () => {
+    expect(issues({ mobile: '12345' })).toBe(false);
+    expect(issues({ mobile: '1234567890' })).toBe(false);
+    expect(issues({ mobile: undefined })).toBe(false);
+    expect(issues({ name: ' ' })).toBe(false);
+    expect(issues({ email: 'nope' })).toBe(false);
     expect(issues({ date: '2026-02-30' })).toBe(false);
     expect(issues({ startTime: '14:30' })).toBe(false);
     expect(issues({ startTime: '2 PM' })).toBe(false);
@@ -149,17 +162,20 @@ describe('hold validation (schema)', () => {
     expect(issues({ company: 'C'.repeat(201) })).toBe(false);
   });
 
-  it('parses the start hour and drops client-sent prices and identity', () => {
+  it('parses the start hour and contact details, and drops client-sent prices and account refs', () => {
     const parsed = holdBody.parse({
-      ...body(),
-      startTime: '14:00',
+      ...request(),
+      mobile: '+91 98765 43210',
+      email: ' Priya@Zenith.IN ',
+      company: '',
       totalAmount: 1,
       customer: { name: 'Someone Else', mobile: '9123456780' },
       customerRef: 'CUS-SOMEONE',
     });
-    expect(parsed.startHour).toBe(14);
+    expect(parsed).toMatchObject({ startHour: 14, name: ACCOUNT.name, mobile: '9876543210', email: 'priya@zenith.in' });
+    expect(parsed.company).toBeUndefined();
     expect(parsed.totalAmount).toBeUndefined();
-    // Who is booking comes from the session, so the schema throws away any identity in the request.
+    // The account a hold belongs to comes from the session (or a claim at checkout), never from the body.
     expect(parsed.customer).toBeUndefined();
     expect(parsed.customerRef).toBeUndefined();
   });

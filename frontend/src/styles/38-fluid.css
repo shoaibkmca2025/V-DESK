@@ -180,7 +180,7 @@
 @media (prefers-reduced-transparency: reduce) {
   /* Frost the glass into a solid surface rather than dropping the layer. */
   .site-header,
-  .site-header.is-scrolled { background: #f6ead3 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .site-header.is-scrolled { background: #ffffff !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
   .modal-overlay.active,
   .modal-overlay.open { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(35, 21, 8, 0.92) !important; }
   .ui-hero__badge,
@@ -447,9 +447,9 @@
 .ui-plan__badge,
 .ui-city__flag,
 .btn--gold {
-  color: #fff !important;
+  color: var(--ui-navy) !important;
 }
-.ui-btn--gold:hover { background: var(--ui-brand-dark); color: #fff !important; }
+.ui-btn--gold:hover { background: var(--ui-gold-light); color: var(--ui-navy) !important; }
 .ui-btn--gold i,
 .ui-plan__badge i { color: inherit; }
 
@@ -513,3 +513,46 @@ a[class*='whatsapp'] { color: var(--ui-navy) !important; }
 }
 .rb-signin h4 { font-family: var(--ui-display); font-size: 1.25rem; color: var(--ui-ink, #33200f); margin: 0 0 6px; }
 .rb-signin p { color: var(--ui-muted, #75604b); margin: 0 auto var(--sp-4, 16px); max-width: 44ch; }
+
+/* ── Google sign-in, checkout gate and test-mode notice (ADR-012) ── */
+.ui-google-signin { display: grid; gap: var(--sp-3, 12px); justify-items: center; }
+.ui-google-signin__button { display: flex; justify-content: center; width: 100%; min-height: 44px; }
+.chk-testmode {
+  margin: 0 0 var(--sp-4, 16px);
+  padding: 10px 14px;
+  border: 1px solid #fde68a;
+  border-radius: 10px;
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.modal-card--checkout .chk-testmode { margin: 0 var(--sp-5, 20px) var(--sp-3, 12px); }
+.chk-gate { text-align: center; display: grid; gap: var(--sp-3, 12px); padding: var(--sp-4, 16px) 0; }
+.chk-gate h4 { font-family: var(--ui-display); font-size: 1.2rem; color: var(--ui-ink, #33200f); margin: 0; }
+.chk-gate p { margin: 0; color: var(--ui-muted, #8a7560); }
+.chk-payer { margin: 0 0 var(--sp-3, 12px); font-size: 0.9rem; color: var(--ui-muted, #8a7560); }
+.rb-form-note { margin: 0 0 var(--sp-3, 12px); font-size: 0.9rem; color: var(--ui-muted, #8a7560); }
+
+/* ── Admin: team and one-time setup codes ── */
+.ui-team { display: grid; gap: var(--sp-4, 16px); }
+.ui-team__title { font-family: var(--ui-display); font-size: 1.3rem; margin: 0; color: var(--ui-ink); }
+.ui-team__add { display: grid; gap: var(--sp-4, 16px); }
+.ui-team__add h3, .ui-setup-code h3 { margin: 0; font-size: 1.05rem; color: var(--ui-ink); }
+.ui-team__fields { display: grid; gap: var(--sp-3, 12px); grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.ui-setup-code { display: grid; gap: var(--sp-3, 12px); border-color: #a7f3d0; background: #ecfdf5; }
+.ui-setup-code p { margin: 0; }
+.ui-setup-code__value {
+  display: block;
+  padding: var(--sp-3, 12px);
+  border-radius: 10px;
+  background: var(--ui-surface, #fff);
+  border: 1px dashed #059669;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: clamp(1.1rem, 4vw, 1.5rem);
+  letter-spacing: 0.08em;
+  text-align: center;
+  color: var(--ui-ink);
+  user-select: all;
+  overflow-wrap: anywhere;
+}

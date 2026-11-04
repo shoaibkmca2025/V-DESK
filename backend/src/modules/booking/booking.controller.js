@@ -14,24 +14,28 @@ export async function getAvailability(req, res) {
 /**
  * POST /api/v1/bookings/hold — 201 for a new hold, 200 when the Idempotency-Key is replayed.
  *
- * Who is booking comes from the session, not the body: the name, mobile and email on the booking are the
- * signed-in customer's own. A booking may name a different company from the account's, so that one field
- * (and only that one) is taken from the request.
+ * No account needed (ADR-012): the contact details come from the form. When a customer is signed in the hold
+ * is theirs straight away, and their account fills in an email or company the form left blank.
  */
 export async function holdBooking(req, res) {
-  const { company, ...details } = req.validated.body;
+  const { name, mobile, email, company, ...details } = req.validated.body;
   const body = {
     ...details,
-    customerRef: req.customer.ref,
+    customerRef: req.customer?.ref ?? null,
     customer: {
-      name: req.customer.name,
-      company: company ?? req.customer.company,
-      mobile: req.customer.mobile,
-      email: req.customer.email,
+      name,
+      mobile,
+      email: email ?? req.customer?.email ?? '',
+      company: company ?? req.customer?.company ?? '',
     },
   };
   const { booking, created } = await bookingService.holdBooking(body, req.get('idempotency-key'));
   res.status(created ? 201 : 200).json({ data: booking });
+}
+
+/** POST /api/v1/bookings/:ref/claim — at checkout, puts a guest hold in the signed-in customer's name. */
+export async function claimBooking(req, res) {
+  res.json({ data: await bookingService.claimBooking(req.validated.params.ref, req.customer.ref) });
 }
 
 /** GET /api/v1/bookings/mine — the signed-in customer's own bookings. */

@@ -22,6 +22,10 @@ export function mapUser(doc) {
     permissions: permissionsFor(doc.role),
     status: doc.status,
     mfaEnabled: Boolean(doc.mfa?.enabled),
+    /** false until the staff member has used their setup code to choose a password (ADR-012). */
+    passwordSet: Boolean(doc.passwordHash),
+    /** When the unused setup code stops working; null once a password is set. The code itself is never shown again. */
+    setupCodeExpiresAt: doc.setupCodeExpiresAt ?? null,
     lockedUntil: doc.lockedUntil && doc.lockedUntil > new Date() ? doc.lockedUntil : null,
     lastLoginAt: doc.lastLoginAt ?? null,
     createdAt: doc.createdAt,
@@ -31,13 +35,14 @@ export function mapUser(doc) {
 
 /**
  * A customer, as the portal sees itself. There is no role and no permission list: a customer account can only
- * ever do customer things, which is the point of keeping it out of `users` (ADR-009).
+ * ever do customer things, which is the point of keeping it out of `users` (ADR-009). The Google account's `sub`
+ * stays inside the API.
  */
 export function mapCustomer(doc) {
   return {
     ref: doc.ref,
     name: doc.name,
-    mobile: doc.mobile,
+    mobile: doc.mobile ?? '',
     email: doc.email ?? '',
     company: doc.company ?? '',
     status: doc.status,

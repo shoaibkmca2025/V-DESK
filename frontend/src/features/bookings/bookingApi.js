@@ -8,8 +8,8 @@ import { api, idempotencyKey, isApiEnabled } from '@/lib/api.js';
  * confirms it. Each call returns `null` when no API is configured, so the scheduler keeps its
  * local simulation and the page behaves the same on the static build.
  *
- * Holding a room needs a signed-in customer: the name, mobile and email on the booking are the ones on that
- * account, so this client never sends them. Only the company the booking is for is per booking.
+ * Holding a room needs no account (ADR-012): the name, mobile, email and company come from the booking form.
+ * Customers sign in with Google at checkout, and `claimBooking` then puts the hold in their name.
  */
 
 /** Slots already taken for a room on a date, so the picker can grey them out. */
@@ -24,16 +24,26 @@ export async function fetchAvailability({ centreRef, room, date }) {
 }
 
 /**
- * Holds a slot for the signed-in customer. `startTime` is on the hour in 24-hour India time ('14:00').
- * Throws an ApiError the caller can show — a clash, or a dead session, is a real answer, not a glitch.
+ * Holds a slot. `startTime` is on the hour in 24-hour India time ('14:00'). A signed-in customer's token goes
+ * along, so their hold is theirs at once; without one it is a guest hold.
+ * Throws an ApiError the caller can show — a clash is a real answer, not a glitch.
  */
-export async function holdBooking({ centreRef, room, date, startTime, duration, attendees, company }) {
+export async function holdBooking({ centreRef, room, date, startTime, duration, attendees, name, mobile, email, company }) {
   if (!isApiEnabled()) return null;
   return api.post('/bookings/hold', {
     idempotencyKey: idempotencyKey('hold'),
     headers: customerHeaders(),
-    body: { centreRef, room, date, startTime, duration, attendees, company },
+    body: { centreRef, room, date, startTime, duration, attendees, name, mobile, email, company },
   });
+}
+
+/**
+ * Checkout, right after "Continue with Google": puts a guest hold in the signed-in customer's name, so it shows
+ * in their bookings. Throws the API's answer (HOLD_EXPIRED, BOOKING_ALREADY_CLAIMED, …) for the caller to show.
+ */
+export async function claimBooking(ref) {
+  if (!isApiEnabled() || !ref) return null;
+  return api.post(`/bookings/${ref}/claim`, { headers: customerHeaders() });
 }
 
 /** The signed-in customer's own bookings, newest first — null when there is no API or no session. */

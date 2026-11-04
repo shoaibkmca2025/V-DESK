@@ -1,22 +1,29 @@
 import request from 'supertest';
 import { hotp, totpStep } from '../src/modules/identity/identity.totp.js';
+import { testPasswordKey } from './passwordKey.js';
 
 export const ADMIN_KEY = 'test-admin-key-0123456789';
-const PASSWORD = 'correct horse battery';
+export const STAFF_PASSWORD = 'correct horse battery 42';
 
 /**
- * Creates a staff user (through x-admin-key) and signs them in with MFA, for tests that need a real
- * Bearer token with a given role. Returns `{ ref, accessToken, auth }` — spread `auth` into `.set()`.
+ * Creates a staff user (through x-admin-key) and signs them in the way a real new staff member does: setup code
+ * → choose a password (sent as its key, ADR-013) → enrol MFA → TOTP code (ADR-012). For tests that need a real Bearer token with a given
+ * role. Returns `{ ref, accessToken, auth }` — spread `auth` into `.set()`.
  */
 export async function staffSession(app, role, email = `${role.toLowerCase()}@vdesk.in`) {
   const created = await request(app)
     .post('/api/v1/auth/users')
     .set('x-admin-key', ADMIN_KEY)
-    .send({ email, name: `${role} tester`, role, password: PASSWORD });
+    .send({ email, name: `${role} tester`, role });
   if (created.status !== 201) throw new Error(`could not create ${role}: ${JSON.stringify(created.body)}`);
 
-  const login = await request(app).post('/api/v1/auth/login').send({ email, password: PASSWORD });
-  const { mfaToken } = login.body.data;
+  const withCode = await request(app)
+    .post('/api/v1/auth/login')
+    .send({ email, setupCode: created.body.data.setupCode });
+  const setup = await request(app)
+    .post('/api/v1/auth/password/setup')
+    .send({ setupToken: withCode.body.data.setupToken, newPasswordKey: testPasswordKey(email, STAFF_PASSWORD) });
+  const { mfaToken } = setup.body.data;
   const { secret } = (await request(app).post('/api/v1/auth/mfa/enroll').send({ mfaToken })).body.data;
   const verify = await request(app)
     .post('/api/v1/auth/mfa/verify')

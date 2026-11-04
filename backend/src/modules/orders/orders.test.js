@@ -7,7 +7,6 @@ import request from 'supertest';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createApp } from '../../app.js';
 import { clearTestDb, count, insert, query, row, startTestDb, stopTestDb } from '../../../test/db.js';
-import { customerSession } from '../../../test/customer.js';
 import { ADMIN_KEY, staffSession } from '../../../test/staff.js';
 import { addDays, istDate } from '../booking/booking.time.js';
 import { previewItem } from '../pricing/index.js';
@@ -28,8 +27,6 @@ const storedOrder = (ref) =>
     [ref],
   );
 const adminKey = { 'x-admin-key': ADMIN_KEY };
-/** The signed-in customer that holds the bookings orders are made from. */
-let customer;
 
 const CUSTOMER = { name: 'Priya Kulkarni', company: 'Zenith D2C', mobile: '9876543210', email: 'priya@zenith.in' };
 let seq = 0;
@@ -54,12 +51,11 @@ async function acceptedQuote(status = 'ACCEPTED') {
   return created.body.data;
 }
 
-/** Holds a room as the signed-in customer — contact details come from that account, not from this body. */
+/** Holds a room as a guest, the way the website does before checkout (ADR-012). */
 async function heldBooking(startTime = '14:00') {
   const res = await request(app)
     .post('/api/v1/bookings/hold')
     .set('Idempotency-Key', key())
-    .set(customer.auth)
     .send({
       centreRef: 'CTR-NSK-001',
       room: 'Conference Room',
@@ -67,6 +63,7 @@ async function heldBooking(startTime = '14:00') {
       startTime,
       duration: 2,
       attendees: 6,
+      ...CUSTOMER,
     });
   expect(res.status).toBe(201);
   return res.body.data;
@@ -83,7 +80,6 @@ beforeEach(async () => {
     address: 'College Road, Nashik',
     services: ['Virtual Office', 'Meeting Rooms'],
   });
-  customer = await customerSession(app, CUSTOMER);
 });
 afterEach(async () => {
   vi.restoreAllMocks();
