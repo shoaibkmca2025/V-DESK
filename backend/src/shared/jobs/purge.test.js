@@ -6,7 +6,6 @@
  * Run: npx vitest run src/shared/jobs/purge.test.js
  */
 import { afterEach, afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { OTP_SEND_WINDOW_MS } from '../../modules/identity/identity.constants.js';
 import { RETENTION_SECONDS } from '../../modules/analytics/analytics.constants.js';
 import { clearTestDb, count, insert, startTestDb, stopTestDb } from '../../../test/db.js';
 import { purgeExpiredRows } from './purge.js';
@@ -24,21 +23,6 @@ describe('purgeExpiredRows', () => {
   it('deletes what is past its time and keeps what is not', async () => {
     await insert('refresh_tokens', { tokenHash: 'dead', userRef: 'USR-1', family: 'f1', expiresAt: ago(DAY) });
     await insert('refresh_tokens', { tokenHash: 'live', userRef: 'USR-1', family: 'f2', expiresAt: ahead(DAY) });
-
-    await insert('otp_challenges', {
-      mobile: '9811111111',
-      codeHash: 'x',
-      expiresAt: ago(DAY),
-      windowStartedAt: ago(DAY),
-      lastSentAt: ago(OTP_SEND_WINDOW_MS + 60_000),
-    });
-    await insert('otp_challenges', {
-      mobile: '9822222222',
-      codeHash: 'y',
-      expiresAt: ahead(300_000),
-      windowStartedAt: ago(60_000),
-      lastSentAt: ago(60_000),
-    });
 
     const slot = { centreRef: 'CTR-1', room: 'Conference Room', date: '2026-10-29' };
     // A lapsed hold's hour, a live hold's hour, and a confirmed booking's hour (expires_at NULL).
@@ -97,14 +81,12 @@ describe('purgeExpiredRows', () => {
 
     expect(await purgeExpiredRows(NOW)).toEqual({
       refreshTokens: 1,
-      otpChallenges: 1,
       bookingSlots: 1,
       domainEvents: 1,
       analyticsEvents: 1,
     });
 
     expect(await count('refresh_tokens')).toBe(1);
-    expect(await count('otp_challenges')).toBe(1);
     expect(await count('booking_slots')).toBe(2);
     expect(await count('booking_slots', 'expires_at IS NULL')).toBe(1);
     expect(await count('analytics_events')).toBe(1);
@@ -117,7 +99,6 @@ describe('purgeExpiredRows', () => {
   it('does nothing when there is nothing to delete, and is safe to run again', async () => {
     expect(await purgeExpiredRows(NOW)).toEqual({
       refreshTokens: 0,
-      otpChallenges: 0,
       bookingSlots: 0,
       domainEvents: 0,
       analyticsEvents: 0,

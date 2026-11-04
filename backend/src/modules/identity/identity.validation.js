@@ -4,8 +4,8 @@
  */
 import { z } from 'zod';
 import {
+  GOOGLE_CREDENTIAL_MAX_LENGTH,
   MOBILE_PATTERN,
-  OTP_LENGTH,
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
   STAFF_ROLES,
@@ -84,13 +84,13 @@ export const listUsersQuery = z.object({
 });
 
 // ──────────────────────────────────────────────
-// Customers (phone OTP)
+// Customers (Google sign-in — ADR-012)
 // ──────────────────────────────────────────────
 
 /** Forms send '' for untouched inputs; treat that the same as "not sent". */
 const blankToUndefined = (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value);
 
-/** Stored as the last 10 digits, so '+91 98765 43210' and '9876543210' are one account. */
+/** Stored as the last 10 digits, so '+91 98765 43210' and '9876543210' are the same number. */
 const mobile = z
   .string()
   .trim()
@@ -99,27 +99,22 @@ const mobile = z
   .refine((value) => MOBILE_PATTERN.test(value), 'Enter a valid 10-digit Indian mobile number')
   .transform((value) => value.slice(-10));
 
-const optionalEmail = z.preprocess(blankToUndefined, email.optional());
-const optionalCompany = z.preprocess(blankToUndefined, z.string().trim().max(200).optional());
+const optional = (schema) => z.preprocess(blankToUndefined, schema.optional());
 const customerName = z.string().trim().min(1, 'Name is required').max(120);
 
-export const otpRequestBody = z.object({ mobile });
-
-/** `name` is only needed the first time a number signs in — that request is the registration. */
-export const otpVerifyBody = z.object({
-  mobile,
-  code: z.preprocess(
-    (value) => (typeof value === 'string' ? value.replace(/\s/g, '') : value),
-    z.string().regex(new RegExp(String.raw`^\d{${OTP_LENGTH}}$`), `Enter the ${OTP_LENGTH}-digit code we sent you`),
-  ),
-  name: z.preprocess(blankToUndefined, customerName.optional()),
-  email: optionalEmail,
-  company: optionalCompany,
+/** Body for POST /api/v1/auth/google — the `credential` the Google button returned (an ID token). */
+export const googleSignInBody = z.object({
+  credential: z.string().trim().min(1, 'credential is required').max(GOOGLE_CREDENTIAL_MAX_LENGTH),
 });
 
-/** Body for PATCH /api/v1/auth/customer/me — the customer's own details, never the mobile number. */
+/** Body for PATCH /api/v1/auth/customer/me — the customer's own details, never the Google account. */
 export const updateCustomerBody = z
-  .object({ name: customerName.optional(), email: optionalEmail, company: optionalCompany })
+  .object({
+    name: optional(customerName),
+    mobile: optional(mobile),
+    email: optional(email),
+    company: optional(z.string().trim().max(200)),
+  })
   .refine((body) => Object.values(body).some((value) => value !== undefined), {
-    message: 'Send at least one of name, email or company',
+    message: 'Send at least one of name, mobile, email or company',
   });

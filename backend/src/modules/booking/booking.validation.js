@@ -11,6 +11,7 @@ import {
   LIST_DEFAULT_LIMIT,
   LIST_MAX_LIMIT,
   MAX_DURATION_HOURS,
+  MOBILE_PATTERN,
   STAFF_STATUS_CHANGES,
 } from './booking.constants.js';
 import { isCalendarDate } from './booking.time.js';
@@ -19,6 +20,15 @@ import { isCalendarDate } from './booking.time.js';
 const blankToUndefined = (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value);
 const optionalText = (max) => z.preprocess(blankToUndefined, z.string().trim().max(max).optional());
 const int = (min, max) => z.coerce.number().int().min(min).max(max);
+
+/** Stored as the last 10 digits, so '+91 98765 43210' and '9876543210' count as one number for the hold cap. */
+const mobile = z
+  .string()
+  .trim()
+  .max(20)
+  .transform((value) => value.replace(/[\s()-]/g, ''))
+  .refine((value) => MOBILE_PATTERN.test(value), 'Enter a valid 10-digit Indian mobile number')
+  .transform((value) => value.slice(-10));
 
 const centreRef = z.string().trim().toUpperCase().min(1).max(40);
 const room = z.string().trim().min(1).max(60);
@@ -42,10 +52,15 @@ export const holdBody = z
     duration: int(1, MAX_DURATION_HOURS),
     attendees: int(1, 100),
     /*
-     * Who is booking is never sent: the route needs a signed-in customer and the controller takes the name,
-     * mobile and email from that account. Only the company this booking is for can be given per booking —
-     * the same person books for more than one entity.
+     * Who is booking. No account is needed to hold a room (ADR-012) — the customer signs in with Google only
+     * to pay — so the contact details come from the form. PII: stored on the booking, never logged.
      */
+    name: z.string().trim().min(1, 'Name is required').max(120),
+    mobile,
+    email: z.preprocess(
+      blankToUndefined,
+      z.string().trim().toLowerCase().max(254).email('Enter a valid email').optional(),
+    ),
     company: optionalText(200),
   })
   .transform(({ startTime, ...rest }) => ({ ...rest, startHour: Number(startTime.slice(0, 2)) }));

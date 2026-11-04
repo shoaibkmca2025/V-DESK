@@ -6,6 +6,7 @@
  *   requireStaff(p)        both of the above — or, while the admin console still uses it, the legacy
  *                          x-admin-key, which keeps full access until it is retired
  *   requireCustomer        Bearer customer token → req.customer + req.actor (the customer's ref)
+ *   optionalCustomer       the same when a valid customer token is sent; a guest otherwise
  */
 import { forbidden, unauthorized } from '../../shared/errors/AppError.js';
 import { requireAdminKey } from '../../shared/middleware/requireAdminKey.js';
@@ -51,5 +52,23 @@ export async function requireCustomer(req, _res, next) {
   if (!token) return next(unauthorized('AUTH_REQUIRED', 'Please sign in to continue'));
   req.customer = await authenticateCustomerToken(token);
   req.actor = req.customer.ref;
+  next();
+}
+
+/**
+ * For routes a guest may use (holding a room, ADR-012): a valid customer token sets req.customer, anything else
+ * — no token, an expired one, a staff one — carries on as a guest. A stale token left in the browser must never
+ * stop someone booking.
+ */
+export async function optionalCustomer(req, _res, next) {
+  const token = bearerToken(req);
+  if (token) {
+    try {
+      req.customer = await authenticateCustomerToken(token);
+      req.actor = req.customer.ref;
+    } catch (err) {
+      if (err.code !== 'TOKEN_INVALID' && err.code !== 'AUTH_NOT_CONFIGURED') throw err;
+    }
+  }
   next();
 }

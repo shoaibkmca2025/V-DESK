@@ -35,13 +35,14 @@ export function mapUser(doc) {
 
 /**
  * A customer, as the portal sees itself. There is no role and no permission list: a customer account can only
- * ever do customer things, which is the point of keeping it out of `users` (ADR-009).
+ * ever do customer things, which is the point of keeping it out of `users` (ADR-009). The Google account's `sub`
+ * stays inside the API.
  */
 export function mapCustomer(doc) {
   return {
     ref: doc.ref,
     name: doc.name,
-    mobile: doc.mobile,
+    mobile: doc.mobile ?? '',
     email: doc.email ?? '',
     company: doc.company ?? '',
     status: doc.status,

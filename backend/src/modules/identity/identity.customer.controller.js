@@ -15,14 +15,9 @@ function sendSession(res, { refreshToken, refreshExpiresAt, ...session }) {
   res.json({ data: { ...session, tokenType: 'Bearer' } });
 }
 
-/** POST /api/v1/auth/otp/request — sends a code; says whether this number is new here. */
-export async function requestOtp(req, res) {
-  res.json({ data: await customerService.requestOtp(req.validated.body) });
-}
-
-/** POST /api/v1/auth/otp/verify — code → portal session (and the account itself, the first time). */
-export async function verifyOtp(req, res) {
-  sendSession(res, await customerService.verifyOtp(req.validated.body));
+/** POST /api/v1/auth/google — Google ID token → portal session (and the account itself, the first time). */
+export async function signInWithGoogle(req, res) {
+  sendSession(res, await customerService.signInWithGoogle(req.validated.body));
 }
 
 /** POST /api/v1/auth/customer/refresh — rotates the customer refresh cookie. */

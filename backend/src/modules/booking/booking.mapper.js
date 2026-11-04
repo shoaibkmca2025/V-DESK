@@ -34,9 +34,14 @@ export function mapBooking(doc, now = new Date()) {
   };
 }
 
-/** Staff view adds the guest's contact details and the status timeline. */
+/** Staff view adds the guest's contact details, their account (null for a guest hold) and the status timeline. */
 export function mapBookingForStaff(doc, now = new Date()) {
-  return { ...mapBooking(doc, now), customer: doc.customer, history: doc.history };
+  return {
+    ...mapBooking(doc, now),
+    customerRef: doc.customerRef ?? null,
+    customer: doc.customer,
+    history: doc.history,
+  };
 }
 
 /** The visitor pass shown after confirmation; `qr` is the text the client encodes as a QR code. */

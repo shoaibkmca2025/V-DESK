@@ -1,6 +1,7 @@
 /**
- * Credentials: HS256 access/MFA/setup tokens (jose), opaque refresh tokens, staff setup codes and phone-OTP
- * codes. Kept apart from the service so the rules there read as rules, not crypto plumbing.
+ * Credentials: HS256 access/MFA/setup tokens (jose), opaque refresh tokens and staff setup codes. Kept apart
+ * from the service so the rules there read as rules, not crypto plumbing. (Google ID tokens are checked in
+ * src/integrations/google.js.)
  * Password hashing lives in identity.password.js and is re-exported here, where its callers look for it.
  */
 import { createHash, randomBytes, randomInt } from 'node:crypto';
@@ -12,7 +13,6 @@ import {
   JWT_AUDIENCE,
   JWT_ISSUER,
   MFA_TOKEN_TTL_SECONDS,
-  OTP_LENGTH,
   SETUP_CODE_ALPHABET,
   SETUP_CODE_LENGTH,
   SETUP_TOKEN_TTL_SECONDS,
@@ -112,19 +112,4 @@ export function generateRefreshToken() {
 
 export function hashRefreshToken(token) {
   return createHash('sha256').update(token).digest('hex');
-}
-
-// ── Phone OTP ─────────────────────────────────
-
-/** A uniformly random 6-digit code — randomInt, never Math.random. */
-export function generateOtpCode() {
-  return String(randomInt(0, 10 ** OTP_LENGTH)).padStart(OTP_LENGTH, '0');
-}
-
-/**
- * Codes are stored hashed, peppered with JWT_SECRET and bound to the mobile number: a leaked database is
- * not a list of working codes, and a hash lifted from one row cannot be replayed against another number.
- */
-export function hashOtp(mobile, code) {
-  return createHash('sha256').update(`${mobile}:${code}:${env.JWT_SECRET}`).digest('hex');
 }

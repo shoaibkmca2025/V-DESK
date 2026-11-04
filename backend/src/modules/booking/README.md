@@ -15,7 +15,9 @@ pass (PRD §34–35).
 | Method  | Path            | Access                | What it does                                                                          |
 | ------- | --------------- | --------------------- | ------------------------------------------------------------------------------------- |
 | `GET`   | `/availability` | public (rate-limited) | `?centreRef=&room=&date=YYYY-MM-DD` → the 11 one-hour slots with `available`          |
-| `POST`  | `/hold`         | public (rate-limited) | Hold body (below) + `Idempotency-Key` header → 201 `HELD` booking                     |
+| `POST`  | `/hold`         | public (rate-limited) | Hold body (below) + `Idempotency-Key` header → 201 `HELD` booking. No account needed  |
+| `POST`  | `/:ref/claim`   | customer Bearer       | Checkout: puts a guest hold in the signed-in customer's name (ADR-012)                |
+| `GET`   | `/mine`         | customer Bearer       | The customer's own bookings, newest first, without contact details                    |
 | `GET`   | `/:ref`         | public (booking ref)  | The booking, without contact details                                                  |
 | `POST`  | `/:ref/cancel`  | public (booking ref)  | Release a hold. Confirmed bookings → `409 CANCELLATION_REQUIRES_STAFF`                |
 | `GET`   | `/:ref/pass`    | public (booking ref)  | Visitor pass (`qr` text to encode) — `CONFIRMED` / `CHECKED_IN` only                  |
@@ -36,11 +38,21 @@ pass (PRD §34–35).
   "startTime": "14:00", // IST, on the hour
   "duration": 2,
   "attendees": 6, // hours; attendees ≤ the room's seats
-  "customer": { "name": "…", "company": "…", "mobile": "98765 43210", "email": "…" },
-} // company/email optional
+  "name": "Priya Kulkarni",
+  "mobile": "98765 43210", // stored as the last 10 digits
+  "email": "priya@zenith.in", // optional — a signed-in customer's account fills it in
+  "company": "Zenith D2C", // optional, as above
+}
 ```
 
-Any `totalAmount`, `pricing` or `state` the client sends is dropped. The response carries `ref`, `status`, `hub`,
+**Who is booking** comes from the form: nobody needs an account to hold a room (ADR-012). If a valid customer
+token is sent, the hold is theirs at once (`customerRef`); otherwise it is a guest hold (`customerRef: null`), and
+a stale or staff token is treated as a guest rather than refused. Customers sign in with Google only to pay — the
+website then calls `POST /:ref/claim`, which puts the hold in their name so it shows in `/mine`. A claim succeeds
+only while the hold is live and unclaimed; claiming your own again is a no-op; someone else's →
+`409 BOOKING_ALREADY_CLAIMED`, a lapsed hold → `409 HOLD_EXPIRED`, anything else → `409 BOOKING_NOT_HELD`.
+
+Any `totalAmount`, `pricing`, `state`, `customer` or `customerRef` the client sends is dropped. The response carries `ref`, `status`, `hub`,
 `room`, `date`, `startTime`, `endTime`, `slot` (`"02:00 PM - 04:00 PM"`, as the client shows it), `duration`,
 `attendees`, `startsAt` / `endsAt` (UTC), `expiresAt` and `pricing` — the pricing engine's `meeting_room`
 breakdown (paise, ADR-007), frozen at hold time.
