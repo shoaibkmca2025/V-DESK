@@ -48,16 +48,33 @@ export function staffHeaders() {
 }
 
 /**
- * Step 1. Returns `{ mfaToken, mfaEnrollmentRequired }` — a first sign-in has to enrol an
- * authenticator app before it can get a code.
+ * Step 1. Email + password → `{ mfaToken, enrolmentRequired }` — a first sign-in has to enrol an authenticator
+ * app before it can get a code. A new staff member signs in with the one-time setup code an admin gave them
+ * instead (ADR-012); that answers `{ passwordSetupRequired: true, setupToken }`, and they choose a password next.
  */
 export async function signInWithPassword(email, password) {
   if (!isApiEnabled()) throw new Error('No API is configured for this build');
   const data = await api.post('/auth/login', { body: { email, password } });
+  if (data.passwordSetupRequired) return { passwordSetupRequired: true, setupToken: data.setupToken };
   return {
     mfaToken: data.mfaToken,
     enrolmentRequired: Boolean(data.mfaEnrollmentRequired),
   };
+}
+
+/** Step 1b (setup code only). Stores the password they chose; answers like step 1, with the MFA token. */
+export async function choosePassword(setupToken, newPassword) {
+  const data = await api.post('/auth/password/setup', { body: { setupToken, newPassword } });
+  return { mfaToken: data.mfaToken, enrolmentRequired: Boolean(data.mfaEnrollmentRequired) };
+}
+
+/** The API's password rule, checked before sending: 12+ characters with at least one letter and one number. */
+export function passwordProblem(password) {
+  if (password.length < 12) return 'Use at least 12 characters.';
+  if (password.length > 128) return 'Use at most 128 characters.';
+  if (!/[A-Za-z]/.test(password)) return 'Include at least one letter.';
+  if (!/\d/.test(password)) return 'Include at least one number.';
+  return null;
 }
 
 /** Step 1b (first sign-in only). Returns the secret to add to an authenticator app. */

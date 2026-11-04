@@ -8,6 +8,7 @@ import { calculateLeadScore, getLeads, setLeadStatus } from '@/features/crm/lead
 import { showToast } from '@/features/ui/toast.js';
 import { isApiEnabled } from '@/lib/api.js';
 import StaffSignIn from './StaffSignIn.jsx';
+import StaffTeam from './StaffTeam.jsx';
 
 /**
  * Staff console.
@@ -287,6 +288,12 @@ export default function AdminDashboard() {
             : 'These enquiries are stored in this browser only.'}
         </p>
       </Section>
+
+      {live && staff?.permissions?.includes('users:manage') && (
+        <Section tone="tint" tight>
+          <StaffTeam me={staff} />
+        </Section>
+      )}
     </>
   );
 }

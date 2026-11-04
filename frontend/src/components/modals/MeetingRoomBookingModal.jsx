@@ -1,6 +1,5 @@
 import {
   cancelRoomBookingHold,
-  goToSignIn,
   handleRoomBookingHold,
   triggerBookingCheckout,
 } from '@/features/meetingRooms/roomBooking.js';
@@ -10,9 +9,8 @@ import { showToast } from '@/features/ui/toast.js';
 /**
  * Meeting room booking flow (summary → hold → confirmed pass).
  *
- * Who is booking comes from the signed-in account, so this dialog shows that account rather than asking for
- * a name and number again; `roomBooking.js` fills `#rbAccount*` in and swaps the form for `#rbSignInRequired`
- * when nobody is signed in.
+ * No account is needed to hold a room (ADR-012): the form asks who the booking is for, and `roomBooking.js`
+ * pre-fills it for a signed-in customer. Signing in happens at payment, in the checkout dialog.
  */
 export default function MeetingRoomBookingModal() {
   return (
@@ -68,40 +66,71 @@ export default function MeetingRoomBookingModal() {
                 <span className="price-gst">Includes 18% GST</span>
               </div>
             </div>
-            <div className="rb-signin" id="rbSignInRequired" style={{ display: 'none', marginTop: '18px' }}>
-              <div className="rb-signin__icon">
-                <i className="ph-bold ph-lock-key" />
-              </div>
-              <h4>Sign in to hold this room</h4>
-              <p>
-                Rooms are held against your V-DESK account for ten minutes, so we need to know who the booking
-                is for. It takes one OTP.
+            <form id="roomBookingUserForm" onSubmit={(event) => handleRoomBookingHold(event)} style={{ marginTop: '18px' }}>
+              <p className="rb-form-note">
+                No account needed to hold a room — you’ll sign in with Google only when you pay.
               </p>
-              <button type="button" className="btn btn--primary btn--block btn--lg" onClick={() => goToSignIn()}>
-                <i className="ph-bold ph-sign-in" />
-                Sign in or register →
-              </button>
-            </div>
-            <form
-              id="roomBookingUserForm"
-              onSubmit={(event) => handleRoomBookingHold(event)}
-              style={{ marginTop: '18px', display: 'none' }}
-            >
-              <div className="rb-account">
-                <div className="rb-account__avatar">
-                  <i className="ph-bold ph-user-circle" />
+              <div className="form-row-2">
+                <div className="form-field">
+                  <label className="form-label" htmlFor="rbName">
+                    Your name *
+                  </label>
+                  <input
+                    type="text"
+                    id="rbName"
+                    name="name"
+                    className="form-input"
+                    autoComplete="name"
+                    placeholder="e.g. Arjun Mehta"
+                    maxLength={120}
+                    required
+                  />
                 </div>
-                <div className="rb-account__who">
-                  <span className="rb-account__label">Booking as</span>
-                  <strong id="rbAccountName">Your account</strong>
-                  <span className="rb-account__meta" id="rbAccountMeta" />
+                <div className="form-field">
+                  <label className="form-label" htmlFor="rbMobile">
+                    Mobile number *
+                  </label>
+                  <input
+                    type="tel"
+                    id="rbMobile"
+                    name="mobile"
+                    className="form-input"
+                    autoComplete="tel"
+                    inputMode="tel"
+                    placeholder="10-digit mobile"
+                    pattern="(\+?91[\s-]?)?[6-9][0-9\s-]{9,11}"
+                    title="A 10-digit Indian mobile number"
+                    required
+                  />
                 </div>
               </div>
-              <div className="form-field">
-                <label className="form-label" htmlFor="rbCompany">
-                  Company / Organization this booking is for
-                </label>
-                <input type="text" id="rbCompany" className="form-input" placeholder="e.g. Acme Innovations" />
+              <div className="form-row-2">
+                <div className="form-field">
+                  <label className="form-label" htmlFor="rbEmail">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    id="rbEmail"
+                    name="email"
+                    className="form-input"
+                    autoComplete="email"
+                    placeholder="name@company.in"
+                  />
+                </div>
+                <div className="form-field">
+                  <label className="form-label" htmlFor="rbCompany">
+                    Company this booking is for
+                  </label>
+                  <input
+                    type="text"
+                    id="rbCompany"
+                    name="company"
+                    className="form-input"
+                    autoComplete="organization"
+                    placeholder="e.g. Acme Innovations"
+                  />
+                </div>
               </div>
               <div className="room-amenities-check">
                 <span>

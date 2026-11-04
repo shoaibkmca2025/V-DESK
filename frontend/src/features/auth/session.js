@@ -3,7 +3,8 @@ import { api, isApiEnabled } from '@/lib/api.js';
 /**
  * The customer's portal session.
  *
- * Signing in is the phone-OTP flow on the API: ask for a code, verify it, and the API answers with an access
+ * Nobody has to sign in to browse or to hold a room. Customers sign in with Google when they pay (ADR-012):
+ * the Google button (googleSignIn.js) hands back an ID token, the API checks it and answers with an access
  * token plus a long-lived refresh cookie. The token is held in memory and mirrored to sessionStorage, so a
  * reload keeps the session inside this tab and closing the tab ends it; a fresh tab gets it back from the
  * cookie through `restoreSession()`. It is never written to localStorage, which other tabs and scripts outlive.
@@ -90,19 +91,11 @@ export function customerHeaders() {
 // ── Signing in ────────────────────────────────
 
 /**
- * Step 1. Sends a code to the number and says whether it has an account yet — `isNewAccount` is what makes
- * the sign-in form ask for a name. Outside production the API hands back the code it would have texted
- * (`devCode`), because no SMS provider is wired up yet.
+ * Exchanges the Google button's ID token (`credential`) for a portal session. The first sign-in with a Google
+ * account creates the V-DESK account, so there is no separate sign-up.
  */
-export async function requestSignInCode(mobile) {
-  if (!isApiEnabled()) return { isNewAccount: false, local: true };
-  return api.post('/auth/otp/request', { body: { mobile } });
-}
-
-/** Step 2. Exchanges the code for a session; a number with no account yet gets one, which is the sign-up. */
-export async function verifySignInCode({ mobile, code, name, email, company }) {
-  if (!isApiEnabled()) return signInLocally({ name, mobile, email, company });
-  const data = await api.post('/auth/otp/verify', { body: { mobile, code, name, email, company } });
+export async function signInWithGoogle(credential) {
+  const data = await api.post('/auth/google', { body: { credential } });
   return store(data).customer;
 }
 

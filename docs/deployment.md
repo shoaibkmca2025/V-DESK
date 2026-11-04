@@ -16,8 +16,9 @@ Workers, the Express app) and the **database** (Neon PostgreSQL). ADR-010 and AD
 **Staff password sign-in needs the Workers Paid plan.** Hashing a password with argon2id costs about half a
 second of CPU — that is the whole point of a password hash — and the Workers **free** plan allows 10 ms of
 CPU per request, so `/auth/login`, `/auth/users` and `/auth/password` fail intermittently with Cloudflare
-error 1102 (served as a 503). Everything else fits comfortably: the customer OTP sign-in, booking, catalog,
-search, quotes, leads and the cron jobs are all I/O-bound.
+error 1102 (served as a 503). Everything else fits comfortably: customer Google sign-in, booking, catalog,
+search, quotes, leads and the cron jobs are all I/O-bound. (Checking a staff setup code is a cheap SHA-256;
+choosing the password afterwards is the expensive part.)
 
 Workers Paid ($5/month) raises the limit to 30 s of CPU, which settles it. Until then, treat the admin
 console as unavailable on this deployment; the public site and the customer portal work.
@@ -35,8 +36,8 @@ npm run migrate -- --status      # what is applied, what is pending
 which is configured with Neon's **direct** (non-pooled) host, because Hyperdrive does the pooling itself.
 
 Hyperdrive **query caching must stay disabled** for this API (`wrangler hyperdrive update <id>
---caching-disabled`). With caching on, a read right after a write can be served from the cache: a customer
-would ask for an OTP and then be told no code was ever requested. The whole data layer assumes
+--caching-disabled`). With caching on, a read right after a write can be served from the cache: a room just
+held would still look free, a setup code just used would still look unused. The whole data layer assumes
 read-your-writes.
 
 Seeding a fresh database:
@@ -62,12 +63,12 @@ node scripts/smoke.mjs                  # API=https://… to check a deployment 
 (`NODE_ENV`, `LOG_LEVEL`, `TRUST_PROXY`, `SITE_URL`, `CORS_ORIGINS`). Two of those matter more than they
 look:
 
-- **`NODE_ENV=production`** — without it the API answers `/auth/otp/request` with the code it was supposed
-  to text, and leaves `Secure` off the refresh cookies.
+- **`NODE_ENV=production`** — without it the API leaves `Secure` off the refresh cookies.
 - **`CORS_ORIGINS`** — must list the site's exact origin, or the browser blocks every call. It carries
   credentials (the refresh cookie), so a wildcard is not an option.
 
-The secrets are set once per Worker and are not in the repository. To rotate: `wrangler secret put
+The secrets are set once per Worker and are not in the repository. `GOOGLE_CLIENT_ID` is not one of them: it is
+public, so it goes in `wrangler.jsonc` → `vars` (see "Customer sign-in with Google" below). To rotate: `wrangler secret put
 JWT_SECRET` (every staff session ends), `wrangler secret put MFA_ENCRYPTION_KEY` (**only with a plan to
 re-enrol every authenticator** — existing TOTP secrets are encrypted with it).
 
@@ -105,11 +106,32 @@ landed:
 grep -ro "vdesk-api[^\"']*" dist/assets/*.js | head -1
 ```
 
+## Customer sign-in with Google (ADR-012)
+
+Customers sign in with "Continue with Google" when they pay. It is free, but it needs an OAuth client that
+belongs to the business, so the **owner** creates it once:
+
+1. Google Cloud Console → create (or pick) a project → **APIs & Services → OAuth consent screen**: External,
+   app name "V-DESK", support email, the site's domain, links to the privacy policy and terms. Only the basic
+   scopes (`openid`, `email`, `profile`) are used, so no Google review is needed.
+2. **Credentials → Create credentials → OAuth client ID → Web application.** Under **Authorised JavaScript
+   origins** add every address the site is served from — `https://vdesk.shoaibk-mca2024.workers.dev` today,
+   `https://vdesk.in` later, and `http://localhost:5173` for development. No redirect URI is needed (the
+   button uses a popup).
+3. Put the client ID (`….apps.googleusercontent.com` — public, not a secret) in two places, then deploy both:
+   - API: `backend/wrangler.jsonc` → `vars.GOOGLE_CLIENT_ID`, then `npx wrangler deploy`.
+   - Site: `frontend/.env.production` → `VITE_GOOGLE_CLIENT_ID`, then `npm run cf:deploy`.
+
+Until both have it, the API answers `POST /auth/google` with 503 and checkout tells the visitor that online
+payment is not available yet; holding a room still works. Moving to a new domain means adding it to the
+client's JavaScript origins too.
+
 ## Moving to a real domain
 
 1. Add the zone to the Cloudflare account, then give each Worker a route: `vdesk.in/*` for the site,
    `api.vdesk.in/*` for the API (`wrangler.jsonc` → `routes`).
-2. Set the API's `SITE_URL` and `CORS_ORIGINS` to the new site origin, and deploy it.
+2. Set the API's `SITE_URL` and `CORS_ORIGINS` to the new site origin, and deploy it. Add the new origin to
+   the Google OAuth client's JavaScript origins.
 3. Change `VITE_API_URL` in `frontend/.env.production` to `https://api.vdesk.in/api/v1`, commit, and
    redeploy the site (`npm run cf:deploy`).
 
@@ -124,6 +146,7 @@ API=https://vdesk-api.shoaibk-mca2024.workers.dev node backend/scripts/smoke.mjs
 npx wrangler tail --name vdesk-api                          # live logs, including cron runs
 ```
 
-`smoke.mjs` skips the sign-in half against a production API, because that deliberately no longer returns
-the OTP code; it still proves health, readiness, the catalog, and that holding a room without a session is
-refused.
+`smoke.mjs` proves health, readiness, the catalog, holding a room as a guest (released straight away), that
+`POST /auth/google` refuses a forged credential (or reports that `GOOGLE_CLIENT_ID` is unset), and that the
+portal routes need a session. A real Google sign-in needs a person at Google's prompt, so try that by hand:
+hold a room on the site, go to payment, continue with Google.

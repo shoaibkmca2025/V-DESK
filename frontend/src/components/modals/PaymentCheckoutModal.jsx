@@ -1,7 +1,13 @@
 import { simulatePaymentProcessing, switchPayMethod } from '@/features/checkout/checkout.js';
 import { closeModal, closeModalOnBackdrop } from '@/features/modals/modalManager.js';
 
-/** Unified payment checkout dialog. */
+/**
+ * Unified payment checkout dialog.
+ *
+ * Paying needs a signed-in customer (ADR-012): until there is one, `#chkSignInGate` shows the Google button and
+ * the payment options stay hidden; checkout.js swaps them over. Payment is simulated until a gateway is
+ * connected, and the dialog says so.
+ */
 export default function PaymentCheckoutModal() {
   return (
     <div
@@ -22,9 +28,27 @@ export default function PaymentCheckoutModal() {
             ×
           </button>
         </div>
+        <p className="chk-testmode" role="note">
+          <i className="ph-bold ph-flask" /> <strong>Test mode — no money is taken.</strong> Payments are simulated until
+          our payment gateway is connected.
+        </p>
         <div className="checkout-layout">
           <div className="checkout-methods">
-            <div className="checkout-tabs">
+            <div className="chk-gate" id="chkSignInGate" style={{ display: 'none' }}>
+              <div className="rb-signin__icon">
+                <i className="ph-bold ph-user-circle" />
+              </div>
+              <h4>Sign in to pay</h4>
+              <p>
+                Your booking and invoice are kept in your V-DESK account. Continue with Google — there is no form to
+                fill and no password to remember.
+              </p>
+              <div className="ui-google-signin__button" id="chkGoogleButton" />
+              <p className="ui-note" id="chkGateStatus" role="status" />
+            </div>
+            <div id="chkPayMethods">
+              <p className="chk-payer" id="chkPayer" />
+              <div className="checkout-tabs">
               <button type="button" className="pay-tab active" onClick={() => switchPayMethod('upi')}>
                 <i className="ph-bold ph-qr-code" /> UPI / QR
               </button>{' '}
@@ -96,6 +120,7 @@ export default function PaymentCheckoutModal() {
                   Axis Bank
                 </button>
               </div>
+            </div>
             </div>
           </div>
           <div className="checkout-summary-box">

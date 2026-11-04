@@ -19,7 +19,7 @@ const apiError = (code, message, status) =>
 const SESSION = {
   accessToken: 'token-abc',
   expiresIn: 3600,
-  customer: { ref: 'CUS-1', name: 'Priya Kulkarni', mobile: '9876543210', email: '', company: '' },
+  customer: { ref: 'CUS-1', name: 'Priya Kulkarni', mobile: '', email: 'priya@example.com', company: '' },
 };
 
 beforeEach(() => {
@@ -35,23 +35,22 @@ afterEach(() => {
 });
 
 describe('customer session', () => {
-  it('signs in with a code and keeps the token for this tab only', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(json({ isNewAccount: true, resendAfter: 30, devCode: '123456' }))
-      .mockResolvedValueOnce(json(SESSION));
+  it('signs in with a Google credential and keeps the token for this tab only', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(json(SESSION));
     vi.stubGlobal('fetch', fetchMock);
-    const { requestSignInCode, verifySignInCode, customerHeaders, getCustomer, isSignedIn } =
-      await loadSession('https://api.test/api/v1');
+    const { signInWithGoogle, customerHeaders, getCustomer, isSignedIn } = await loadSession('https://api.test/api/v1');
 
-    const sent = await requestSignInCode('9876543210');
-    expect(sent).toMatchObject({ isNewAccount: true, devCode: '123456' });
-
-    const customer = await verifySignInCode({ mobile: '9876543210', code: '123456', name: 'Priya Kulkarni' });
+    const customer = await signInWithGoogle('google-id-token');
     expect(customer).toMatchObject({ ref: 'CUS-1', name: 'Priya Kulkarni' });
     expect(isSignedIn()).toBe(true);
     expect(customerHeaders()).toEqual({ authorization: 'Bearer token-abc' });
-    expect(getCustomer().mobile).toBe('9876543210');
+    expect(getCustomer().email).toBe('priya@example.com');
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe('https://api.test/api/v1/auth/google');
+    expect(JSON.parse(init.body)).toEqual({ credential: 'google-id-token' });
+    // The refresh cookie has to ride along or the session cannot be restored later.
+    expect(init.credentials).toBe('include');
 
     // The token lives in sessionStorage; localStorage only learns that a session exists.
     expect(sessionStorage.getItem('VDESK_SESSION')).toContain('token-abc');
@@ -59,32 +58,11 @@ describe('customer session', () => {
     expect(JSON.stringify(localStorage)).not.toContain('token-abc');
   });
 
-  it('asks the API for a code and sends the account details on verify', async () => {
-    const fetchMock = vi.fn().mockResolvedValueOnce(json({ isNewAccount: false })).mockResolvedValueOnce(json(SESSION));
-    vi.stubGlobal('fetch', fetchMock);
-    const { requestSignInCode, verifySignInCode } = await loadSession('https://api.test/api/v1');
+  it('lets a refused credential through to the caller to explain', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(apiError('GOOGLE_TOKEN_INVALID', 'Google sign-in did not go through.', 401)));
+    const { signInWithGoogle, isSignedIn } = await loadSession('https://api.test/api/v1');
 
-    await requestSignInCode('9876543210');
-    await verifySignInCode({ mobile: '9876543210', code: '123456', name: 'Priya', company: 'Zenith D2C' });
-
-    const [requestUrl, requestInit] = fetchMock.mock.calls[0];
-    expect(requestUrl).toBe('https://api.test/api/v1/auth/otp/request');
-    expect(JSON.parse(requestInit.body)).toEqual({ mobile: '9876543210' });
-
-    const [verifyUrl, verifyInit] = fetchMock.mock.calls[1];
-    expect(verifyUrl).toBe('https://api.test/api/v1/auth/otp/verify');
-    expect(JSON.parse(verifyInit.body)).toMatchObject({ code: '123456', company: 'Zenith D2C' });
-    // The refresh cookie has to ride along or the session cannot be restored later.
-    expect(verifyInit.credentials).toBe('include');
-  });
-
-  it('lets a wrong code through to the caller to explain', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(apiError('OTP_INVALID', 'That code is not right.', 401)));
-    const { verifySignInCode, isSignedIn } = await loadSession('https://api.test/api/v1');
-
-    await expect(verifySignInCode({ mobile: '9876543210', code: '000000' })).rejects.toMatchObject({
-      code: 'OTP_INVALID',
-    });
+    await expect(signInWithGoogle('forged')).rejects.toMatchObject({ code: 'GOOGLE_TOKEN_INVALID' });
     expect(isSignedIn()).toBe(false);
   });
 
@@ -101,7 +79,7 @@ describe('customer session', () => {
     const fetchMock = vi.fn().mockResolvedValueOnce(json(SESSION));
     vi.stubGlobal('fetch', fetchMock);
     let api = await loadSession('https://api.test/api/v1');
-    await api.verifySignInCode({ mobile: '9876543210', code: '123456', name: 'Priya Kulkarni' });
+    await api.signInWithGoogle('google-id-token');
 
     // A new tab: the same localStorage hint, but no token in sessionStorage.
     sessionStorage.clear();
@@ -126,8 +104,8 @@ describe('customer session', () => {
   it('signs out through the API and forgets the session either way', async () => {
     const fetchMock = vi.fn().mockResolvedValueOnce(json(SESSION)).mockResolvedValueOnce(new Response(null, { status: 204 }));
     vi.stubGlobal('fetch', fetchMock);
-    const { verifySignInCode, signOut, isSignedIn } = await loadSession('https://api.test/api/v1');
-    await verifySignInCode({ mobile: '9876543210', code: '123456', name: 'Priya Kulkarni' });
+    const { signInWithGoogle, signOut, isSignedIn } = await loadSession('https://api.test/api/v1');
+    await signInWithGoogle('google-id-token');
 
     await signOut();
     expect(fetchMock.mock.calls.at(-1)[0]).toBe('https://api.test/api/v1/auth/customer/logout');
@@ -138,11 +116,10 @@ describe('customer session', () => {
   it('falls back to a local session on a build with no API', async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
-    const { requestSignInCode, verifySignInCode, isSignedIn } = await loadSession('');
+    const { signInLocally, isSignedIn } = await loadSession('');
 
-    expect(await requestSignInCode('9876543210')).toMatchObject({ local: true });
-    const customer = await verifySignInCode({ mobile: '9876543210', code: '123456', name: 'Priya Kulkarni' });
-    expect(customer).toMatchObject({ name: 'Priya Kulkarni', mobile: '9876543210', local: true });
+    const customer = signInLocally({ name: 'Priya Kulkarni' });
+    expect(customer).toMatchObject({ name: 'Priya Kulkarni', local: true });
     expect(isSignedIn()).toBe(true);
     expect(fetchMock).not.toHaveBeenCalled();
   });
