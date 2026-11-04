@@ -54,7 +54,12 @@ export default function AdminDashboard() {
   }, [load]);
 
   const live = Array.isArray(apiLeads);
-  const leads = live ? apiLeads : localLeads;
+  /*
+   * With an API, enquiries are customers' personal details: nothing is shown — not even this browser's own
+   * copies — until a staff member has signed in. Only the static demo build (no API) shows local data.
+   */
+  const locked = isApiEnabled() && !signedIn;
+  const leads = live ? apiLeads : isApiEnabled() ? [] : localLeads;
   /*
    * Roles differ: an operations admin may read the pipeline but not move it. Showing a control the
    * API will refuse is worse than not showing it, so the status is a badge unless this account can
@@ -111,6 +116,23 @@ export default function AdminDashboard() {
     setStaff(null);
   }
 
+  if (locked) {
+    return (
+      <>
+        <section className="ui-portal-head">
+          <div className="ui-container">
+            <span className="ui-portal-head__eyebrow">Staff console</span>
+            <h1 className="ui-portal-head__title">Sign in</h1>
+            <p className="ui-portal-head__meta">Enquiries and customer details are shown only to signed-in staff.</p>
+          </div>
+        </section>
+        <Section tone="tint" tight>
+          <StaffSignIn onSignedIn={() => setSignedIn(true)} />
+        </Section>
+      </>
+    );
+  }
+
   return (
     <>
       <section className="ui-portal-head">
@@ -123,12 +145,19 @@ export default function AdminDashboard() {
                 {live
                   ? `Live CRM${staff?.name ? ` · signed in as ${staff.name}` : ''}`
                   : isApiEnabled()
-                    ? 'Showing enquiries saved in this browser — sign in for the live CRM'
+                    ? staff
+                      ? `Signed in as ${staff.name} — this account does not have access to enquiries`
+                      : 'Loading the live CRM…'
                     : 'Showing enquiries saved in this browser'}
               </p>
             </div>
             <div className="ui-actions">
-              <Button variant="outline" icon="ph-download-simple" onClick={() => (live ? downloadLeadsCsv() : exportLeadsToCSV())}>
+              <Button
+                variant="outline"
+                icon="ph-download-simple"
+                disabled={isApiEnabled() && !live}
+                onClick={() => (live ? downloadLeadsCsv() : exportLeadsToCSV())}
+              >
                 Export CSV
               </Button>
               {live ? (
@@ -165,12 +194,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       </section>
-
-      {!live && isApiEnabled() && (
-        <Section tone="tint" tight>
-          <StaffSignIn onSignedIn={() => setSignedIn(true)} />
-        </Section>
-      )}
 
       <Section tone="white" tight>
         <div className="ui-admin-toolbar">

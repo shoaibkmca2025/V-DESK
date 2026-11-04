@@ -286,3 +286,9 @@ APOB/PPOB — additional/principal place of business (GST) · ARN — GST applic
   the same key vector. Still to do: the production migration (0002, 0003) and deploy, which wait on Shoaib
   running `npm run migrate` against Neon; the Google OAuth client ID; re-scripting the video guides
   (`docs/guides/render.mjs` still signs in the old ways).
+- **2026-11-04 (privacy fix)** — The admin page showed this browser's stored enquiries (and the demo pipeline)
+  before anyone signed in, and every enquiry form kept a permanent copy of the visitor's name, mobile and email
+  in localStorage. With an API configured: the admin page shows only the sign-in box until a staff member signs
+  in; the browser keeps an enquiry only until the API has it, then deletes it; demo leads and already-sent copies
+  are cleared from browsers that still hold them; the ⌘K "Admin CRM Portal" item opens the signed-in console.
+  The static no-API build keeps its local demo CRM.
