@@ -1,9 +1,13 @@
 /**
  * Identity service — staff sign-in, MFA, sessions and staff user management.
  *
- * Rules (docs/backend/rules.md §19–20, ADR-012):
+ * Rules (docs/backend/rules.md §19–20, ADR-012, ADR-013):
  *  - Accounts start with a one-time setup code, never a password an admin chose. Signing in with the code
  *    leads only to "choose your password" (`setupPassword`); storing that password spends the code.
+ *  - The API never receives a password. The sign-in page derives a key from it with argon2id (the slow, costly
+ *    part) and sends `passwordKey`; the API stores and checks a salted SHA-256 of that key, which takes
+ *    microseconds — so staff sign-in fits the Workers free plan. The password rules (length, letters and
+ *    numbers) can therefore only be enforced by the page.
  *  - Password → 5-minute MFA token → TOTP code → session. No staff session is ever issued without TOTP;
  *    staff who have not enrolled are sent through /mfa/enroll first.
  *  - Wrong passwords and wrong codes share one counter; MAX_FAILED_ATTEMPTS locks the account for LOCKOUT_MS.
@@ -32,14 +36,15 @@ import * as repo from './identity.repository.js';
 import {
   generateRefreshToken,
   generateSetupCode,
-  hashPassword,
+  hashPasswordKey,
   hashRefreshToken,
   hashSetupCode,
+  isLegacyPasswordHash,
   signAccessToken,
   signMfaToken,
   signSetupToken,
   verifyAgainstDummy,
-  verifyPassword,
+  verifyPasswordKey,
   verifySetupToken,
   verifyToken,
 } from './identity.tokens.js';
@@ -111,23 +116,31 @@ async function mfaStep(user) {
 
 const sameHash = (a, b) => a.length === b.length && timingSafeEqual(Buffer.from(a), Buffer.from(b));
 
+const passwordResetRequired = () =>
+  unauthorized(
+    'PASSWORD_RESET_REQUIRED',
+    'Your password has to be set again after a security upgrade. Ask your admin for a setup code.',
+  );
+
 /**
- * Step 1: email + password. Never returns a session — only an MFA token. An account still waiting for its
- * first password accepts its setup code in the password field instead, and gets a setup token for
- * POST /auth/password/setup — the code itself is spent only when the password is stored.
+ * Step 1: email + `passwordKey` (the key the page derived from the password), or — for an account still waiting
+ * for its first password — email + `setupCode`. Never returns a session: a password leads to an MFA token, a
+ * setup code to a setup token for POST /auth/password/setup. The code itself is spent only when the password
+ * is stored.
  */
-export async function login({ email, password }) {
+export async function login({ email, passwordKey, setupCode }) {
   assertConfigured();
   const now = new Date();
   const user = await repo.findUserByEmail(email);
   if (!user || user.status !== 'active') {
-    await verifyAgainstDummy(password);
+    verifyAgainstDummy(passwordKey);
     throw invalidCredentials();
   }
   assertNotLocked(user, now);
 
-  if (!user.passwordHash) {
-    if (!user.setupCodeHash || !sameHash(hashSetupCode(password), user.setupCodeHash)) {
+  if (setupCode !== undefined) {
+    // A code only opens an account that has no password yet; once one is set, the code is gone.
+    if (user.passwordHash || !user.setupCodeHash || !sameHash(hashSetupCode(setupCode), user.setupCodeHash)) {
       await recordFailure(user, now);
       throw invalidCredentials();
     }
@@ -137,7 +150,8 @@ export async function login({ email, password }) {
     return { passwordSetupRequired: true, setupToken: await signSetupToken(user), expiresIn: SETUP_TOKEN_TTL_SECONDS };
   }
 
-  if (!(await verifyPassword(user.passwordHash, password))) {
+  if (isLegacyPasswordHash(user.passwordHash)) throw passwordResetRequired();
+  if (!verifyPasswordKey(user.passwordHash, passwordKey)) {
     await recordFailure(user, now);
     throw invalidCredentials();
   }
@@ -148,7 +162,7 @@ export async function login({ email, password }) {
  * Step 1b (first sign-in, or after an admin issued a fresh code): the staff member chooses their password.
  * Storing it spends the setup code; then sign-in carries on exactly as after a password (MFA next).
  */
-export async function setupPassword({ setupToken, newPassword }) {
+export async function setupPassword({ setupToken, newPasswordKey }) {
   assertConfigured();
   const now = new Date();
   const claim = await verifySetupToken(setupToken);
@@ -156,7 +170,7 @@ export async function setupPassword({ setupToken, newPassword }) {
   if (!user || user.status !== 'active') {
     throw unauthorized('SETUP_TOKEN_INVALID', 'Please sign in with your setup code again');
   }
-  const updated = await repo.completeSetup(user.ref, claim.codeHashPrefix, await hashPassword(newPassword), now);
+  const updated = await repo.completeSetup(user.ref, claim.codeHashPrefix, hashPasswordKey(newPasswordKey), now);
   if (!updated) {
     throw unauthorized('SETUP_TOKEN_INVALID', 'This setup code was already used or replaced. Sign in again.');
   }
@@ -266,7 +280,7 @@ export async function getMe(ref) {
 }
 
 /** Changing your password signs out every other device. */
-export async function changePassword(ref, { currentPassword, newPassword }) {
+export async function changePassword(ref, { currentPasswordKey, newPasswordKey }) {
   const now = new Date();
   const user = await repo.findUserByRef(ref);
   if (!user) throw notFound('USER_NOT_FOUND', 'User not found');
@@ -274,13 +288,14 @@ export async function changePassword(ref, { currentPassword, newPassword }) {
   if (!user.passwordHash) {
     throw conflict('PASSWORD_NOT_SET', 'Set your password with your setup code first (POST /auth/password/setup)');
   }
-  if (!(await verifyPassword(user.passwordHash, currentPassword))) {
+  if (isLegacyPasswordHash(user.passwordHash)) throw passwordResetRequired();
+  if (!verifyPasswordKey(user.passwordHash, currentPasswordKey)) {
     await recordFailure(user, now);
     throw unauthorized('INVALID_CREDENTIALS', 'Current password is incorrect');
   }
-  if (currentPassword === newPassword)
+  if (currentPasswordKey === newPasswordKey)
     throw badRequest('PASSWORD_UNCHANGED', 'Choose a password you have not used here');
-  await repo.updateUser(ref, { passwordHash: await hashPassword(newPassword) });
+  await repo.updateUser(ref, { passwordHash: hashPasswordKey(newPasswordKey) });
   await repo.revokeAllForUser(ref, now);
   log.info({ event: 'auth.password_changed', userRef: ref }, 'password changed');
 }
@@ -298,18 +313,19 @@ function newSetupCode(now) {
 
 /**
  * Creates a staff account with a one-time setup code — returned here once, for the admin to hand over, and
- * never retrievable again. `password` is only for scripts/create-admin.js bootstrapping the first admin.
- * `actor` is the creating user's ref, 'admin-key', or 'script'.
+ * never retrievable again. `passwordKey` is only for scripts/create-admin.js bootstrapping the first admin
+ * (derived on that machine, as the sign-in page would). `actor` is the creating user's ref, 'admin-key', or
+ * 'script'.
  */
-export async function createUser({ email, name, role, password }, actor) {
+export async function createUser({ email, name, role, passwordKey }, actor) {
   const now = new Date();
-  const code = password ? null : newSetupCode(now);
+  const code = passwordKey ? null : newSetupCode(now);
   const doc = await repo.insertUser({
     ref: generateRef('USR', 6),
     email,
     name,
     role,
-    ...(password ? { passwordHash: await hashPassword(password) } : code.stored),
+    ...(passwordKey ? { passwordHash: hashPasswordKey(passwordKey) } : code.stored),
     createdBy: actor,
   });
   if (!doc) throw conflict('EMAIL_TAKEN', 'A user with this email already exists');
@@ -317,6 +333,16 @@ export async function createUser({ email, name, role, password }, actor) {
   return code
     ? { ...mapUser(doc), setupCode: code.setupCode, setupCodeExpiresAt: code.setupCodeExpiresAt }
     : mapUser(doc);
+}
+
+/**
+ * For scripts/issue-setup-code.js — a fresh setup code for the account with this email, when nobody can sign in
+ * to issue one (e.g. the only super admin, whose password predates ADR-013).
+ */
+export async function issueSetupCodeByEmail(email, actor) {
+  const user = await repo.findUserByEmail(email);
+  if (!user) throw notFound('USER_NOT_FOUND', 'No staff account has that email');
+  return updateUser(user.ref, { issueSetupCode: true }, actor);
 }
 
 export async function listUsers({ cursor, limit }) {

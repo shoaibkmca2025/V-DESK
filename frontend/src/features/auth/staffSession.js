@@ -1,7 +1,8 @@
 import { api, isApiEnabled } from '@/lib/api.js';
+import { derivePasswordKey } from './passwordKey.js';
 
 /**
- * Staff sign-in for the admin console: password → authenticator code → access token.
+ * Staff sign-in for the admin console: password (sent as a key, ADR-013) → authenticator code → access token.
  *
  * The token is held in memory and mirrored to sessionStorage so a page reload inside the same tab
  * keeps the session, and closing the tab ends it. It is never written to localStorage, which other
@@ -47,28 +48,39 @@ export function staffHeaders() {
   return token ? { authorization: `Bearer ${token}` } : {};
 }
 
+const mfaNext = (data) => ({ mfaToken: data.mfaToken, enrolmentRequired: Boolean(data.mfaEnrollmentRequired) });
+
 /**
  * Step 1. Email + password → `{ mfaToken, enrolmentRequired }` — a first sign-in has to enrol an authenticator
- * app before it can get a code. A new staff member signs in with the one-time setup code an admin gave them
- * instead (ADR-012); that answers `{ passwordSetupRequired: true, setupToken }`, and they choose a password next.
+ * app before it can get a code. The password never leaves this browser: it is turned into a key here (about a
+ * second of work, ADR-013) and only the key is sent.
  */
 export async function signInWithPassword(email, password) {
   if (!isApiEnabled()) throw new Error('No API is configured for this build');
-  const data = await api.post('/auth/login', { body: { email, password } });
-  if (data.passwordSetupRequired) return { passwordSetupRequired: true, setupToken: data.setupToken };
-  return {
-    mfaToken: data.mfaToken,
-    enrolmentRequired: Boolean(data.mfaEnrollmentRequired),
-  };
+  const passwordKey = await derivePasswordKey(email, password);
+  return mfaNext(await api.post('/auth/login', { body: { email, passwordKey } }));
 }
 
-/** Step 1b (setup code only). Stores the password they chose; answers like step 1, with the MFA token. */
-export async function choosePassword(setupToken, newPassword) {
-  const data = await api.post('/auth/password/setup', { body: { setupToken, newPassword } });
-  return { mfaToken: data.mfaToken, enrolmentRequired: Boolean(data.mfaEnrollmentRequired) };
+/**
+ * Step 1, first time: email + the one-time setup code an admin gave them (ADR-012) → `{ setupToken }`; they
+ * choose a password next.
+ */
+export async function signInWithSetupCode(email, setupCode) {
+  if (!isApiEnabled()) throw new Error('No API is configured for this build');
+  const data = await api.post('/auth/login', { body: { email, setupCode } });
+  return { setupToken: data.setupToken };
 }
 
-/** The API's password rule, checked before sending: 12+ characters with at least one letter and one number. */
+/** Step 1b (setup code only). Stores the password they chose — as its key; answers with the MFA token. */
+export async function choosePassword(setupToken, email, newPassword) {
+  const newPasswordKey = await derivePasswordKey(email, newPassword);
+  return mfaNext(await api.post('/auth/password/setup', { body: { setupToken, newPasswordKey } }));
+}
+
+/**
+ * The password rule (ADR-012): 12+ characters with at least one letter and one number. Only this page can check
+ * it — the API never sees the password, just the key made from it (ADR-013).
+ */
 export function passwordProblem(password) {
   if (password.length < 12) return 'Use at least 12 characters.';
   if (password.length > 128) return 'Use at most 128 characters.';

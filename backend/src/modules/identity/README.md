@@ -17,26 +17,39 @@ sessions, roles and permissions (PRD §69–70, rules.md §19–20, ADR-012).
 
 | Method  | Path              | Access                | What it does                                                                         |
 | ------- | ----------------- | --------------------- | ------------------------------------------------------------------------------------ |
-| `POST`  | `/login`          | public (rate-limited) | `{ email, password }` → `{ mfaToken, mfaRequired \| mfaEnrollmentRequired }`, or     |
-|         |                   |                       | with a setup code as `password` → `{ passwordSetupRequired: true, setupToken }`      |
-| `POST`  | `/password/setup` | setup token           | `{ setupToken, newPassword }` → the MFA step, as `/login` answers it                 |
+| `POST`  | `/login`          | public (rate-limited) | `{ email, passwordKey }` → `{ mfaToken, mfaRequired \| mfaEnrollmentRequired }`, or  |
+|         |                   |                       | `{ email, setupCode }` → `{ passwordSetupRequired: true, setupToken }`               |
+| `POST`  | `/password/setup` | setup token           | `{ setupToken, newPasswordKey }` → the MFA step, as `/login` answers it              |
 | `POST`  | `/mfa/enroll`     | MFA token             | `{ mfaToken }` → `{ secret, otpauthUrl }` (first sign-in only)                       |
 | `POST`  | `/mfa/verify`     | MFA token             | `{ mfaToken, code }` → `{ accessToken, expiresIn, user }` + refresh cookie           |
 | `POST`  | `/refresh`        | refresh cookie        | Rotates the cookie, returns a new access token                                       |
 | `POST`  | `/logout`         | refresh cookie        | Revokes the session, clears the cookie → 204                                         |
 | `GET`   | `/me`             | Bearer                | The signed-in user with `permissions`                                                |
-| `POST`  | `/password`       | Bearer                | `{ currentPassword, newPassword }` → 204; ends the user's other sessions             |
+| `POST`  | `/password`       | Bearer                | `{ currentPasswordKey, newPasswordKey }` → 204; ends the user's other sessions       |
 | `GET`   | `/users`          | `users:manage`        | Staff list, newest first, `?cursor=&limit=`                                          |
 | `POST`  | `/users`          | `users:manage`        | `{ email, name, role }` → 201 with a one-time `setupCode` (shown only in this reply) |
 | `GET`   | `/users/:ref`     | `users:manage`        | One user (`passwordSet`, `setupCodeExpiresAt`, never the code)                       |
 | `PATCH` | `/users/:ref`     | `users:manage`        | Any of `{ name, role, status, issueSetupCode: true, resetMfa: true, unlock: true }`  |
 
+## Passwords never reach the API (ADR-013)
+
+The sign-in page turns the password into a 32-byte key with argon2id **in the browser** (about a second;
+`frontend/src/features/auth/passwordKey.js`) and sends `passwordKey` — the API never receives a password. It
+stores a salted SHA-256 of the key (`identity.password.js`), which takes microseconds, so staff sign-in fits the
+Cloudflare Workers free plan (10 ms of CPU per request). A leaked table still costs an attacker an argon2id run
+per guess. The two halves must agree: `identity.passwordKey.js` (scripts, tests) and the frontend file check the
+same test vector. Consequences: a plain password in a request is refused (400); the password rule (12+
+characters, a letter and a number) is enforced by the page, since the API cannot see it; and a password stored
+before ADR-013 (`$argon2id$…`) answers `401 PASSWORD_RESET_REQUIRED` until the account gets a new setup code
+(`scripts/issue-setup-code.js <email>` when no admin can sign in).
+
 ## A new staff member's first sign-in
 
 1. A super admin creates the account (`POST /users`) and passes on the `setupCode`, e.g. `ABCD-EFGH-JKMN`. Nobody
    types a password for someone else, so an admin never knows a staff member's password.
-2. The staff member signs in with their email and the code as the password. `POST /login` answers
-   `{ passwordSetupRequired: true, setupToken }` (15 minutes) — no session, no MFA token.
+2. On the sign-in page they choose "I have a setup code" and enter their email and the code. `POST /login`
+   (`{ email, setupCode }`) answers `{ passwordSetupRequired: true, setupToken }` (15 minutes) — no session, no MFA
+   token.
 3. `POST /password/setup` stores the password they choose (12+ characters, at least one letter and one number) and
    answers with the MFA step. The code is spent: it never works again.
 4. MFA as for everyone: `POST /mfa/enroll` (first time), then `POST /mfa/verify` with the authenticator code.
@@ -47,7 +60,7 @@ phone). Codes last 72 hours; a new code cancels the previous one and any setup a
 
 ## Every staff sign-in after that
 
-1. `POST /login` checks the password and returns a 5-minute `mfaToken` — never a session.
+1. `POST /login` checks the password (as its key) and returns a 5-minute `mfaToken` — never a session.
 2. `POST /mfa/verify` with the 6-digit code returns a 15-minute `accessToken` (send as `Authorization: Bearer …`) and
    sets the `vd_rt` refresh cookie (`HttpOnly`, `SameSite=Strict`, `Path=/api/v1/auth`, `Secure` in production,
    7 days). The first good code also switches MFA on.
@@ -89,7 +102,8 @@ Nobody needs an account to browse, ask for a quote or hold a room. A customer si
 - **Guards:** you can't change your own role/status/MFA or issue yourself a setup code
   (`409 CANNOT_CHANGE_OWN_ACCESS`), and the last active `SUPER_ADMIN` can't be demoted or disabled
   (`409 LAST_SUPER_ADMIN`).
-- **Secrets at rest:** passwords are argon2id; setup codes and refresh tokens are SHA-256 only; TOTP secrets are
+- **Secrets at rest:** passwords are argon2id keys made in the browser, stored as salted SHA-256; setup codes and
+  refresh tokens are SHA-256 only; TOTP secrets are
   AES-256-GCM sealed with `MFA_ENCRYPTION_KEY`.
 
 ## Permissions (`identity.constants.js` → `PERMISSIONS`)
@@ -122,9 +136,9 @@ Nobody needs an account to browse, ask for a quote or hold a room. A customer si
 - **Local:** `POST /api/v1/auth/users` with `x-admin-key` and `role: "SUPER_ADMIN"`.
 - **Servers without an admin key:** `node --env-file-if-exists=.env scripts/create-admin.js you@vdesk.in "Your Name"`
   prints a one-time setup code; sign in on the admin page with it and choose your password.
+- **An admin who cannot sign in** (lost password, or one stored before ADR-013):
+  `node --env-file-if-exists=.env scripts/issue-setup-code.js you@vdesk.in` prints a fresh setup code.
 
 ## Not built yet
 
 Audit log (rules.md §26), organisations (enterprise module), Redis-backed rate limits for more than one API instance.
-Staff password sign-in hashes with argon2id (~0.5 s of CPU), which needs the Workers Paid plan — on the free plan it
-can fail with error 1102 (ADR-011).

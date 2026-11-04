@@ -5,6 +5,7 @@ import {
   enrolAuthenticator,
   passwordProblem,
   signInWithPassword,
+  signInWithSetupCode,
   verifyCode,
 } from '@/features/auth/staffSession.js';
 import { isApiEnabled } from '@/lib/api.js';
@@ -13,8 +14,9 @@ import { isApiEnabled } from '@/lib/api.js';
  * Staff sign-in: password, then a code from an authenticator app (the API requires it, and a first
  * sign-in enrols the app before it can ask for a code).
  *
- * A new staff member signs in with the one-time setup code a super admin gave them (ADR-012). The API then
- * asks them to choose their own password — the `setup` step — and carries on to the authenticator as usual.
+ * A new staff member signs in with the one-time setup code a super admin gave them ("I have a setup code",
+ * ADR-012), then chooses their own password — the `setup` step — and carries on to the authenticator as usual.
+ * Passwords are turned into a key in this browser before anything is sent (ADR-013), which takes about a second.
  *
  * Each step's form carries its own `key` so React replaces it rather than reusing the same inputs —
  * without that, what was typed in the email box stays behind in the code box.
@@ -24,6 +26,8 @@ function explain(err) {
   switch (err.code) {
     case 'INVALID_CREDENTIALS':
       return 'That email and password (or setup code) do not match.';
+    case 'PASSWORD_RESET_REQUIRED':
+      return 'Your password has to be set again after a security upgrade. Ask an admin for a setup code, then choose "I have a setup code".';
     case 'SETUP_CODE_EXPIRED':
       return 'This setup code has expired. Ask your admin for a new one.';
     case 'SETUP_TOKEN_INVALID':
@@ -39,6 +43,8 @@ function explain(err) {
 
 export default function StaffSignIn({ onSignedIn }) {
   const [step, setStep] = useState('password');
+  const [withCode, setWithCode] = useState(false);
+  const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [setupToken, setSetupToken] = useState(null);
@@ -47,6 +53,7 @@ export default function StaffSignIn({ onSignedIn }) {
 
   /** Both the password step and the setup step end in an MFA token. */
   async function toMfa({ mfaToken: token, enrolmentRequired }) {
+    setWithCode(false);
     setMfaToken(token);
     setSecret(null);
     if (enrolmentRequired) {
@@ -72,14 +79,16 @@ export default function StaffSignIn({ onSignedIn }) {
   function submitPassword(event) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
+    const address = String(form.get('email')).trim().toLowerCase();
+    setEmail(address);
     run(async () => {
-      const result = await signInWithPassword(form.get('email'), form.get('password'));
-      if (result.passwordSetupRequired) {
-        setSetupToken(result.setupToken);
+      if (withCode) {
+        const { setupToken: token } = await signInWithSetupCode(address, form.get('secret'));
+        setSetupToken(token);
         setStep('setup');
         return;
       }
-      await toMfa(result);
+      await toMfa(await signInWithPassword(address, form.get('secret')));
     });
   }
 
@@ -90,7 +99,7 @@ export default function StaffSignIn({ onSignedIn }) {
     const problem = passwordProblem(password);
     if (problem) return setError(problem);
     if (password !== form.get('confirmPassword')) return setError('The two passwords do not match.');
-    run(async () => toMfa(await choosePassword(setupToken, password)));
+    run(async () => toMfa(await choosePassword(setupToken, email, password)));
   }
 
   function submitCode(event) {
@@ -125,19 +134,51 @@ export default function StaffSignIn({ onSignedIn }) {
       <h2>{step === 'setup' ? 'Choose your password' : 'Staff sign-in'}</h2>
       {step === 'password' && (
         <form key="password" onSubmit={submitPassword} className="ui-signin__form">
-          <p>Use your V-DESK staff account. First time here? Use the setup code your admin gave you as the password.</p>
+          <p>
+            {withCode
+              ? 'First time here? Enter the one-time setup code your admin gave you. You will choose your password next.'
+              : 'Use your V-DESK staff account.'}
+          </p>
           <div className="ui-field">
             <label htmlFor="staffEmail">Work email</label>
-            <input id="staffEmail" name="email" type="email" autoComplete="username" required placeholder="you@vdesk.in" />
+            <input
+              id="staffEmail"
+              name="email"
+              type="email"
+              autoComplete="username"
+              required
+              placeholder="you@vdesk.in"
+              defaultValue={email}
+            />
           </div>
           <div className="ui-field">
-            <label htmlFor="staffPassword">Password or setup code</label>
-            <input id="staffPassword" name="password" type="password" autoComplete="current-password" required />
+            <label htmlFor="staffSecret">{withCode ? 'Setup code' : 'Password'}</label>
+            <input
+              key={withCode ? 'code' : 'password'}
+              id="staffSecret"
+              name="secret"
+              type={withCode ? 'text' : 'password'}
+              autoComplete={withCode ? 'one-time-code' : 'current-password'}
+              autoCapitalize={withCode ? 'characters' : undefined}
+              spellCheck={false}
+              placeholder={withCode ? 'ABCD-EFGH-JKMN' : undefined}
+              required
+            />
           </div>
           {errorLine}
           <Button type="submit" variant="primary" block disabled={busy}>
-            {busy ? 'Checking…' : 'Continue'}
+            {busy ? (withCode ? 'Checking…' : 'Checking… this takes a second') : 'Continue'}
           </Button>
+          <button
+            type="button"
+            className="ui-btn ui-btn--ghost ui-btn--sm"
+            onClick={() => {
+              setError(null);
+              setWithCode(!withCode);
+            }}
+          >
+            {withCode ? 'I have a password' : 'I have a setup code (first sign-in)'}
+          </button>
         </form>
       )}
 
@@ -174,7 +215,7 @@ export default function StaffSignIn({ onSignedIn }) {
           </div>
           {errorLine}
           <Button type="submit" variant="primary" block disabled={busy}>
-            {busy ? 'Saving…' : 'Save password & continue'}
+            {busy ? 'Saving… this takes a second' : 'Save password & continue'}
           </Button>
         </form>
       )}
@@ -212,6 +253,7 @@ export default function StaffSignIn({ onSignedIn }) {
             className="ui-btn ui-btn--ghost ui-btn--sm"
             onClick={() => {
               setError(null);
+              setWithCode(false);
               setStep('password');
             }}
           >

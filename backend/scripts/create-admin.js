@@ -8,10 +8,12 @@
  * email and that code, chooses their own password, then enrols an authenticator app (MFA is mandatory).
  *
  * Setting ADMIN_PASSWORD instead skips the setup code and stores that password directly — only for automated
- * environments; it comes from the environment so it doesn't land in shell history.
+ * environments; it comes from the environment so it doesn't land in shell history. Like the sign-in page, this
+ * script turns the password into its argon2id key first (ADR-013), so the password itself never reaches the API
+ * or the database.
  */
 import { connectDb, disconnectDb } from '../src/config/db.js';
-import { createUser } from '../src/modules/identity/index.js';
+import { createUser, derivePasswordKey } from '../src/modules/identity/index.js';
 
 const [email, name] = process.argv.slice(2);
 const password = process.env.ADMIN_PASSWORD || undefined;
@@ -23,7 +25,9 @@ if (!email || !name || (password !== undefined && password.length < 12)) {
 
 await connectDb();
 try {
-  const user = await createUser({ email: email.trim().toLowerCase(), name, role: 'SUPER_ADMIN', password }, 'script');
+  const address = email.trim().toLowerCase();
+  const passwordKey = password === undefined ? undefined : await derivePasswordKey(address, password);
+  const user = await createUser({ email: address, name, role: 'SUPER_ADMIN', passwordKey }, 'script');
   console.log(`[create-admin] created ${user.ref} (${user.role})`);
   if (user.setupCode) {
     console.log(`[create-admin] one-time setup code: ${user.setupCode}`);

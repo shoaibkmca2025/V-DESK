@@ -1,79 +1,69 @@
 /**
- * Password hashing: the PHC format, and what has to stay true when the implementation changes.
- * Run: npx vitest run src/modules/identity/identity.password.test.js
+ * Staff password storage (ADR-013): the browser's argon2id key derivation, and the API's cheap salted check of
+ * the key. Run: npx vitest run src/modules/identity/identity.password.test.js
  */
 import { describe, expect, it } from 'vitest';
-import { ARGON2_PARAMS, hashPassword, verifyAgainstDummy, verifyPassword } from './identity.password.js';
+import { hashPasswordKey, isLegacyPasswordHash, verifyAgainstDummy, verifyPasswordKey } from './identity.password.js';
+import { derivePasswordKey, PASSWORD_KEY_PARAMS, passwordKeySalt } from './identity.passwordKey.js';
 
-const PASSWORD = 'correct horse battery';
+/*
+ * The same vector is checked in frontend/src/__tests__/passwordKey.test.js. If either side changes its
+ * parameters, salt or encoding, one of the two tests fails — instead of every staff member being locked out.
+ */
+const VECTOR = {
+  email: ' Asha@VDESK.in ',
+  password: 'correct horse battery 42',
+  // Cross-checked with Node's own argon2 (crypto.argon2Sync), an implementation independent of @noble/hashes.
+  key: 'u3SEnVGIztJZQZ64eCUWuFls5ciW0KnJqLromGXkR7Q',
+};
 
-describe('password hashing', () => {
-  it('produces a PHC string carrying its own parameters, with a fresh salt each time', async () => {
-    const first = await hashPassword(PASSWORD);
-    const second = await hashPassword(PASSWORD);
+describe('derivePasswordKey (the browser half)', () => {
+  it('matches the shared test vector', async () => {
+    expect(PASSWORD_KEY_PARAMS).toEqual({ m: 19_456, t: 2, p: 1, dkLen: 32 });
+    expect(passwordKeySalt(VECTOR.email)).toBe('vdesk-staff-password:asha@vdesk.in');
+    expect(await derivePasswordKey(VECTOR.email, VECTOR.password)).toBe(VECTOR.key);
+  });
 
-    expect(first).toMatch(
-      new RegExp(
-        `^\\$argon2id\\$v=19\\$m=${ARGON2_PARAMS.m},t=${ARGON2_PARAMS.t},p=${ARGON2_PARAMS.p}\\$[^$]+\\$[^$]+$`,
-      ),
-    );
+  it('differs per account and per password', async () => {
+    const key = await derivePasswordKey('a@vdesk.in', 'correct horse battery 42');
+    expect(key).toMatch(/^[A-Za-z0-9_-]{43}$/);
+    expect(await derivePasswordKey('b@vdesk.in', 'correct horse battery 42')).not.toBe(key);
+    expect(await derivePasswordKey('a@vdesk.in', 'correct horse battery 43')).not.toBe(key);
+  });
+});
+
+describe('hashPasswordKey / verifyPasswordKey (the API half)', () => {
+  const KEY = 'k'.repeat(43);
+
+  it('salts every hash and verifies only the same key', () => {
+    const first = hashPasswordKey(KEY);
+    const second = hashPasswordKey(KEY);
+    expect(first).toMatch(/^\$vdk-key\$v=1\$[A-Za-z0-9_-]{22}\$[A-Za-z0-9_-]{43}$/);
     expect(first).not.toBe(second);
-    expect(await verifyPassword(first, PASSWORD)).toBe(true);
-    expect(await verifyPassword(second, PASSWORD)).toBe(true);
+    expect(verifyPasswordKey(first, KEY)).toBe(true);
+    expect(verifyPasswordKey(second, KEY)).toBe(true);
+    for (const wrong of ['j'.repeat(43), `${KEY}x`, '', undefined]) expect(verifyPasswordKey(first, wrong)).toBe(false);
   });
 
-  it('refuses the wrong password, including near misses', async () => {
-    const hash = await hashPassword(PASSWORD);
-    for (const wrong of ['', ' ', 'correct horse batter', 'Correct horse battery', `${PASSWORD} `]) {
-      expect(await verifyPassword(hash, wrong)).toBe(false);
-    }
-  });
-
-  it('keeps leading and trailing spaces, which are part of a password', async () => {
-    const hash = await hashPassword(`  ${PASSWORD}  `);
-    expect(await verifyPassword(hash, `  ${PASSWORD}  `)).toBe(true);
-    expect(await verifyPassword(hash, PASSWORD)).toBe(false);
-  });
-
-  it('verifies a hash made with other parameters, because the hash says what they were', async () => {
-    // The shape a different argon2id implementation (or an older setting) would have stored.
-    const older = '$argon2id$v=19$m=65536,t=3,p=4$c29tZXNhbHR2YWx1ZQ$3jhdqlAfnp+aIGaDnDvAZLVPnDuGTevGrQxq3w6aVgM';
-    expect(await verifyPassword(older, 'not the password')).toBe(false);
-    // It parses rather than throwing — a wrong answer, never an error.
-    expect(typeof (await verifyPassword(older, PASSWORD))).toBe('boolean');
-  });
-
-  it('answers false for anything that is not one of our hashes', async () => {
+  it('never matches a malformed, legacy or missing hash', () => {
     for (const stored of [
       null,
-      undefined,
       '',
-      'plain-text',
-      '$2b$10$abcdefghijklmnopqrstuv',
-      '$argon2i$v=19$m=1,t=1,p=1$c2FsdHNhbHQ$aGFzaA',
+      '$vdk-key$v=1$',
+      '$vdk-key$v=1$abc',
+      '$argon2id$v=19$m=19456,t=2,p=1$c2FsdA$aGFzaA',
     ]) {
-      expect(await verifyPassword(stored, PASSWORD)).toBe(false);
+      expect(verifyPasswordKey(stored, KEY)).toBe(false);
     }
+    expect(isLegacyPasswordHash('$argon2id$v=19$m=19456,t=2,p=1$c2FsdA$aGFzaA')).toBe(true);
+    expect(isLegacyPasswordHash(hashPasswordKey(KEY))).toBe(false);
+    expect(verifyAgainstDummy(KEY)).toBe(false);
   });
 
-  it('spends the same work on an unknown account as on a wrong password', async () => {
-    const hash = await hashPassword(PASSWORD);
-    const wrongPassword = async () => {
-      const started = performance.now();
-      await verifyPassword(hash, 'nope');
-      return performance.now() - started;
-    };
-    const unknownAccount = async () => {
-      const started = performance.now();
-      await verifyAgainstDummy('nope');
-      return performance.now() - started;
-    };
-    await unknownAccount(); // the dummy hash is derived once, on first use
-
-    expect(await verifyAgainstDummy('nope')).toBe(false);
-    const ratio = (await unknownAccount()) / (await wrongPassword());
-    // Same algorithm, same parameters: within a factor of three even on a noisy machine.
-    expect(ratio).toBeGreaterThan(0.33);
-    expect(ratio).toBeLessThan(3);
+  it('is cheap enough for the Workers free plan (10 ms of CPU per request)', () => {
+    const stored = hashPasswordKey(KEY);
+    const started = performance.now();
+    for (let i = 0; i < 100; i++) verifyPasswordKey(stored, KEY);
+    expect((performance.now() - started) / 100).toBeLessThan(1);
   });
 });

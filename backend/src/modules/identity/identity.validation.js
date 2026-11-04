@@ -3,35 +3,33 @@
  * applied with `validate({ body, query, params })` in identity.routes.js.
  */
 import { z } from 'zod';
-import {
-  GOOGLE_CREDENTIAL_MAX_LENGTH,
-  MOBILE_PATTERN,
-  PASSWORD_MAX_LENGTH,
-  PASSWORD_MIN_LENGTH,
-  STAFF_ROLES,
-  USER_STATUSES,
-} from './identity.constants.js';
+import { GOOGLE_CREDENTIAL_MAX_LENGTH, MOBILE_PATTERN, STAFF_ROLES, USER_STATUSES } from './identity.constants.js';
 
 const email = z.string().trim().toLowerCase().max(254).email('Enter a valid email');
-/** Never trimmed: leading/trailing spaces are part of a password. Letters and numbers both required (ADR-012). */
-const newPassword = z
+/**
+ * Never a password (ADR-013): the 32-byte key the sign-in page derived from it with argon2id, base64url. The
+ * exact shape is enforced so a client that sends a plain password by mistake is refused, not stored.
+ */
+const passwordKey = z
   .string()
-  .min(PASSWORD_MIN_LENGTH, `Use at least ${PASSWORD_MIN_LENGTH} characters`)
-  .max(PASSWORD_MAX_LENGTH)
-  .regex(/[A-Za-z]/, 'Include at least one letter')
-  .regex(/\d/, 'Include at least one number');
+  .regex(/^[A-Za-z0-9_-]{43}$/, 'Expected the key the sign-in page derives from the password — reload the page');
 const mfaToken = z.string().min(1, 'mfaToken is required').max(2000);
 
-/** `password` is the account's password — or, before the first sign-in, its one-time setup code. */
-export const loginBody = z.object({
-  email,
-  password: z.string().min(1, 'Password is required').max(PASSWORD_MAX_LENGTH),
-});
+/** A password (as its key), or — before the first sign-in — the one-time setup code. Exactly one of the two. */
+export const loginBody = z
+  .object({
+    email,
+    passwordKey: passwordKey.optional(),
+    setupCode: z.string().trim().min(1, 'Enter your setup code').max(40).optional(),
+  })
+  .refine((body) => (body.passwordKey === undefined) !== (body.setupCode === undefined), {
+    message: 'Send either passwordKey or setupCode',
+  });
 
-/** Body for POST /auth/password/setup — the token from signing in with the setup code, and the new password. */
+/** Body for POST /auth/password/setup — the token from signing in with the setup code, and the new password's key. */
 export const setupPasswordBody = z.object({
   setupToken: z.string().min(1, 'setupToken is required').max(2000),
-  newPassword,
+  newPasswordKey: passwordKey,
 });
 
 export const mfaEnrollBody = z.object({ mfaToken });
@@ -45,10 +43,7 @@ export const mfaVerifyBody = z.object({
   ),
 });
 
-export const changePasswordBody = z.object({
-  currentPassword: z.string().min(1, 'Current password is required').max(PASSWORD_MAX_LENGTH),
-  newPassword,
-});
+export const changePasswordBody = z.object({ currentPasswordKey: passwordKey, newPasswordKey: passwordKey });
 
 /**
  * No password here: the API generates a one-time setup code and returns it once (ADR-012), so an admin never

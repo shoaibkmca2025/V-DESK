@@ -2,7 +2,7 @@
  * Credentials: HS256 access/MFA/setup tokens (jose), opaque refresh tokens and staff setup codes. Kept apart
  * from the service so the rules there read as rules, not crypto plumbing. (Google ID tokens are checked in
  * src/integrations/google.js.)
- * Password hashing lives in identity.password.js and is re-exported here, where its callers look for it.
+ * Stored password keys live in identity.password.js and are re-exported here, where their callers look for them.
  */
 import { createHash, randomBytes, randomInt } from 'node:crypto';
 import { jwtVerify, SignJWT } from 'jose';
@@ -20,7 +20,7 @@ import {
 
 // ── Passwords ─────────────────────────────────
 
-export { hashPassword, verifyPassword, verifyAgainstDummy } from './identity.password.js';
+export { hashPasswordKey, isLegacyPasswordHash, verifyAgainstDummy, verifyPasswordKey } from './identity.password.js';
 
 // ── Signed tokens ─────────────────────────────
 

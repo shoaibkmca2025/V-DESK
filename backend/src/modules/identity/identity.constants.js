@@ -53,6 +53,10 @@ export const REFRESH_COOKIE_PATH = '/api/v1/auth';
 export const MAX_FAILED_ATTEMPTS = 5;
 export const LOCKOUT_MS = 15 * 60 * 1000;
 
+/**
+ * The password rule (ADR-012). The API never sees a password (ADR-013) — only the key derived from it — so the
+ * sign-in page enforces this (frontend features/auth/staffSession.js `passwordProblem`); kept here as the record.
+ */
 export const PASSWORD_MIN_LENGTH = 12;
 export const PASSWORD_MAX_LENGTH = 128;
 

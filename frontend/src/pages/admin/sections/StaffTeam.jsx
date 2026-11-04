@@ -48,8 +48,9 @@ function SetupCodeCard({ issued, onDone }) {
     <div className="ui-card ui-setup-code" role="status">
       <h3>One-time setup code for {issued.name}</h3>
       <p>
-        Give this to <strong>{issued.email}</strong>. They sign in on this page with their email and this code, then
-        choose their own password. It works once and expires {formatWhen(issued.setupCodeExpiresAt)}.
+        Give this to <strong>{issued.email}</strong>. On this page they choose “I have a setup code”, enter their
+        email and this code, then choose their own password. It works once and expires{' '}
+        {formatWhen(issued.setupCodeExpiresAt)}.
       </p>
       <code className="ui-setup-code__value">{issued.setupCode}</code>
       <p className="ui-table__sub">This is the only time the code is shown. If it is lost, issue a new one.</p>

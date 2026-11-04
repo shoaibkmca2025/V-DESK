@@ -11,17 +11,23 @@ Workers, the Express app) and the **database** (Neon PostgreSQL). ADR-010 and AD
 | Database | Neon, project `vdesk` (`super-recipe-64885215`), Singapore | `backend/migrations/` | — |
 | Pooling  | Cloudflare Hyperdrive `vdesk-neon`               | —             | binding `HYPERDRIVE`                          |
 
-## Before anything: one plan decision
+## The Workers plan
 
-**Staff password sign-in needs the Workers Paid plan.** Hashing a password with argon2id costs about half a
-second of CPU — that is the whole point of a password hash — and the Workers **free** plan allows 10 ms of
-CPU per request, so `/auth/login`, `/auth/users` and `/auth/password` fail intermittently with Cloudflare
-error 1102 (served as a 503). Everything else fits comfortably: customer Google sign-in, booking, catalog,
-search, quotes, leads and the cron jobs are all I/O-bound. (Checking a staff setup code is a cheap SHA-256;
-choosing the password afterwards is the expensive part.)
+Everything runs on the Workers **free** plan (10 ms of CPU per request). Staff passwords used to be hashed on the
+API with argon2id — about half a second of CPU — which failed with error 1102 on the free plan. Since ADR-013 the
+sign-in page does that hashing in the browser and the API only checks a SHA-256 of the result, so nothing on the
+API needs more than a few milliseconds.
 
-Workers Paid ($5/month) raises the limit to 30 s of CPU, which settles it. Until then, treat the admin
-console as unavailable on this deployment; the public site and the customer portal work.
+One consequence for an existing deployment: a staff password stored before ADR-013 cannot be checked any more, and
+signing in answers "your password has to be set again". Give each such account a new setup code — from the Team
+panel if a super admin can still sign in, otherwise from a machine with `DATABASE_URL`:
+
+```bash
+cd backend
+node --env-file-if-exists=.env scripts/issue-setup-code.js admin@vdesk.in   # prints a one-time setup code
+```
+
+Then sign in on the admin page with "I have a setup code" and choose a password again (the authenticator app stays).
 
 ## The database
 
