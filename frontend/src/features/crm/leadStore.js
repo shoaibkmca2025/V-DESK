@@ -2,9 +2,19 @@ import { LEGACY_LEAD_STATUSES } from '@/data/constants.js';
 import { api, isApiEnabled } from '@/lib/api.js';
 import { readJson, writeJson } from '@/lib/storage.js';
 
-/** CRM lead store persisted in localStorage (PRD §43). Seeds a demo pipeline on first visit. */
+/**
+ * Enquiries kept in this browser's localStorage (PRD §43).
+ *
+ * With an API (the live site) the CRM lives on the server, and this browser keeps an enquiry only until the API
+ * has it — a retry queue, never a copy. Names, numbers and emails must not sit in a visitor's browser after they
+ * were sent: on a shared computer the next person could read them. Demo enquiries are never added there.
+ *
+ * Without an API (the static demo build) this store *is* the CRM, seeded with a demo pipeline on first visit.
+ */
 
 const CRM_KEY = 'VDESK_LEADS';
+/** The demo pipeline's ids, so browsers that were seeded before the live CRM existed can drop them. */
+const DEMO_IDS = new Set(['VD-MUM-8921', 'VD-NSK-4412', 'VD-BLR-7729', 'VD-DEL-1093']);
 
 function hoursAgo(hours) {
   return new Date(Date.now() - 3600000 * hours).toISOString();
@@ -35,6 +45,13 @@ function renameLegacyStatuses(leads) {
 
 export function getLeads() {
   const cached = readJson(CRM_KEY, null);
+  if (isApiEnabled()) {
+    // Only enquiries still on their way to the API; anything already sent, and any demo data, is cleared out.
+    const stored = Array.isArray(cached) ? cached : [];
+    const pending = stored.filter((lead) => !lead.synced && !DEMO_IDS.has(lead.id));
+    if (pending.length !== stored.length || !Array.isArray(cached)) saveLeads(pending);
+    return renameLegacyStatuses(pending);
+  }
   if (Array.isArray(cached) && cached.length > 0) return renameLegacyStatuses(cached);
   const seeded = demoLeads();
   writeJson(CRM_KEY, seeded);
@@ -85,19 +102,16 @@ function sendLeadToApi(lead) {
         source: lead.source,
       },
     })
-    .then(() => markLeadSynced(lead.id))
+    .then(() => forgetSentLead(lead.id))
     .catch((error) => {
-      // Kept locally with synced:false — the admin list still shows it and a retry can pick it up.
+      // Kept in this browser, unsent, so a retry can pick it up; it is removed once the API has it.
       console.warn('[V-DESK] lead not sent to the API:', error.code, error.message);
     });
 }
 
-function markLeadSynced(id) {
-  const leads = getLeads();
-  const lead = leads.find((l) => l.id === id);
-  if (!lead) return;
-  lead.synced = true;
-  saveLeads(leads);
+/** The API has it now, so this browser no longer keeps the visitor's details. */
+function forgetSentLead(id) {
+  saveLeads(getLeads().filter((lead) => lead.id !== id));
 }
 
 export function setLeadStatus(id, status) {

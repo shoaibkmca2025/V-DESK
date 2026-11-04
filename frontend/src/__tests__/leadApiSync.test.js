@@ -33,7 +33,7 @@ describe('lead → API sync', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('posts the enquiry and marks it synced', async () => {
+  it('posts the enquiry, then forgets the visitor’s details in this browser', async () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValue(new Response(JSON.stringify({ data: { ref: 'VD-API' } }), { status: 201 }));
@@ -50,7 +50,29 @@ describe('lead → API sync', () => {
     const body = JSON.parse(init.body);
     expect(body.ref).toBe(lead.id); // client ref makes the POST idempotent
     expect(body.name).toBe('Asha');
-    expect(getLeads()[0].synced).toBe(true);
+    // Once the API has it, no copy stays behind — on a shared computer the next person could read it.
+    expect(getLeads()).toEqual([]);
+    expect(localStorage.getItem('VDESK_LEADS')).not.toContain('Asha');
+  });
+
+  it('clears out enquiries already sent and the demo pipeline from browsers that kept them', async () => {
+    localStorage.setItem(
+      'VDESK_LEADS',
+      JSON.stringify([
+        { id: 'VD-MUM-8921', name: 'Priya Kulkarni', status: 'QUALIFIED' },
+        { id: 'VD-OLD-SENT', name: 'Shoaib', status: 'NEW', synced: true },
+        { id: 'VD-PENDING1', name: 'Ravi', status: 'NEW' },
+      ]),
+    );
+    const { getLeads } = await loadStore('https://api.test/api/v1');
+    expect(getLeads().map((lead) => lead.id)).toEqual(['VD-PENDING1']);
+    expect(localStorage.getItem('VDESK_LEADS')).not.toContain('Priya');
+    expect(localStorage.getItem('VDESK_LEADS')).not.toContain('Shoaib');
+  });
+
+  it('still keeps a local pipeline, with demo data, on a build with no API', async () => {
+    const { getLeads } = await loadStore('');
+    expect(getLeads().length).toBeGreaterThan(0);
   });
 
   it('keeps the enquiry when the API is unreachable', async () => {

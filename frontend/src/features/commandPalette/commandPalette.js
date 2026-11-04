@@ -2,6 +2,7 @@ import { openAdminModal } from '@/features/admin/adminLeadsTable.js';
 import { filterLocationsByCity } from '@/features/locations/locationExplorer.js';
 import { openQuoteModal } from '@/features/quote/quoteModal.js';
 import { scrollToSection } from '@/features/ui/scroll.js';
+import { isApiEnabled } from '@/lib/api.js';
 import { listen } from '@/lib/pageScope.js';
 import { action } from '@/lib/html.js';
 
@@ -34,7 +35,8 @@ const COMMAND_PALETTE_ITEMS = [
   { type: 'tool', title: 'Operational ROI Calculator', subtitle: 'Calculate savings vs traditional leases', icon: 'ph-calculator', run: () => scrollToSection('#pricing') },
   { type: 'tool', title: 'Business Setup Advisor', subtitle: '5-step tailored enterprise blueprint wizard', icon: 'ph-magic-wand', run: () => scrollToSection('#wizard') },
   { type: 'tool', title: 'Instant Quote Generator', subtitle: 'Get verified pricing & brochure in 2 minutes', icon: 'ph-paper-plane-tilt', run: () => openQuoteModal('Command Palette') },
-  { type: 'tool', title: 'Admin CRM Portal', subtitle: 'Internal lead management and CSV export', icon: 'ph-lock-key', run: () => openAdminModal() },
+  // With a live CRM, staff go to the signed-in console; the in-page dialog is only for the no-API demo build.
+  { type: 'tool', title: 'Admin CRM Portal', subtitle: 'Internal lead management and CSV export', icon: 'ph-lock-key', run: () => (isApiEnabled() ? globalThis.location.assign(`${import.meta.env.BASE_URL}admin`) : openAdminModal()) },
 ];
 
 const GROUP_LABELS = { city: 'Commercial Cities', service: 'Workspace & Legal Solutions', tool: 'Platform Tools & Actions' };
