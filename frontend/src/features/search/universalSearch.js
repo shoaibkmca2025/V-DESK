@@ -130,7 +130,7 @@ export function renderExplorerResults() {
 
       return `
       <div class="explorer-card">
-        <div class="explorer-card__image" style="background-image: linear-gradient(180deg, rgba(5,19,43,0.2) 0%, rgba(5,19,43,0.7) 100%), url('${bgImage}');">
+        <div class="explorer-card__image" style="background-image: linear-gradient(180deg, rgba(27,16,6,0.2) 0%, rgba(27,16,6,0.7) 100%), url('${bgImage}');">
           <span class="badge ${item.status === 'available' ? 'badge--success' : 'badge--warning'}">
             ${item.status === 'available' ? '● Verified Available' : '● High Demand'}
           </span>

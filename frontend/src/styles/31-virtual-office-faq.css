@@ -4,7 +4,7 @@
 
 .vo-faq-section {
   padding: 5rem 0;
-  background: #05132B;
+  background: #1B1006;
 }
 
 .vo-faq-accordion {
@@ -16,7 +16,7 @@
 }
 
 .vo-faq-item {
-  background: rgba(8, 29, 64, 0.65);
+  background: rgba(43, 26, 12, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   overflow: hidden;
@@ -24,8 +24,8 @@
 }
 
 .vo-faq-item.active {
-  border-color: rgba(197, 146, 57, 0.4);
-  background: rgba(8, 29, 64, 0.95);
+  border-color: rgba(184, 131, 47, 0.4);
+  background: rgba(43, 26, 12, 0.95);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
@@ -48,12 +48,12 @@
 }
 
 .vo-faq-trigger:hover {
-  color: #DFB15B;
+  color: #D9A858;
 }
 
 .vo-faq-icon {
   font-size: 1.1rem;
-  color: #DFB15B;
+  color: #D9A858;
   transition: transform 0.3s ease;
   flex-shrink: 0;
 }
@@ -67,7 +67,7 @@
   overflow: hidden;
   transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), padding 0.3s ease;
   padding: 0 1.5rem;
-  color: #C2D1E5;
+  color: #E2D3B9;
   font-size: 0.9rem;
   line-height: 1.65;
 }

@@ -90,7 +90,7 @@ export default function BookingsPage() {
     return (
       <main id="main-content" className="ui-page">
         <Breadcrumbs trail={[{ label: 'Client Portal', to: '/portal' }, { label: 'My Bookings' }]} />
-        <section className="section" style={{ padding: '56px 0', background: '#F8FAFC' }}>
+        <section className="section" style={{ padding: '56px 0', background: '#FBF5EA' }}>
           <div className="container" style={{ maxWidth: '640px' }}>
             <div className="ui-card ui-signin">
               <h2>Sign in to see your bookings</h2>
@@ -137,7 +137,7 @@ export default function BookingsPage() {
         }
       />
 
-      <section className="section" style={{ padding: '56px 0', background: '#F8FAFC' }}>
+      <section className="section" style={{ padding: '56px 0', background: '#FBF5EA' }}>
         <div className="container" style={{ maxWidth: '1040px' }}>
           <div className="cw-amenities-filters" style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
             {TABS.map(([key, label]) => (
@@ -148,10 +148,10 @@ export default function BookingsPage() {
           </div>
 
           {list.length === 0 ? (
-            <div style={{ background: '#FFFFFF', border: '1px dashed #C59239', borderRadius: '14px', padding: '40px', textAlign: 'center' }}>
-              <i className="ph-bold ph-calendar-blank" style={{ fontSize: '2.4rem', color: '#C59239' }} />
-              <h3 style={{ color: '#081D40', margin: '12px 0 6px' }}>No {tab} bookings</h3>
-              <p style={{ color: '#64748B', marginBottom: '18px' }}>Reserve a boardroom or huddle room in any V-DESK centre.</p>
+            <div style={{ background: '#FFFFFF', border: '1px dashed #B8832F', borderRadius: '14px', padding: '40px', textAlign: 'center' }}>
+              <i className="ph-bold ph-calendar-blank" style={{ fontSize: '2.4rem', color: '#B8832F' }} />
+              <h3 style={{ color: '#2B1A0C', margin: '12px 0 6px' }}>No {tab} bookings</h3>
+              <p style={{ color: '#8A7560', marginBottom: '18px' }}>Reserve a boardroom or huddle room in any V-DESK centre.</p>
               <Link to="/meeting-rooms" className="btn btn--primary">
                 Browse Meeting Rooms
               </Link>
@@ -159,19 +159,19 @@ export default function BookingsPage() {
           ) : (
             <div style={{ display: 'grid', gap: '16px' }}>
               {list.map((b) => (
-                <div key={b.ref} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '14px', padding: '20px 24px', display: 'grid', gridTemplateColumns: '1fr auto', gap: '16px', alignItems: 'center' }} className="booking-row">
+                <div key={b.ref} style={{ background: '#FFFFFF', border: '1px solid #ECDFC9', borderRadius: '14px', padding: '20px 24px', display: 'grid', gridTemplateColumns: '1fr auto', gap: '16px', alignItems: 'center' }} className="booking-row">
                   <div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', marginBottom: '6px' }}>
                       <span className={`kyc-status-badge ${['confirmed', 'completed', 'checked_in'].includes(b.state) ? 'verified' : ''}`}>{STATE_LABEL[b.state] || b.state}</span>
-                      <strong style={{ color: '#081D40', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem' }}>{b.ref}</strong>
+                      <strong style={{ color: '#2B1A0C', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.85rem' }}>{b.ref}</strong>
                     </div>
-                    <h3 style={{ color: '#081D40', fontSize: '1.1rem', margin: '0 0 4px' }}>{b.room}</h3>
-                    <div style={{ color: '#64748B', fontSize: '0.86rem' }}>
+                    <h3 style={{ color: '#2B1A0C', fontSize: '1.1rem', margin: '0 0 4px' }}>{b.room}</h3>
+                    <div style={{ color: '#8A7560', fontSize: '0.86rem' }}>
                       <i className="ph-bold ph-map-pin" /> {b.hub} &nbsp;•&nbsp; <i className="ph-bold ph-clock" /> {b.date}, {b.slot} ({b.duration}h) &nbsp;•&nbsp; <i className="ph-bold ph-users" /> {b.attendees} Pax
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '1.15rem', fontWeight: '800', color: '#081D40', marginBottom: '8px' }}>₹{b.totalAmount.toLocaleString('en-IN')}</div>
+                    <div style={{ fontSize: '1.15rem', fontWeight: '800', color: '#2B1A0C', marginBottom: '8px' }}>₹{b.totalAmount.toLocaleString('en-IN')}</div>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                       {['confirmed', 'checked_in'].includes(b.state) && (
                         <button className="btn btn--outline btn--sm" onClick={() => showToast('Access Pass', `Pass code ${b.ref} • Guest Wi-Fi: VDESK-VIP-2026`, 'info')}>

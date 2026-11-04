@@ -10,10 +10,10 @@ export function renderLocations(locations) {
 
   if (locations.length === 0) {
     container.innerHTML = `
-      <div style="grid-column:1/-1;text-align:center;padding:3.5rem 1.5rem;background:var(--vd-bg-secondary, #FAF8F3);border-radius:12px;border:1px dashed var(--vd-border-soft, #E8E2D8);">
+      <div style="grid-column:1/-1;text-align:center;padding:3.5rem 1.5rem;background:var(--vd-bg-secondary, #FBF4E7);border-radius:12px;border:1px dashed var(--vd-border-soft, #ECDFC9);">
         <div style="font-size:2.2rem;margin-bottom:0.75rem;">📍</div>
-        <h4 style="color:var(--vd-navy-deep, #0B1B33);margin-bottom:0.35rem;font-size:1.1rem;">No locations found matching your search</h4>
-        <p style="color:var(--vd-text-muted, #687386);font-size:0.875rem;margin-bottom:1.25rem;">Try searching for a different city, neighborhood, or service.</p>
+        <h4 style="color:var(--vd-navy-deep, #241509);margin-bottom:0.35rem;font-size:1.1rem;">No locations found matching your search</h4>
+        <p style="color:var(--vd-text-muted, #8A7762);font-size:0.875rem;margin-bottom:1.25rem;">Try searching for a different city, neighborhood, or service.</p>
         <button class="btn btn--secondary btn--sm" ${action('clearLocationSearch')}>Show All Locations</button>
       </div>`;
     return;
@@ -119,7 +119,7 @@ export function jumpToMetro(cardId) {
   const card = el.closest('.metro-hub-card') || el;
   card.scrollIntoView({ behavior: 'smooth', block: 'center' });
   card.style.transition = 'box-shadow 0.4s ease, transform 0.4s ease';
-  card.style.boxShadow = '0 0 0 3px #C59239, 0 16px 36px rgba(197, 146, 57, 0.3)';
+  card.style.boxShadow = '0 0 0 3px #B8832F, 0 16px 36px rgba(184, 131, 47, 0.3)';
   card.style.transform = 'translateY(-4px)';
   setTimeout(() => {
     card.style.boxShadow = '';

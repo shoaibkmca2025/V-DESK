@@ -18,7 +18,7 @@ export default function TeamSavingsCalculator() {
             <div>
               <label className="cw-calc-label" htmlFor="calcTeamSize">
                 Team Size:{' '}
-                <span id="teamSizeVal" style={{ color: '#DFB15B', fontSize: '1.2rem' }}>
+                <span id="teamSizeVal" style={{ color: '#D9A858', fontSize: '1.2rem' }}>
                   10 Desks
                 </span>
               </label>
@@ -29,7 +29,7 @@ export default function TeamSavingsCalculator() {
                 max="50"
                 defaultValue="10"
                 step="1"
-                style={{ width: '100%', accentColor: '#C59239' }}
+                style={{ width: '100%', accentColor: '#B8832F' }}
                 onInput={(event) => updateTeamSavings(event.currentTarget.value)}
               />
               <div
@@ -37,7 +37,7 @@ export default function TeamSavingsCalculator() {
                   display: 'flex',
                   justifyContent: 'space-between',
                   fontSize: '0.75rem',
-                  color: '#94A3B8',
+                  color: '#BCA88F',
                   marginTop: '4px',
                 }}
               >
@@ -68,11 +68,11 @@ export default function TeamSavingsCalculator() {
               <strong id="tradCost" style={{ fontSize: '1.3rem', color: '#EF4444', fontWeight: '800' }}>
                 ₹1,20,000<small style={{ fontSize: '0.75rem', fontWeight: '400' }}>/mo</small>
               </strong>
-              <div style={{ fontSize: '0.72rem', color: '#94A3B8' }}>Incl. rent, fitouts, AC & power</div>
+              <div style={{ fontSize: '0.72rem', color: '#BCA88F' }}>Incl. rent, fitouts, AC & power</div>
             </div>
             <div className="cw-calc-result-box">
               <span className="cw-calc-res-title">V-DESK Flexi-Pass</span>
-              <strong id="vdeskCost" style={{ fontSize: '1.3rem', color: '#DFB15B', fontWeight: '800' }}>
+              <strong id="vdeskCost" style={{ fontSize: '1.3rem', color: '#D9A858', fontWeight: '800' }}>
                 ₹35,000<small style={{ fontSize: '0.75rem', fontWeight: '400' }}>/mo</small>
               </strong>
               <div style={{ fontSize: '0.72rem', color: '#10B981' }}>Zero deposit, cancel anytime</div>
@@ -97,7 +97,7 @@ export default function TeamSavingsCalculator() {
               marginTop: '24px',
             }}
           >
-            <span style={{ fontSize: '0.85rem', color: '#94A3B8' }}>
+            <span style={{ fontSize: '0.85rem', color: '#BCA88F' }}>
               <i className="ph-bold ph-shield-check" style={{ color: '#10B981' }} /> Includes enterprise Wi-Fi, meeting
               room credits & pantry access.
             </span>

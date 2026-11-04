@@ -69,7 +69,7 @@ export default function CityProductPage() {
           aside={<LeadCard title={`${product.name} — ${city.name}`} subtitle="Get availability and an itemised quote within 15 minutes." service={product.service} city={city.name} source={`City Product: ${city.name} ${product.name}`} />}
         />
 
-        <section className="section" style={{ padding: '70px 0', background: '#F8FAFC' }}>
+        <section className="section" style={{ padding: '70px 0', background: '#FBF5EA' }}>
           <div className="container">
             <SectionHeader eyebrow="Availability" title={`${product.name} centres in`} highlight={city.name} description={centres.length || workspaces.length ? undefined : `We are onboarding partner centres for ${product.name.toLowerCase()} in ${city.name}. Leave your details and we will confirm availability within a working day.`} />
             {centres.length > 0 && (

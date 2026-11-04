@@ -13,19 +13,19 @@
 }
 
 .universal-search-card {
-  background: rgba(10, 25, 54, 0.85);
+  background: rgba(36, 21, 9, 0.85);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(197, 146, 57, 0.35);
+  border: 1px solid rgba(184, 131, 47, 0.35);
   border-radius: 20px;
   padding: 24px 28px;
-  box-shadow: 0 25px 50px -12px rgba(5, 19, 43, 0.65), 0 0 35px rgba(197, 146, 57, 0.15);
+  box-shadow: 0 25px 50px -12px rgba(27, 16, 6, 0.65), 0 0 35px rgba(184, 131, 47, 0.15);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .universal-search-card:focus-within {
   border-color: var(--vd-gold-primary);
-  box-shadow: 0 30px 60px -12px rgba(5, 19, 43, 0.8), 0 0 45px rgba(197, 146, 57, 0.3);
+  box-shadow: 0 30px 60px -12px rgba(27, 16, 6, 0.8), 0 0 45px rgba(184, 131, 47, 0.3);
   transform: translateY(-2px);
 }
 
@@ -99,7 +99,7 @@
 }
 
 .universal-search__field::placeholder {
-  color: #8A99AD;
+  color: #AB977F;
   font-size: 0.96rem;
 }
 
@@ -119,8 +119,8 @@
 }
 
 .universal-search__action-btn {
-  background: linear-gradient(135deg, #E6BA6E 0%, #C59239 50%, #9E6C1C 100%);
-  color: #05132B;
+  background: linear-gradient(135deg, #E6BA6E 0%, #B8832F 50%, #8A5F18 100%);
+  color: #1B1006;
   font-weight: 700;
   font-size: 0.98rem;
   border: none;
@@ -130,7 +130,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 14px rgba(197, 146, 57, 0.4);
+  box-shadow: 0 4px 14px rgba(184, 131, 47, 0.4);
   transition: all 0.2s ease;
   flex-shrink: 0;
 }
@@ -138,14 +138,14 @@
 .universal-search__action-btn:hover {
   filter: brightness(1.08);
   transform: scale(1.02);
-  box-shadow: 0 6px 20px rgba(197, 146, 57, 0.55);
+  box-shadow: 0 6px 20px rgba(184, 131, 47, 0.55);
 }
 
 /* Natural Language Intent Banner */
 .universal-search__intent-banner {
   margin-top: 14px;
-  background: rgba(197, 146, 57, 0.12);
-  border: 1px solid rgba(197, 146, 57, 0.35);
+  background: rgba(184, 131, 47, 0.12);
+  border: 1px solid rgba(184, 131, 47, 0.35);
   border-radius: 10px;
   padding: 8px 14px;
   display: flex;
@@ -204,8 +204,8 @@
   left: 0;
   right: 0;
   margin-top: 10px;
-  background: #081D40;
-  border: 1px solid rgba(197, 146, 57, 0.35);
+  background: #2B1A0C;
+  border: 1px solid rgba(184, 131, 47, 0.35);
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
@@ -252,7 +252,7 @@
 }
 
 .dropdown-list li:hover {
-  background: rgba(197, 146, 57, 0.18);
+  background: rgba(184, 131, 47, 0.18);
   color: #FFFFFF;
   transform: translateX(4px);
 }
@@ -312,14 +312,14 @@
 .hero-chip:hover {
   background: var(--vd-gold-primary);
   border-color: var(--vd-gold-primary);
-  color: #05132B;
+  color: #1B1006;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(197, 146, 57, 0.35);
+  box-shadow: 0 4px 12px rgba(184, 131, 47, 0.35);
 }
 
 /* ─── 2. VIRTUAL OFFICE PLATFORM & CONFIGURATOR (PRD Sec 24 - 29) ─────────── */
 .vo-platform-section {
-  background: #F8FAFC;
+  background: #FBF5EA;
   padding: 80px 0;
   position: relative;
 }
@@ -332,7 +332,7 @@
   margin: 0 auto 40px auto;
   padding: 16px 24px;
   background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #ECDFC9;
   border-radius: 50px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
   overflow-x: auto;
@@ -349,8 +349,8 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: #E2E8F0;
-  color: #64748B;
+  background: #ECDFC9;
+  color: #8A7560;
   font-size: 0.78rem;
   font-weight: 700;
   display: flex;
@@ -361,13 +361,13 @@
 .vo-step-item.active .vo-step-num {
   background: var(--vd-navy-deep);
   color: var(--vd-gold-primary);
-  box-shadow: 0 0 10px rgba(8, 29, 64, 0.3);
+  box-shadow: 0 0 10px rgba(43, 26, 12, 0.3);
 }
 
 .vo-step-label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #64748B;
+  color: #8A7560;
 }
 
 .vo-step-item.active .vo-step-label {
@@ -377,7 +377,7 @@
 .vo-step-line {
   flex: 1;
   height: 2px;
-  background: #E2E8F0;
+  background: #ECDFC9;
   margin: 0 10px;
   min-width: 14px;
 }
@@ -391,7 +391,7 @@
 
 .vo-card-box {
   background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #ECDFC9;
   border-radius: 18px;
   padding: 24px;
   margin-bottom: 20px;
@@ -420,7 +420,7 @@
 
 .vo-centre-meta-banner {
   margin-top: 14px;
-  background: rgba(8, 29, 64, 0.04);
+  background: rgba(43, 26, 12, 0.04);
   border-radius: 10px;
   padding: 10px 14px;
   display: flex;
@@ -440,7 +440,7 @@
   font-weight: 600;
   color: var(--vd-navy-deep);
   background: #FFFFFF;
-  border: 1px solid #CBD5E1;
+  border: 1px solid #D9C4A3;
   padding: 3px 8px;
   border-radius: 6px;
   display: flex;
@@ -468,8 +468,8 @@
 }
 
 .vo-purpose-btn {
-  background: #F8FAFC;
-  border: 1.5px solid #E2E8F0;
+  background: #FBF5EA;
+  border: 1.5px solid #ECDFC9;
   border-radius: 12px;
   padding: 12px 14px;
   cursor: pointer;
@@ -482,13 +482,13 @@
 
 .vo-purpose-btn:hover {
   border-color: var(--vd-gold-primary);
-  background: #FAF2E3;
+  background: #F9EED9;
 }
 
 .vo-purpose-btn.active {
-  background: #FAF2E3;
+  background: #F9EED9;
   border-color: var(--vd-gold-primary);
-  box-shadow: 0 4px 12px rgba(197, 146, 57, 0.2);
+  box-shadow: 0 4px 12px rgba(184, 131, 47, 0.2);
 }
 
 .vo-purpose-btn i {
@@ -508,7 +508,7 @@
 
 .purpose-btn-info span {
   font-size: 0.74rem;
-  color: #64748B;
+  color: #8A7560;
 }
 
 .vo-addons-list {
@@ -521,7 +521,7 @@
   display: flex;
   align-items: center;
   padding: 12px 14px;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #ECDFC9;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -529,8 +529,8 @@
 }
 
 .vo-addon-item:hover {
-  background: #F8FAFC;
-  border-color: #CBD5E1;
+  background: #FBF5EA;
+  border-color: #D9C4A3;
 }
 
 .vo-addon-item input[type="checkbox"] {
@@ -553,7 +553,7 @@
 
 .addon-info span {
   font-size: 0.76rem;
-  color: #64748B;
+  color: #8A7560;
 }
 
 .addon-price {
@@ -565,11 +565,11 @@
 /* Right Summary Card */
 .vo-summary-card {
   background: var(--vd-navy-deep);
-  border: 1.5px solid rgba(197, 146, 57, 0.4);
+  border: 1.5px solid rgba(184, 131, 47, 0.4);
   border-radius: 20px;
   padding: 28px;
   color: #FFFFFF;
-  box-shadow: 0 20px 45px rgba(5, 19, 43, 0.4);
+  box-shadow: 0 20px 45px rgba(27, 16, 6, 0.4);
   position: sticky;
   top: 100px;
 }
@@ -621,8 +621,8 @@
 
 .vo-tenure-btn.active {
   background: var(--vd-gold-primary);
-  color: #05132B;
-  box-shadow: 0 2px 8px rgba(197, 146, 57, 0.35);
+  color: #1B1006;
+  box-shadow: 0 2px 8px rgba(184, 131, 47, 0.35);
 }
 
 .vo-breakdown-table {
@@ -712,8 +712,8 @@
 }
 
 .meeting-scheduler-box {
-  background: #F8FAFC;
-  border: 1.5px solid #E2E8F0;
+  background: #FBF5EA;
+  border: 1.5px solid #ECDFC9;
   border-radius: 20px;
   padding: 32px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
@@ -728,7 +728,7 @@
 .mr-state-ticker {
   margin-top: 28px;
   padding-top: 24px;
-  border-top: 1px solid #E2E8F0;
+  border-top: 1px solid #ECDFC9;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -768,7 +768,7 @@
 
 .mr-rate-calc {
   font-size: 0.8rem;
-  color: #64748B;
+  color: #8A7560;
 }
 
 .mr-final-cost {
@@ -779,13 +779,13 @@
 
 /* ─── 4. GST PLATFORM & LIVE ARN STEPPER (PRD Sec 37) ───────────────────── */
 .gst-tracker-section {
-  background: #F1F5F9;
+  background: #F6ECDB;
   padding: 80px 0;
 }
 
 .tracker-console {
   background: #FFFFFF;
-  border: 1px solid #CBD5E1;
+  border: 1px solid #D9C4A3;
   border-radius: 20px;
   padding: 32px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
@@ -803,8 +803,8 @@
   flex: 1;
   display: flex;
   align-items: center;
-  background: #F8FAFC;
-  border: 1.5px solid #CBD5E1;
+  background: #FBF5EA;
+  border: 1.5px solid #D9C4A3;
   border-radius: 12px;
   padding: 0 16px;
 }
@@ -853,8 +853,8 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: #E2E8F0;
-  color: #64748B;
+  background: #ECDFC9;
+  color: #8A7560;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -869,10 +869,10 @@
 }
 
 .gst-step.active .gst-step-circle {
-  background: #FAF2E3;
+  background: #F9EED9;
   color: var(--vd-gold-primary);
   border-color: var(--vd-gold-primary);
-  box-shadow: 0 0 12px rgba(197, 146, 57, 0.4);
+  box-shadow: 0 0 12px rgba(184, 131, 47, 0.4);
 }
 
 .gst-step-label {
@@ -884,13 +884,13 @@
 
 .gst-step-date {
   font-size: 0.72rem;
-  color: #64748B;
+  color: #8A7560;
 }
 
 .gst-step-line {
   flex: 1;
   height: 3px;
-  background: #E2E8F0;
+  background: #ECDFC9;
   margin: -24px 8px 0 8px;
   min-width: 20px;
 }
@@ -904,8 +904,8 @@
 }
 
 .tracker-detail-banner {
-  background: #FAF2E3;
-  border: 1px solid rgba(197, 146, 57, 0.35);
+  background: #F9EED9;
+  border: 1px solid rgba(184, 131, 47, 0.35);
   border-radius: 12px;
   padding: 16px 20px;
   display: flex;
@@ -920,7 +920,7 @@
   font-weight: 700;
   color: var(--vd-gold-primary);
   background: #FFFFFF;
-  border: 1px solid rgba(197, 146, 57, 0.4);
+  border: 1px solid rgba(184, 131, 47, 0.4);
   padding: 4px 10px;
   border-radius: 20px;
   display: flex;
@@ -941,7 +941,7 @@
 
 .tracker-message span {
   font-size: 0.8rem;
-  color: #64748B;
+  color: #8A7560;
 }
 
 /* ─── 5. FULL FACETED EXPLORER MODAL (PRD Sec 15 & 16) ─────────────────── */
@@ -991,8 +991,8 @@
 }
 
 .explorer-intent-strip {
-  background: rgba(8, 29, 64, 0.05);
-  border-bottom: 1px solid #E2E8F0;
+  background: rgba(43, 26, 12, 0.05);
+  border-bottom: 1px solid #ECDFC9;
   padding: 10px 24px;
   display: flex;
   align-items: center;
@@ -1019,8 +1019,8 @@
 }
 
 .explorer-filter-sidebar {
-  background: #F8FAFC;
-  border-right: 1px solid #E2E8F0;
+  background: #FBF5EA;
+  border-right: 1px solid #ECDFC9;
   padding: 20px;
   overflow-y: auto;
 }
@@ -1079,7 +1079,7 @@
 
 .cap-pill {
   background: #FFFFFF;
-  border: 1px solid #CBD5E1;
+  border: 1px solid #D9C4A3;
   border-radius: 6px;
   padding: 4px 8px;
   font-size: 0.78rem;
@@ -1100,7 +1100,7 @@
 
 .filter-price-readout {
   font-size: 0.82rem;
-  color: #64748B;
+  color: #8A7560;
   margin-top: 4px;
 }
 
@@ -1127,7 +1127,7 @@
 }
 
 .explorer-card {
-  border: 1px solid #E2E8F0;
+  border: 1px solid #ECDFC9;
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.25s ease;
@@ -1138,7 +1138,7 @@
 .explorer-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
-  border-color: #CBD5E1;
+  border-color: #D9C4A3;
 }
 
 .explorer-card__image {
@@ -1176,7 +1176,7 @@
 
 .explorer-card__address {
   font-size: 0.8rem;
-  color: #64748B;
+  color: #8A7560;
   margin-bottom: 12px;
   line-height: 1.4;
 }
@@ -1189,7 +1189,7 @@
 }
 
 .explorer-tag {
-  background: #F1F5F9;
+  background: #F6ECDB;
   font-size: 0.72rem;
   font-weight: 600;
   padding: 3px 8px;
@@ -1200,7 +1200,7 @@
 .explorer-card__footer {
   margin-top: auto;
   padding-top: 14px;
-  border-top: 1px solid #E2E8F0;
+  border-top: 1px solid #ECDFC9;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1213,7 +1213,7 @@
 
 .explorer-card__price small {
   font-size: 0.76rem;
-  color: #64748B;
+  color: #8A7560;
 }
 
 /* Zero Results Experience (PRD Sec 16) */
@@ -1228,7 +1228,7 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: rgba(197, 146, 57, 0.12);
+  background: rgba(184, 131, 47, 0.12);
   color: var(--vd-gold-primary);
   font-size: 2rem;
   display: flex;
@@ -1246,14 +1246,14 @@
 
 .zero-results-desc {
   font-size: 0.92rem;
-  color: #64748B;
+  color: #8A7560;
   margin-bottom: 24px;
   line-height: 1.5;
 }
 
 .zero-results-recommendations {
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: #FBF5EA;
+  border: 1px solid #ECDFC9;
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 24px;
@@ -1275,7 +1275,7 @@
 
 .zero-tag {
   background: #FFFFFF;
-  border: 1px solid #CBD5E1;
+  border: 1px solid #D9C4A3;
   padding: 6px 12px;
   border-radius: 8px;
   font-size: 0.8rem;
@@ -1298,7 +1298,7 @@
   align-items: center;
   gap: 12px;
   font-size: 0.88rem;
-  color: #64748B;
+  color: #8A7560;
 }
 
 /* ─── 6. CUSTOMER PORTAL & DIGITAL KYC STYLING ──────────────────────────── */
@@ -1332,7 +1332,7 @@
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: rgba(197, 146, 57, 0.2);
+  background: rgba(184, 131, 47, 0.2);
   border: 1px solid var(--vd-gold-primary);
   color: var(--vd-gold-light);
   display: flex;
@@ -1353,7 +1353,7 @@
 }
 
 .portal-tabs {
-  background: #081D40;
+  background: #2B1A0C;
   display: flex;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding: 0 16px;
@@ -1382,7 +1382,7 @@
 
 .portal-tab-content {
   padding: 28px;
-  background: #F8FAFC;
+  background: #FBF5EA;
   overflow-y: auto;
   flex: 1;
 }
@@ -1399,7 +1399,7 @@
   display: flex;
   align-items: center;
   background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #ECDFC9;
   border-radius: 12px;
   padding: 14px 18px;
   gap: 14px;
@@ -1409,7 +1409,7 @@
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  background: #FAF2E3;
+  background: #F9EED9;
   color: var(--vd-gold-primary);
   display: flex;
   align-items: center;
@@ -1430,7 +1430,7 @@
 
 .doc-details span {
   font-size: 0.76rem;
-  color: #64748B;
+  color: #8A7560;
 }
 
 .doc-action {
@@ -1440,8 +1440,8 @@
 }
 
 .doc-upload-btn {
-  background: #F1F5F9;
-  border: 1px solid #CBD5E1;
+  background: #F6ECDB;
+  border: 1px solid #D9C4A3;
   padding: 6px 14px;
   border-radius: 8px;
   font-size: 0.8rem;
@@ -1469,13 +1469,13 @@
 }
 
 .doc-status.pending {
-  background: #F1F5F9;
-  color: #64748B;
+  background: #F6ECDB;
+  color: #8A7560;
 }
 
 .kyc-otp-box {
   background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #ECDFC9;
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
@@ -1503,7 +1503,7 @@
   text-align: center;
   font-size: 1.2rem;
   font-weight: 700;
-  border: 1.5px solid #CBD5E1;
+  border: 1.5px solid #D9C4A3;
   border-radius: 8px;
 }
 
@@ -1522,7 +1522,7 @@
   align-items: flex-start;
   gap: 10px;
   font-size: 0.8rem;
-  color: #64748B;
+  color: #8A7560;
   margin-bottom: 18px;
   line-height: 1.4;
 }
@@ -1538,14 +1538,14 @@
 .proposal-document {
   background: #FFFFFF;
   padding: 24px;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #ECDFC9;
   border-radius: 14px;
 }
 
 .proposal-header {
   display: flex;
   justify-content: space-between;
-  border-bottom: 2px solid #CBD5E1;
+  border-bottom: 2px solid #D9C4A3;
   padding-bottom: 16px;
   margin-bottom: 20px;
 }
@@ -1560,7 +1560,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  background: #F8FAFC;
+  background: #FBF5EA;
   padding: 16px;
   border-radius: 10px;
   margin-bottom: 20px;
@@ -1584,12 +1584,12 @@
 
 .proposal-table td {
   padding: 12px 14px;
-  border-bottom: 1px solid #E2E8F0;
+  border-bottom: 1px solid #ECDFC9;
 }
 
 .proposal-terms {
-  background: #FAF2E3;
-  border: 1px solid rgba(197, 146, 57, 0.3);
+  background: #F9EED9;
+  border: 1px solid rgba(184, 131, 47, 0.3);
   padding: 14px;
   border-radius: 10px;
   font-size: 0.78rem;
@@ -1617,12 +1617,12 @@
   overflow: hidden !important;
   display: flex;
   flex-direction: column;
-  background: #0B172E;
+  background: #1D1207;
   color: #FFFFFF;
 }
 
 .admin-top-bar {
-  background: #05132B;
+  background: #1B1006;
   padding: 16px 24px;
   display: flex;
   align-items: center;
@@ -1637,7 +1637,7 @@
 }
 
 .admin-nav-tabs {
-  background: #081D40;
+  background: #2B1A0C;
   display: flex;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding: 0 16px;
@@ -1791,7 +1791,7 @@
 }
 
 .lead-score-pill.med {
-  background: rgba(197, 146, 57, 0.2);
+  background: rgba(184, 131, 47, 0.2);
   color: var(--vd-gold-light);
 }
 
@@ -1802,10 +1802,10 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(5, 19, 43, 0.96);
+  background: rgba(27, 16, 6, 0.96);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(197, 146, 57, 0.3);
+  border-top: 1px solid rgba(184, 131, 47, 0.3);
   padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px)) 12px;
   z-index: 998;
   justify-content: space-around;
@@ -1921,13 +1921,13 @@
   letter-spacing: -0.025em !important;
   text-align: center !important;
   margin-bottom: 18px !important;
-  color: #05132B !important;
+  color: #1B1006 !important;
 }
 
 .hero-rmc__desc {
   font-size: clamp(1.05rem, 1.3vw, 1.25rem) !important;
   line-height: 1.6 !important;
-  color: #334155 !important;
+  color: #574434 !important;
   max-width: 740px !important;
   margin: 0 auto 28px !important;
   text-align: center !important;

@@ -20,7 +20,7 @@ export default function EnterpriseSuiteModal() {
       <div
         className="modal-container"
         ref={rawStyle(
-          'max-width: 820px; background: #05132B; color: #FFFFFF; border: 1px solid rgba(197,146,57,0.3); border-radius: 16px; padding: 32px;',
+          'max-width: 820px; background: #1B1006; color: #FFFFFF; border: 1px solid rgba(184,131,47,0.3); border-radius: 16px; padding: 32px;',
         )}
       >
         <div
@@ -37,7 +37,7 @@ export default function EnterpriseSuiteModal() {
             <span
               style={{
                 fontSize: '0.75rem',
-                background: '#C59239',
+                background: '#B8832F',
                 color: '#000',
                 padding: '2px 8px',
                 fontWeight: '800',
@@ -49,7 +49,7 @@ export default function EnterpriseSuiteModal() {
             <h3 id="enterpriseSuiteModalTitle" style={{ margin: '4px 0 0 0', color: '#FFFFFF', fontSize: '1.4rem' }}>
               Enterprise Multi-City Workspace Platform
             </h3>
-            <p style={{ margin: '2px 0 0 0', fontSize: '0.82rem', color: '#94A3B8' }}>
+            <p style={{ margin: '2px 0 0 0', fontSize: '0.82rem', color: '#BCA88F' }}>
               Bulk desk allocation, custom master services agreements (MSA), and centralized billing across 10+ Indian
               metros.
             </p>
@@ -68,7 +68,7 @@ export default function EnterpriseSuiteModal() {
               <label
                 style={{
                   fontSize: '0.82rem',
-                  color: '#CBD5E1',
+                  color: '#D9C4A3',
                   fontWeight: '600',
                   display: 'block',
                   marginBottom: '8px',
@@ -129,10 +129,10 @@ export default function EnterpriseSuiteModal() {
                     marginBottom: '6px',
                   }}
                 >
-                  <label style={{ fontSize: '0.82rem', color: '#CBD5E1', fontWeight: '600' }}>
+                  <label style={{ fontSize: '0.82rem', color: '#D9C4A3', fontWeight: '600' }}>
                     2. Total Required Capacity:
                   </label>
-                  <strong id="entDeskCountDisplay" style={{ color: '#C59239' }}>
+                  <strong id="entDeskCountDisplay" style={{ color: '#B8832F' }}>
                     50 Desks / Cabins
                   </strong>
                 </div>
@@ -142,7 +142,7 @@ export default function EnterpriseSuiteModal() {
                   max="500"
                   step="10"
                   defaultValue="50"
-                  style={{ width: '100%', accentColor: '#C59239' }}
+                  style={{ width: '100%', accentColor: '#B8832F' }}
                   onInput={(event) => handleEnterpriseDeskChange(event.currentTarget.value)}
                 />
                 <div
@@ -150,7 +150,7 @@ export default function EnterpriseSuiteModal() {
                     display: 'flex',
                     justifyContent: 'space-between',
                     fontSize: '0.72rem',
-                    color: '#64748B',
+                    color: '#8A7560',
                     marginTop: '4px',
                   }}
                 >
@@ -168,7 +168,7 @@ export default function EnterpriseSuiteModal() {
                   padding: '14px',
                 }}
               >
-                <span style={{ fontSize: '0.78rem', color: '#94A3B8', display: 'block', marginBottom: '6px' }}>
+                <span style={{ fontSize: '0.78rem', color: '#BCA88F', display: 'block', marginBottom: '6px' }}>
                   Enterprise Amenities Included:
                 </span>
                 <div
@@ -177,7 +177,7 @@ export default function EnterpriseSuiteModal() {
                     gridTemplateColumns: '1fr 1fr',
                     gap: '8px',
                     fontSize: '0.78rem',
-                    color: '#E2E8F0',
+                    color: '#ECDFC9',
                   }}
                 >
                   <div>✓ Dedicated Key Account Director</div>
@@ -191,7 +191,7 @@ export default function EnterpriseSuiteModal() {
             </div>
             <div>
               <div className="enterprise-kpi-banner">
-                <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#C59239', fontWeight: '700' }}>
+                <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#B8832F', fontWeight: '700' }}>
                   Dynamic Enterprise Rate
                 </span>
                 <div
@@ -223,19 +223,19 @@ export default function EnterpriseSuiteModal() {
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#94A3B8' }}>Selected Metros:</span>
+                    <span style={{ color: '#BCA88F' }}>Selected Metros:</span>
                     <strong id="entCitiesSelected" style={{ color: '#FFF' }}>
                       Mumbai, Bangalore
                     </strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#94A3B8' }}>Estimated Annual Investment:</span>
-                    <strong id="entTotalAnnual" style={{ color: '#C59239' }}>
+                    <span style={{ color: '#BCA88F' }}>Estimated Annual Investment:</span>
+                    <strong id="entTotalAnnual" style={{ color: '#B8832F' }}>
                       ₹48,09,892 / yr
                     </strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#94A3B8' }}>Savings vs Traditional Leases:</span>
+                    <span style={{ color: '#BCA88F' }}>Savings vs Traditional Leases:</span>
                     <strong id="entSavingsAnnual" style={{ color: '#10B981' }}>
                       ₹65,18,000 Savings
                     </strong>
@@ -250,7 +250,7 @@ export default function EnterpriseSuiteModal() {
                   placeholder="Your Name"
                   required
                   ref={rawStyle(
-                    'background: #081D40; color: #FFF; border-color: rgba(255,255,255,0.2); padding: 8px 12px; font-size: 0.85rem;',
+                    'background: #2B1A0C; color: #FFF; border-color: rgba(255,255,255,0.2); padding: 8px 12px; font-size: 0.85rem;',
                   )}
                 />
                 <input
@@ -260,7 +260,7 @@ export default function EnterpriseSuiteModal() {
                   placeholder="Company Name"
                   required
                   ref={rawStyle(
-                    'background: #081D40; color: #FFF; border-color: rgba(255,255,255,0.2); padding: 8px 12px; font-size: 0.85rem;',
+                    'background: #2B1A0C; color: #FFF; border-color: rgba(255,255,255,0.2); padding: 8px 12px; font-size: 0.85rem;',
                   )}
                 />
               </div>
@@ -272,7 +272,7 @@ export default function EnterpriseSuiteModal() {
                   placeholder="Work Email"
                   required
                   ref={rawStyle(
-                    'background: #081D40; color: #FFF; border-color: rgba(255,255,255,0.2); padding: 8px 12px; font-size: 0.85rem;',
+                    'background: #2B1A0C; color: #FFF; border-color: rgba(255,255,255,0.2); padding: 8px 12px; font-size: 0.85rem;',
                   )}
                 />
                 <input
@@ -282,7 +282,7 @@ export default function EnterpriseSuiteModal() {
                   placeholder="Mobile / WhatsApp"
                   required
                   ref={rawStyle(
-                    'background: #081D40; color: #FFF; border-color: rgba(255,255,255,0.2); padding: 8px 12px; font-size: 0.85rem;',
+                    'background: #2B1A0C; color: #FFF; border-color: rgba(255,255,255,0.2); padding: 8px 12px; font-size: 0.85rem;',
                   )}
                 />
               </div>

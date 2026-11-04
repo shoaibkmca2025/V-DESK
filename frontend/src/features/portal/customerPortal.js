@@ -10,20 +10,20 @@ const toast = (title, desc, type) => action('showToast', title, desc, type);
 const PORTAL_MODAL_TABS = {
   activeServices: () => `
       <div style="display: flex; flex-direction: column; gap: 20px;">
-        <div style="background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 24px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+        <div style="background: #fff; border: 1px solid #ECDFC9; border-radius: 16px; padding: 24px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
             <div>
               <span class="badge badge--success" style="margin-bottom: 8px;">● Subscription Active</span>
               <h4 style="font-size: 1.25rem; margin: 4px 0; color: var(--vd-navy-deep);">Mumbai — Bandra Kurla Complex (BKC)</h4>
-              <p style="color: #64748B; font-size: 0.84rem; margin: 0;">BKC Business Center, G Block, BKC, Mumbai &bull; Plan: Virtual Office for GST</p>
+              <p style="color: #8A7560; font-size: 0.84rem; margin: 0;">BKC Business Center, G Block, BKC, Mumbai &bull; Plan: Virtual Office for GST</p>
             </div>
             <div style="text-align: right;">
-              <span style="font-size: 0.76rem; color: #64748B; display: block;">Renewal Due:</span>
+              <span style="font-size: 0.76rem; color: #8A7560; display: block;">Renewal Due:</span>
               <strong style="color: var(--vd-navy-deep); font-size: 1.05rem;">12 Mar 2027</strong>
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; background: #F8FAFC; padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; background: #FBF5EA; padding: 16px; border-radius: 12px; margin-bottom: 20px;">
             <div><strong>GST Status:</strong> <span style="color: #10B981; font-weight: 600;">Verified (27AAY...Z1)</span></div>
             <div><strong>Mail Forwarding:</strong> <span>Active (3 pieces forwarded)</span></div>
             <div><strong>Meeting Credits:</strong> <span>5 Hours Remaining</span></div>
@@ -39,27 +39,27 @@ const PORTAL_MODAL_TABS = {
       </div>
     `,
   bookings: () => `
-      <div style="background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 24px;">
+      <div style="background: #fff; border: 1px solid #ECDFC9; border-radius: 16px; padding: 24px;">
         <h4 style="font-size: 1.1rem; color: var(--vd-navy-deep); margin-bottom: 16px;"><i class="ph-bold ph-calendar-check"></i> Upcoming Workspaces &amp; Rooms</h4>
-        <div style="border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="border: 1px solid #ECDFC9; border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
           <div>
             <span class="badge badge--success">Confirmed</span>
             <h5 style="margin: 4px 0; font-size: 1rem;">Executive Conference Room (8 Pax)</h5>
-            <span style="font-size: 0.8rem; color: #64748B;">Mumbai BKC Centre &bull; Tomorrow, 02:00 PM &ndash; 04:00 PM</span>
+            <span style="font-size: 0.8rem; color: #8A7560;">Mumbai BKC Centre &bull; Tomorrow, 02:00 PM &ndash; 04:00 PM</span>
           </div>
           <button class="btn btn--outline btn--sm" ${toast('Pass Displayed', 'Pass code: BK-2026-9812', 'info')}><i class="ph-bold ph-qr-code"></i> View Pass</button>
         </div>
       </div>
     `,
   documents: () => `
-      <div style="background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 24px;">
+      <div style="background: #fff; border: 1px solid #ECDFC9; border-radius: 16px; padding: 24px;">
         <h4 style="font-size: 1.1rem; color: var(--vd-navy-deep); margin-bottom: 16px;"><i class="ph-bold ph-files"></i> Verified Business Documents</h4>
         <div style="display: flex; flex-direction: column; gap: 10px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #F8FAFC; border-radius: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #FBF5EA; border-radius: 10px;">
             <span><i class="ph-bold ph-file-text" style="color: var(--vd-gold-primary);"></i> Certificate of Incorporation (CIN: U74999MH2024PTC123456)</span>
             <span style="color: #10B981; font-weight: 600; font-size: 0.84rem;">Verified &bull; Approved</span>
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #F8FAFC; border-radius: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #FBF5EA; border-radius: 10px;">
             <span><i class="ph-bold ph-file-text" style="color: var(--vd-gold-primary);"></i> Director PAN &amp; Aadhaar Card</span>
             <span style="color: #10B981; font-weight: 600; font-size: 0.84rem;">Verified &bull; Approved</span>
           </div>
@@ -67,7 +67,7 @@ const PORTAL_MODAL_TABS = {
       </div>
     `,
   invoices: () => `
-      <div style="background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 24px;">
+      <div style="background: #fff; border: 1px solid #ECDFC9; border-radius: 16px; padding: 24px;">
         <h4 style="font-size: 1.1rem; color: var(--vd-navy-deep); margin-bottom: 16px;"><i class="ph-bold ph-receipt"></i> Billing &amp; Tax Invoices</h4>
         <table class="proposal-table">
           <thead>
@@ -86,18 +86,18 @@ const PORTAL_MODAL_TABS = {
       </div>
     `,
   renewals: () => `
-      <div style="background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 24px;">
+      <div style="background: #fff; border: 1px solid #ECDFC9; border-radius: 16px; padding: 24px;">
         <h4 style="font-size: 1.1rem; color: var(--vd-navy-deep); margin-bottom: 8px;"><i class="ph-bold ph-arrows-clockwise"></i> 1-Click Subscription Renewal</h4>
-        <p style="color: #64748B; font-size: 0.88rem; margin-bottom: 20px;">Renew your Mumbai BKC agreement early to lock in your preferential base rate and maintain continuous GST compliance without inspection risks.</p>
+        <p style="color: #8A7560; font-size: 0.88rem; margin-bottom: 20px;">Renew your Mumbai BKC agreement early to lock in your preferential base rate and maintain continuous GST compliance without inspection risks.</p>
         <button class="btn btn--primary" ${action('openCheckoutModal', { item: 'Renewal: Mumbai BKC Virtual Office (12 Months)', amount: 19999 })}>
           <i class="ph-bold ph-arrows-clockwise"></i> Renew Now (Save Additional 10%) &rarr;
         </button>
       </div>
     `,
   support: () => `
-      <div style="background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 24px;">
+      <div style="background: #fff; border: 1px solid #ECDFC9; border-radius: 16px; padding: 24px;">
         <h4 style="font-size: 1.1rem; color: var(--vd-navy-deep); margin-bottom: 16px;"><i class="ph-bold ph-headset"></i> Dedicated Concierge Desk</h4>
-        <p style="color: #64748B; font-size: 0.84rem; margin-bottom: 16px;">Assigned Executive: <strong>Adv. Rahul Deshmukh</strong> &bull; Direct Helpline: +91 98765 43210</p>
+        <p style="color: #8A7560; font-size: 0.84rem; margin-bottom: 16px;">Assigned Executive: <strong>Adv. Rahul Deshmukh</strong> &bull; Direct Helpline: +91 98765 43210</p>
         <button class="btn btn--primary" ${action('openExternal', SUPPORT_WHATSAPP_URL)}>
           <i class="ph-bold ph-whatsapp-logo"></i> Connect on WhatsApp
         </button>
@@ -127,34 +127,34 @@ export function openCustomerPortal() {
    --------------------------------------------------------------------------- */
 const PORTAL_PAGE_TABS = {
   activeServices: () => `
-      <div style="border: 1px solid #E2E8F0; border-radius: 12px; padding: 24px; margin-bottom: 24px; background: #FAFDFB;">
+      <div style="border: 1px solid #ECDFC9; border-radius: 12px; padding: 24px; margin-bottom: 24px; background: #FAFDFB;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
           <div>
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
               <span style="width: 8px; height: 8px; border-radius: 50%; background: #10B981; display: inline-block;"></span>
               <strong style="color: #10B981; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Subscription Active</strong>
             </div>
-            <h3 style="font-size: 1.3rem; font-weight: 700; color: #081D40; margin: 0 0 4px 0;">Mumbai &mdash; Bandra Kurla Complex (BKC)</h3>
-            <p style="font-size: 0.88rem; color: #64748B; margin: 0;">BKC Business Center, G Block, BKC, Mumbai &bull; Plan: Virtual Office for GST</p>
+            <h3 style="font-size: 1.3rem; font-weight: 700; color: #2B1A0C; margin: 0 0 4px 0;">Mumbai &mdash; Bandra Kurla Complex (BKC)</h3>
+            <p style="font-size: 0.88rem; color: #8A7560; margin: 0;">BKC Business Center, G Block, BKC, Mumbai &bull; Plan: Virtual Office for GST</p>
           </div>
           <div style="text-align: right;">
-            <span style="font-size: 0.8rem; color: #64748B; display: block;">Renewal Due:</span>
-            <strong style="font-size: 1.1rem; color: #081D40;">12 Mar 2027</strong>
+            <span style="font-size: 0.8rem; color: #8A7560; display: block;">Renewal Due:</span>
+            <strong style="font-size: 1.1rem; color: #2B1A0C;">12 Mar 2027</strong>
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 20px 0; padding: 16px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 20px 0; padding: 16px; background: #FFFFFF; border: 1px solid #ECDFC9; border-radius: 10px;">
           <div>
-            <span style="font-size: 0.75rem; text-transform: uppercase; color: #64748B; display: block;">GST Status</span>
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: #8A7560; display: block;">GST Status</span>
             <strong style="color: #10B981; font-size: 0.95rem;">Verified (27AAY...Z1)</strong>
           </div>
           <div>
-            <span style="font-size: 0.75rem; text-transform: uppercase; color: #64748B; display: block;">Mail Forwarding</span>
-            <strong style="color: #081D40; font-size: 0.95rem;">Active (3 pieces forwarded)</strong>
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: #8A7560; display: block;">Mail Forwarding</span>
+            <strong style="color: #2B1A0C; font-size: 0.95rem;">Active (3 pieces forwarded)</strong>
           </div>
           <div>
-            <span style="font-size: 0.75rem; text-transform: uppercase; color: #64748B; display: block;">Meeting Credits</span>
-            <strong style="color: #C59239; font-size: 0.95rem;">5 Hours Remaining</strong>
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: #8A7560; display: block;">Meeting Credits</span>
+            <strong style="color: #B8832F; font-size: 0.95rem;">5 Hours Remaining</strong>
           </div>
         </div>
 
@@ -168,7 +168,7 @@ const PORTAL_PAGE_TABS = {
     `,
   bookings: () => `
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h4 style="margin: 0; color: #081D40;">Meeting Room &amp; Workspace Bookings</h4>
+        <h4 style="margin: 0; color: #2B1A0C;">Meeting Room &amp; Workspace Bookings</h4>
         <button class="btn btn--primary btn--sm" ${action('openMeetingBookingModal')}><i class="ph-bold ph-plus"></i> New Room Reservation</button>
       </div>
       <table class="tax-invoice-table">
@@ -197,45 +197,45 @@ const PORTAL_PAGE_TABS = {
     `,
   documents: () => `
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h4 style="margin: 0; color: #081D40;">Compliance Document Vault</h4>
+        <h4 style="margin: 0; color: #2B1A0C;">Compliance Document Vault</h4>
         <button class="btn btn--outline btn--sm" ${action('openDigitalKycModal')}><i class="ph-bold ph-upload-simple"></i> Upload New Document</button>
       </div>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-        <div style="border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px; background: #FFFFFF;">
+        <div style="border: 1px solid #ECDFC9; border-radius: 10px; padding: 18px; background: #FFFFFF;">
           <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-            <i class="ph-bold ph-file-text" style="font-size: 1.8rem; color: #081D40;"></i>
+            <i class="ph-bold ph-file-text" style="font-size: 1.8rem; color: #2B1A0C;"></i>
             <span class="kyc-status-badge verified">Verified ✓</span>
           </div>
-          <strong style="color: #081D40; display: block; margin-bottom: 4px;">Registered Rent Agreement</strong>
-          <p style="font-size: 0.8rem; color: #64748B; margin: 0 0 12px 0;">12-Month Notarized Commercial Lease for MCA / GST registration.</p>
+          <strong style="color: #2B1A0C; display: block; margin-bottom: 4px;">Registered Rent Agreement</strong>
+          <p style="font-size: 0.8rem; color: #8A7560; margin: 0 0 12px 0;">12-Month Notarized Commercial Lease for MCA / GST registration.</p>
           <button class="btn btn--primary btn--sm" style="width: 100%;" ${toast('Downloading Rent Agreement', 'Verified agreement PDF saved.', 'success')}>Download PDF</button>
         </div>
 
-        <div style="border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px; background: #FFFFFF;">
+        <div style="border: 1px solid #ECDFC9; border-radius: 10px; padding: 18px; background: #FFFFFF;">
           <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-            <i class="ph-bold ph-shield-check" style="font-size: 1.8rem; color: #C59239;"></i>
+            <i class="ph-bold ph-shield-check" style="font-size: 1.8rem; color: #B8832F;"></i>
             <span class="kyc-status-badge verified">Verified ✓</span>
           </div>
-          <strong style="color: #081D40; display: block; margin-bottom: 4px;">Owner Non-Objection (NOC)</strong>
-          <p style="font-size: 0.8rem; color: #64748B; margin: 0 0 12px 0;">Official building ownership consent certificate.</p>
+          <strong style="color: #2B1A0C; display: block; margin-bottom: 4px;">Owner Non-Objection (NOC)</strong>
+          <p style="font-size: 0.8rem; color: #8A7560; margin: 0 0 12px 0;">Official building ownership consent certificate.</p>
           <button class="btn btn--outline btn--sm" style="width: 100%;" ${toast('Downloading Landlord NOC', 'NOC certificate saved.', 'success')}>Download NOC</button>
         </div>
 
-        <div style="border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px; background: #FFFFFF;">
+        <div style="border: 1px solid #ECDFC9; border-radius: 10px; padding: 18px; background: #FFFFFF;">
           <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
             <i class="ph-bold ph-lightning" style="font-size: 1.8rem; color: #10B981;"></i>
             <span class="kyc-status-badge verified">Verified ✓</span>
           </div>
-          <strong style="color: #081D40; display: block; margin-bottom: 4px;">Commercial Electricity Bill</strong>
-          <p style="font-size: 0.8rem; color: #64748B; margin: 0 0 12px 0;">Latest billing cycle utility proof with paid verification receipt.</p>
+          <strong style="color: #2B1A0C; display: block; margin-bottom: 4px;">Commercial Electricity Bill</strong>
+          <p style="font-size: 0.8rem; color: #8A7560; margin: 0 0 12px 0;">Latest billing cycle utility proof with paid verification receipt.</p>
           <button class="btn btn--outline btn--sm" style="width: 100%;" ${toast('Downloading Utility Proof', 'Electricity bill copy saved.', 'success')}>Download Bill</button>
         </div>
       </div>
     `,
   invoices: () => `
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h4 style="margin: 0; color: #081D40;">Tax Invoices &amp; GST Receipts</h4>
-        <span style="font-size: 0.82rem; color: #64748B;">GSTIN: 27AAYCZ8921P1Z8</span>
+        <h4 style="margin: 0; color: #2B1A0C;">Tax Invoices &amp; GST Receipts</h4>
+        <span style="font-size: 0.82rem; color: #8A7560;">GSTIN: 27AAYCZ8921P1Z8</span>
       </div>
       <table class="tax-invoice-table">
         <thead>
@@ -264,21 +264,21 @@ const PORTAL_PAGE_TABS = {
       </table>
     `,
   renewals: () => `
-      <div style="background: #FAF8F3; border: 1px solid #E8E2D8; border-radius: 12px; padding: 24px; max-width: 620px;">
+      <div style="background: #FBF4E7; border: 1px solid #ECDFC9; border-radius: 12px; padding: 24px; max-width: 620px;">
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-          <i class="ph-bold ph-arrows-clockwise" style="font-size: 2rem; color: #C59239;"></i>
+          <i class="ph-bold ph-arrows-clockwise" style="font-size: 2rem; color: #B8832F;"></i>
           <div>
-            <h4 style="margin: 0; color: #081D40;">Annual License Renewal Management</h4>
-            <span style="font-size: 0.82rem; color: #64748B;">Next Renewal: 12 March 2027 (180 Days Remaining)</span>
+            <h4 style="margin: 0; color: #2B1A0C;">Annual License Renewal Management</h4>
+            <span style="font-size: 0.82rem; color: #8A7560;">Next Renewal: 12 March 2027 (180 Days Remaining)</span>
           </div>
         </div>
-        <p style="font-size: 0.85rem; color: #334155; line-height: 1.6;">Your registered address at Mumbai BKC is protected under sovereign lease lock. Renewing ahead ensures continuous GST compliance and automatic notarized rent agreement extension.</p>
-        <div style="margin: 16px 0; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: center;">
+        <p style="font-size: 0.85rem; color: #574434; line-height: 1.6;">Your registered address at Mumbai BKC is protected under sovereign lease lock. Renewing ahead ensures continuous GST compliance and automatic notarized rent agreement extension.</p>
+        <div style="margin: 16px 0; background: #FFFFFF; border: 1px solid #ECDFC9; border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <strong style="color: #081D40;">2-Year Lock-In Extension</strong>
+            <strong style="color: #2B1A0C;">2-Year Lock-In Extension</strong>
             <div style="font-size: 0.78rem; color: #10B981;">Includes 25% Multi-Year Discount</div>
           </div>
-          <strong style="color: #C59239; font-size: 1.15rem;">₹17,199 / yr</strong>
+          <strong style="color: #B8832F; font-size: 1.15rem;">₹17,199 / yr</strong>
         </div>
         <button class="btn btn--gold btn--full" ${action('openCheckoutModal', { item: '2-Year Virtual Office Renewal Lock', amount: 34398, city: 'Mumbai' })}>
           <i class="ph-bold ph-shield-check"></i> Extend Subscription with 25% Rebate
@@ -290,15 +290,15 @@ const PORTAL_PAGE_TABS = {
 export function switchPortalPageTab(tab) {
   document.querySelectorAll('.portal-nav-tab').forEach((t) => {
     t.classList.remove('active');
-    t.style.color = '#94A3B8';
+    t.style.color = '#BCA88F';
     t.style.borderBottom = 'none';
   });
 
   const activeBtn = document.getElementById(`pTabBtn_${tab}`);
   if (activeBtn) {
     activeBtn.classList.add('active');
-    activeBtn.style.color = '#C59239';
-    activeBtn.style.borderBottom = '2px solid #C59239';
+    activeBtn.style.color = '#B8832F';
+    activeBtn.style.borderBottom = '2px solid #B8832F';
   }
 
   const body = document.getElementById('portalTabContentBody');

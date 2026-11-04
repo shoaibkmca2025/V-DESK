@@ -18,8 +18,8 @@
 }
 
 .beacon-dot.gold {
-  background: #C59239;
-  box-shadow: 0 0 0 0 rgba(197, 146, 57, 0.7);
+  background: #B8832F;
+  box-shadow: 0 0 0 0 rgba(184, 131, 47, 0.7);
   animation: pulseBeaconGold 1.8s infinite;
 }
 
@@ -30,9 +30,9 @@
 }
 
 @keyframes pulseBeaconGold {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(197, 146, 57, 0.7); }
-  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(197, 146, 57, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(197, 146, 57, 0); }
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(184, 131, 47, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(184, 131, 47, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(184, 131, 47, 0); }
 }
 
 /* 2. Hero Interactive Micro-Widgets */
@@ -40,22 +40,22 @@
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(197, 146, 57, 0.25);
+  border: 1px solid rgba(184, 131, 47, 0.25);
   border-radius: 14px;
   padding: 14px 20px;
   display: inline-flex;
   align-items: center;
   gap: 14px;
   margin-top: 18px;
-  box-shadow: 0 8px 24px rgba(8, 29, 64, 0.08);
+  box-shadow: 0 8px 24px rgba(43, 26, 12, 0.08);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   max-width: 100%;
 }
 
 .hero-micro-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(8, 29, 64, 0.12);
-  border-color: #C59239;
+  box-shadow: 0 12px 30px rgba(43, 26, 12, 0.12);
+  border-color: #B8832F;
 }
 
 /* 3. Interactive Copyable Badge */
@@ -63,27 +63,27 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #F1F5F9;
-  border: 1px dashed #CBD5E1;
+  background: #F6ECDB;
+  border: 1px dashed #D9C4A3;
   padding: 4px 10px;
   border-radius: 6px;
   font-family: monospace;
   font-size: 0.82rem;
-  color: #081D40;
+  color: #2B1A0C;
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: all;
 }
 
 .copyable-badge:hover {
-  background: #FAF2E3;
-  border-color: #C59239;
-  color: #9E6C1C;
+  background: #F9EED9;
+  border-color: #B8832F;
+  color: #8A5F18;
 }
 
 .copyable-badge i {
   font-size: 0.9rem;
-  color: #64748B;
+  color: #8A7560;
 }
 
 /* 4. Interactive Billing Toggle Switch (Monthly vs Annual) */
@@ -92,7 +92,7 @@
   align-items: center;
   gap: 12px;
   background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #ECDFC9;
   padding: 6px 14px;
   border-radius: 30px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.04);
@@ -105,13 +105,13 @@
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #64748B;
+  color: #8A7560;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .billing-opt-btn.active {
-  background: #081D40;
+  background: #2B1A0C;
   color: #FFFFFF;
 }
 
@@ -165,8 +165,8 @@
 
 .city-chip-btn {
   background: #FFFFFF;
-  border: 1px solid #CBD5E1;
-  color: #081D40;
+  border: 1px solid #D9C4A3;
+  color: #2B1A0C;
   padding: 5px 12px;
   border-radius: 20px;
   font-size: 0.78rem;
@@ -179,9 +179,9 @@
 }
 
 .city-chip-btn:hover {
-  background: #081D40;
+  background: #2B1A0C;
   color: #FFFFFF;
-  border-color: #081D40;
+  border-color: #2B1A0C;
   transform: translateY(-2px);
 }
 

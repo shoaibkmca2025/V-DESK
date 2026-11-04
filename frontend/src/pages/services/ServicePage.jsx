@@ -55,13 +55,13 @@ export default function ServicePage() {
           </div>
         </section>
 
-        <section className="section" style={{ padding: '70px 0', background: '#F8FAFC' }}>
+        <section className="section" style={{ padding: '70px 0', background: '#FBF5EA' }}>
           <div className="container">
             <SectionHeader eyebrow="Who It's For" title="Who this is for" />
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center', marginTop: '28px' }}>
               {service.suitability.map((item) => (
-                <span key={item} className="hero-trust-badge" style={{ background: '#FFFFFF', border: '1px solid #E8E2D8', color: '#081D40', padding: '10px 16px', borderRadius: '30px', display: 'inline-flex', alignItems: 'center', gap: '8px', fontWeight: '600', fontSize: '0.88rem' }}>
-                  <i className="ph-bold ph-check-circle" style={{ color: '#C59239' }} />
+                <span key={item} className="hero-trust-badge" style={{ background: '#FFFFFF', border: '1px solid #ECDFC9', color: '#2B1A0C', padding: '10px 16px', borderRadius: '30px', display: 'inline-flex', alignItems: 'center', gap: '8px', fontWeight: '600', fontSize: '0.88rem' }}>
+                  <i className="ph-bold ph-check-circle" style={{ color: '#B8832F' }} />
                   {item}
                 </span>
               ))}
@@ -76,7 +76,7 @@ export default function ServicePage() {
           </div>
         </section>
 
-        <section className="section" style={{ padding: '70px 0', background: '#F8FAFC' }}>
+        <section className="section" style={{ padding: '70px 0', background: '#FBF5EA' }}>
           <div className="container">
             <SectionHeader eyebrow="Available Across India" title={`${service.name} in`} highlight="10+ cities" />
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginTop: '28px' }}>

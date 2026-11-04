@@ -58,22 +58,22 @@ export default function QuotePage() {
           </div>
         </section>
 
-        <section className="section" style={{ padding: '56px 0', background: '#F8FAFC' }}>
+        <section className="section" style={{ padding: '56px 0', background: '#FBF5EA' }}>
           <div className="container" style={{ maxWidth: '960px' }}>
             {quote.fallback && (
               <div style={{ background: '#FFF7E6', border: '1px solid #F5D9A6', borderRadius: '10px', padding: '12px 16px', marginBottom: '18px', fontSize: '0.86rem', color: '#7C5A12' }}>
                 <i className="ph-bold ph-info" /> This quote reference was not generated in this browser; a representative proposal is shown. Ask your advisor to resend the link if figures differ.
               </div>
             )}
-            <div className="proposal-document" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '32px' }}>
-              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '16px', borderBottom: '1px solid #E2E8F0', paddingBottom: '18px', marginBottom: '22px' }}>
+            <div className="proposal-document" style={{ background: '#FFFFFF', border: '1px solid #ECDFC9', borderRadius: '16px', padding: '32px' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '16px', borderBottom: '1px solid #ECDFC9', paddingBottom: '18px', marginBottom: '22px' }}>
                 <div>
-                  <strong style={{ color: '#081D40', fontSize: '1.2rem' }}>V-DESK Workspace & Consulting LLP</strong>
-                  <div style={{ color: '#64748B', fontSize: '0.84rem' }}>LLPIN AAY-9842 • College Road, Nashik 422005 • GSTIN 27AAYCZ8921P1Z8</div>
+                  <strong style={{ color: '#2B1A0C', fontSize: '1.2rem' }}>V-DESK Workspace & Consulting LLP</strong>
+                  <div style={{ color: '#8A7560', fontSize: '0.84rem' }}>LLPIN AAY-9842 • College Road, Nashik 422005 • GSTIN 27AAYCZ8921P1Z8</div>
                 </div>
-                <div style={{ textAlign: 'right', fontSize: '0.86rem', color: '#64748B' }}>
+                <div style={{ textAlign: 'right', fontSize: '0.86rem', color: '#8A7560' }}>
                   <div>
-                    Quote No. <strong style={{ color: '#081D40' }}>{quote.ref}</strong>
+                    Quote No. <strong style={{ color: '#2B1A0C' }}>{quote.ref}</strong>
                   </div>
                   <div>Sales Rep: Adv. Rahul Deshmukh</div>
                 </div>
@@ -92,7 +92,7 @@ export default function QuotePage() {
                     <td>
                       <strong>{quote.product}</strong>
                       <br />
-                      <span style={{ color: '#64748B', fontSize: '0.82rem' }}>Purpose: {quote.purpose} • Includes rent agreement, landlord NOC & utility bill</span>
+                      <span style={{ color: '#8A7560', fontSize: '0.82rem' }}>Purpose: {quote.purpose} • Includes rent agreement, landlord NOC & utility bill</span>
                     </td>
                     <td>{quote.tenure}</td>
                     <td>{rupees(quote.rateMonth)}/mo</td>
@@ -112,12 +112,12 @@ export default function QuotePage() {
                     <td colSpan="3">
                       <strong>Total Payable</strong>
                     </td>
-                    <td style={{ textAlign: 'right', fontSize: '1.2rem', fontWeight: '800', color: '#081D40' }}>{rupees(total)}</td>
+                    <td style={{ textAlign: 'right', fontSize: '1.2rem', fontWeight: '800', color: '#2B1A0C' }}>{rupees(total)}</td>
                   </tr>
                 </tbody>
               </table>
-              <div style={{ fontSize: '0.8rem', color: '#64748B', marginTop: '18px', lineHeight: '1.7' }}>
-                <strong style={{ color: '#081D40' }}>Terms:</strong> Documents issued within 24 working hours of KYC approval. 100% refund if a GST/MCA application is rejected solely due to a V-DESK document defect. Prices valid for 14 days from issue. See <Link to="/legal/terms">Terms of Service</Link> and <Link to="/legal/refund-policy">Refund Policy</Link>.
+              <div style={{ fontSize: '0.8rem', color: '#8A7560', marginTop: '18px', lineHeight: '1.7' }}>
+                <strong style={{ color: '#2B1A0C' }}>Terms:</strong> Documents issued within 24 working hours of KYC approval. 100% refund if a GST/MCA application is rejected solely due to a V-DESK document defect. Prices valid for 14 days from issue. See <Link to="/legal/terms">Terms of Service</Link> and <Link to="/legal/refund-policy">Refund Policy</Link>.
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '24px' }}>
                 {quote.status !== 'ACCEPTED' ? (

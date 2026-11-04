@@ -17,8 +17,8 @@ export default function IncorporationWizardSection() {
           style={{
             maxWidth: '860px',
             margin: '35px auto 0 auto',
-            background: '#FAF8F3',
-            border: '1px solid #E8E2D8',
+            background: '#FBF4E7',
+            border: '1px solid #ECDFC9',
             borderRadius: '16px',
             padding: '36px',
             boxShadow: '0 10px 30px rgba(0,0,0,0.04)',
@@ -33,7 +33,7 @@ export default function IncorporationWizardSection() {
             }}
           >
             <div className="form-field">
-              <label className="form-label" htmlFor="wizEntityType" style={{ fontWeight: '700', color: '#081D40' }}>
+              <label className="form-label" htmlFor="wizEntityType" style={{ fontWeight: '700', color: '#2B1A0C' }}>
                 <i className="ph-bold ph-buildings" /> 1. Legal Entity Structure
               </label>
               <select
@@ -57,7 +57,7 @@ export default function IncorporationWizardSection() {
               </select>
             </div>
             <div className="form-field">
-              <label className="form-label" htmlFor="wizState" style={{ fontWeight: '700', color: '#081D40' }}>
+              <label className="form-label" htmlFor="wizState" style={{ fontWeight: '700', color: '#2B1A0C' }}>
                 <i className="ph-bold ph-map-pin" /> 2. Registered Office State
               </label>
               <select
@@ -93,7 +93,7 @@ export default function IncorporationWizardSection() {
             }}
           >
             <div className="form-field">
-              <label className="form-label" htmlFor="wizDirectors" style={{ fontWeight: '700', color: '#081D40' }}>
+              <label className="form-label" htmlFor="wizDirectors" style={{ fontWeight: '700', color: '#2B1A0C' }}>
                 <i className="ph-bold ph-users" /> 3. Number of Directors (DSCs Required)
               </label>
               <select id="wizDirectors" className="form-select" onChange={() => calculateIncorpFees()} defaultValue="2">
@@ -103,13 +103,13 @@ export default function IncorporationWizardSection() {
               </select>
             </div>
             <div className="form-field">
-              <label className="form-label" style={{ fontWeight: '700', color: '#081D40' }}>
+              <label className="form-label" style={{ fontWeight: '700', color: '#2B1A0C' }}>
                 <i className="ph-bold ph-house-line" /> 4. V-DESK Registered Office Address
               </label>
               <div
                 style={{
                   background: '#FFFFFF',
-                  border: '1px solid #E2E8F0',
+                  border: '1px solid #ECDFC9',
                   padding: '12px',
                   borderRadius: '8px',
                   display: 'flex',
@@ -122,9 +122,9 @@ export default function IncorporationWizardSection() {
                   id="wizBundleVo"
                   defaultChecked
                   onChange={() => calculateIncorpFees()}
-                  style={{ accentColor: '#C59239', width: '18px', height: '18px' }}
+                  style={{ accentColor: '#B8832F', width: '18px', height: '18px' }}
                 />
-                <label htmlFor="wizBundleVo" style={{ fontSize: '0.85rem', color: '#081D40', cursor: 'pointer' }}>
+                <label htmlFor="wizBundleVo" style={{ fontSize: '0.85rem', color: '#2B1A0C', cursor: 'pointer' }}>
                   <strong>Bundle 1-Yr Virtual Office Address</strong>
                   <span style={{ display: 'block', fontSize: '0.75rem', color: '#10B981' }}>
                     Save 20% on Address + Guaranteed MCA Approval
@@ -136,7 +136,7 @@ export default function IncorporationWizardSection() {
           <div
             style={{
               background: '#FFFFFF',
-              border: '1px solid #E2E8F0',
+              border: '1px solid #ECDFC9',
               borderRadius: '12px',
               padding: '24px',
               marginBottom: '24px',
@@ -148,17 +148,17 @@ export default function IncorporationWizardSection() {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 marginBottom: '16px',
-                borderBottom: '1px solid #F1F5F9',
+                borderBottom: '1px solid #F6ECDB',
                 paddingBottom: '12px',
               }}
             >
-              <h4 style={{ margin: '0', color: '#081D40', fontSize: '1.1rem' }}>Incorporation Fee Breakdown</h4>
+              <h4 style={{ margin: '0', color: '#2B1A0C', fontSize: '1.1rem' }}>Incorporation Fee Breakdown</h4>
               <span className="kyc-status-badge verified" style={{ fontSize: '0.75rem' }}>
                 100% SPICe+ Compliant
               </span>
             </div>
             <div
-              style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.88rem', color: '#334155' }}
+              style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.88rem', color: '#574434' }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Professional Drafting & CA/CS Filing Retainer:</span>
@@ -175,22 +175,22 @@ export default function IncorporationWizardSection() {
               <div style={{ display: 'flex', justifyContent: 'space-between' }} id="wizVoRow">
                 <span>1-Year V-DESK Virtual Office Address (Bundled):</span>
                 <strong style={{ color: '#10B981' }} id="wizVoFee">
-                  ₹11,999 <small style={{ color: '#64748B', textDecoration: 'line-through' }}>₹14,999</small>
+                  ₹11,999 <small style={{ color: '#8A7560', textDecoration: 'line-through' }}>₹14,999</small>
                 </strong>
               </div>
               <div
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  borderTop: '2px dashed #E2E8F0',
+                  borderTop: '2px dashed #ECDFC9',
                   paddingTop: '10px',
                   marginTop: '6px',
                   fontSize: '1.15rem',
-                  color: '#081D40',
+                  color: '#2B1A0C',
                 }}
               >
                 <strong>Estimated Total Investment:</strong>
-                <strong style={{ color: '#C59239' }} id="wizTotalFee">
+                <strong style={{ color: '#B8832F' }} id="wizTotalFee">
                   ₹19,998
                 </strong>
               </div>
@@ -205,7 +205,7 @@ export default function IncorporationWizardSection() {
               gap: '16px',
             }}
           >
-            <span style={{ fontSize: '0.85rem', color: '#64748B' }}>
+            <span style={{ fontSize: '0.85rem', color: '#8A7560' }}>
               <i className="ph-bold ph-shield-check" style={{ color: '#10B981' }} /> Guaranteed incorporation in 5-7
               working days or full fee refund.
             </span>

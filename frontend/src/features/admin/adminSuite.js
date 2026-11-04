@@ -51,15 +51,15 @@ function kanbanBoard(leads) {
 
 function telemetryLog(events) {
   return `
-        ${events.length === 0 ? '<div style="color: #64748B;">No telemetry events recorded yet. Perform searches to see live log.</div>' : ''}
+        ${events.length === 0 ? '<div style="color: #8A7560;">No telemetry events recorded yet. Perform searches to see live log.</div>' : ''}
         ${events
           .map(
             (e) => `
-          <div style="margin-bottom: 8px; border-bottom: 1px solid #1E293B; padding-bottom: 4px;">
+          <div style="margin-bottom: 8px; border-bottom: 1px solid #342618; padding-bottom: 4px;">
             <span style="color: #10B981;">[${new Date(e.timestamp).toLocaleTimeString()}]</span>
             <strong style="color: var(--vd-gold-primary); margin: 0 8px;">${escapeHtml(e.type)}</strong>
-            <span style="color: #94A3B8;">(${escapeHtml(e.device)})</span>
-            <span style="color: #E2E8F0; margin-left: 8px;">${escapeHtml(JSON.stringify(e.data))}</span>
+            <span style="color: #BCA88F;">(${escapeHtml(e.device)})</span>
+            <span style="color: #ECDFC9; margin-left: 8px;">${escapeHtml(JSON.stringify(e.data))}</span>
           </div>
         `,
           )
@@ -278,29 +278,29 @@ export function switchStandaloneAdminTab(tab) {
   if (tab === 'dashboard') {
     body.innerHTML = `
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
-        <div style="background: #081D40; border: 1px solid rgba(197, 146, 57, 0.25); border-radius: 12px; padding: 20px;">
-          <span style="font-size: 0.8rem; color: #94A3B8; text-transform: uppercase;">Total Inbound Leads</span>
+        <div style="background: #2B1A0C; border: 1px solid rgba(184, 131, 47, 0.25); border-radius: 12px; padding: 20px;">
+          <span style="font-size: 0.8rem; color: #BCA88F; text-transform: uppercase;">Total Inbound Leads</span>
           <strong style="font-size: 1.8rem; font-weight: 800; color: #10B981; display: block; margin-top: 4px;">${leads.length}</strong>
-          <small style="color: #64748B;">↑ 22% this week</small>
+          <small style="color: #8A7560;">↑ 22% this week</small>
         </div>
-        <div style="background: #081D40; border: 1px solid rgba(197, 146, 57, 0.25); border-radius: 12px; padding: 20px;">
-          <span style="font-size: 0.8rem; color: #94A3B8; text-transform: uppercase;">Conversion Rate</span>
-          <strong style="font-size: 1.8rem; font-weight: 800; color: #C59239; display: block; margin-top: 4px;">28.4%</strong>
-          <small style="color: #64748B;">Target: 25%</small>
+        <div style="background: #2B1A0C; border: 1px solid rgba(184, 131, 47, 0.25); border-radius: 12px; padding: 20px;">
+          <span style="font-size: 0.8rem; color: #BCA88F; text-transform: uppercase;">Conversion Rate</span>
+          <strong style="font-size: 1.8rem; font-weight: 800; color: #B8832F; display: block; margin-top: 4px;">28.4%</strong>
+          <small style="color: #8A7560;">Target: 25%</small>
         </div>
-        <div style="background: #081D40; border: 1px solid rgba(197, 146, 57, 0.25); border-radius: 12px; padding: 20px;">
-          <span style="font-size: 0.8rem; color: #94A3B8; text-transform: uppercase;">Active Subscriptions</span>
+        <div style="background: #2B1A0C; border: 1px solid rgba(184, 131, 47, 0.25); border-radius: 12px; padding: 20px;">
+          <span style="font-size: 0.8rem; color: #BCA88F; text-transform: uppercase;">Active Subscriptions</span>
           <strong style="font-size: 1.8rem; font-weight: 800; color: #38BDF8; display: block; margin-top: 4px;">1,482</strong>
-          <small style="color: #64748B;">Across 10 Metros</small>
+          <small style="color: #8A7560;">Across 10 Metros</small>
         </div>
-        <div style="background: #081D40; border: 1px solid rgba(197, 146, 57, 0.25); border-radius: 12px; padding: 20px;">
-          <span style="font-size: 0.8rem; color: #94A3B8; text-transform: uppercase;">MRR (Infrastructure)</span>
+        <div style="background: #2B1A0C; border: 1px solid rgba(184, 131, 47, 0.25); border-radius: 12px; padding: 20px;">
+          <span style="font-size: 0.8rem; color: #BCA88F; text-transform: uppercase;">MRR (Infrastructure)</span>
           <strong style="font-size: 1.8rem; font-weight: 800; color: #F59E0B; display: block; margin-top: 4px;">₹38.4L</strong>
-          <small style="color: #64748B;">98.2% Renewal Rate</small>
+          <small style="color: #8A7560;">98.2% Renewal Rate</small>
         </div>
       </div>
 
-      <div style="background: #081D40; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 24px;">
+      <div style="background: #2B1A0C; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 24px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
           <h3 style="margin: 0; color: #FFF; font-size: 1.15rem;"><i class="ph-bold ph-funnel"></i> Recent Client Inquiries</h3>
           <button class="btn btn--outline btn--sm" ${action('exportLeadsToCSV')}><i class="ph-bold ph-download-simple"></i> Export CSV</button>

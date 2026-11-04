@@ -39,7 +39,7 @@ function ResultCard({ item, navigate }) {
   };
   return (
     <div className="explorer-card">
-      <div className="explorer-card__image" style={{ backgroundImage: `linear-gradient(180deg, rgba(5,19,43,0.2) 0%, rgba(5,19,43,0.7) 100%), url('${image}')` }}>
+      <div className="explorer-card__image" style={{ backgroundImage: `linear-gradient(180deg, rgba(27,16,6,0.2) 0%, rgba(27,16,6,0.7) 100%), url('${image}')` }}>
         <span className={`badge ${item.status === 'available' ? 'badge--success' : 'badge--warning'}`}>{item.status === 'available' ? '● Verified Available' : '● High Demand'}</span>
         <span style={{ fontSize: '0.75rem', color: '#fff', background: 'rgba(0,0,0,0.6)', padding: '2px 8px', borderRadius: '4px' }}>
           ★ {item.rating} ({item.reviews})
@@ -165,17 +165,17 @@ export default function SearchResultsPage() {
           </form>
           {parsed && (
             <p className="hero-luxury-desc" style={{ marginTop: '14px', marginBottom: 0 }}>
-              <i className="ph-bold ph-brain" style={{ color: '#DFB15B' }} /> Detected intent: <strong style={{ color: '#081D40' }}>{parsed.summary}</strong> • {total} result{total === 1 ? '' : 's'}
+              <i className="ph-bold ph-brain" style={{ color: '#D9A858' }} /> Detected intent: <strong style={{ color: '#2B1A0C' }}>{parsed.summary}</strong> • {total} result{total === 1 ? '' : 's'}
             </p>
           )}
         </div>
       </section>
 
-      <section className="section" style={{ padding: '50px 0', background: '#F8FAFC' }}>
+      <section className="section" style={{ padding: '50px 0', background: '#FBF5EA' }}>
         <div className="container">
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 280px) 1fr', gap: '28px', alignItems: 'start' }} className="search-layout">
-            <aside style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '14px', padding: '20px', position: 'sticky', top: '100px' }}>
-              <h4 style={{ margin: '0 0 14px 0', color: '#081D40', fontSize: '1rem' }}>
+            <aside style={{ background: '#FFFFFF', border: '1px solid #ECDFC9', borderRadius: '14px', padding: '20px', position: 'sticky', top: '100px' }}>
+              <h4 style={{ margin: '0 0 14px 0', color: '#2B1A0C', fontSize: '1rem' }}>
                 <i className="ph-bold ph-funnel" /> Filters
               </h4>
               <div className="form-field">
@@ -232,24 +232,24 @@ export default function SearchResultsPage() {
             <div>
               {services.length > 0 && (
                 <div style={{ marginBottom: '28px' }}>
-                  <h3 style={{ color: '#081D40', fontSize: '1.1rem', margin: '0 0 12px 0' }}>
+                  <h3 style={{ color: '#2B1A0C', fontSize: '1.1rem', margin: '0 0 12px 0' }}>
                     <i className="ph-bold ph-file-text" /> Business Services
                   </h3>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
                     {services.map((s) => (
-                      <Link key={s.slug} to={`/services/${s.slug}`} className="spotlight-card" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '18px', display: 'block' }}>
-                        <i className={`ph-bold ${s.icon}`} style={{ color: '#C59239', fontSize: '1.3rem' }} />
-                        <strong style={{ display: 'block', color: '#081D40', margin: '8px 0 4px' }}>{s.name}</strong>
-                        <span style={{ fontSize: '0.82rem', color: '#64748B' }}>From ₹{s.startingPrice.toLocaleString('en-IN')}{s.priceUnit}</span>
+                      <Link key={s.slug} to={`/services/${s.slug}`} className="spotlight-card" style={{ background: '#FFFFFF', border: '1px solid #ECDFC9', borderRadius: '12px', padding: '18px', display: 'block' }}>
+                        <i className={`ph-bold ${s.icon}`} style={{ color: '#B8832F', fontSize: '1.3rem' }} />
+                        <strong style={{ display: 'block', color: '#2B1A0C', margin: '8px 0 4px' }}>{s.name}</strong>
+                        <span style={{ fontSize: '0.82rem', color: '#8A7560' }}>From ₹{s.startingPrice.toLocaleString('en-IN')}{s.priceUnit}</span>
                       </Link>
                     ))}
                   </div>
                 </div>
               )}
 
-              <h3 style={{ color: '#081D40', fontSize: '1.1rem', margin: '0 0 12px 0' }}>
+              <h3 style={{ color: '#2B1A0C', fontSize: '1.1rem', margin: '0 0 12px 0' }}>
                 <i className="ph-bold ph-buildings" /> Locations & Workspaces{' '}
-                <span style={{ color: '#64748B', fontWeight: '400', fontSize: '0.9rem' }}>
+                <span style={{ color: '#8A7560', fontWeight: '400', fontSize: '0.9rem' }}>
                   — {results.length} available
                 </span>
               </h3>
@@ -261,10 +261,10 @@ export default function SearchResultsPage() {
                   ))}
                 </div>
               ) : (
-                <div style={{ background: '#FFFFFF', border: '1px dashed #C59239', borderRadius: '14px', padding: '36px 24px', textAlign: 'center' }}>
-                  <i className="ph-bold ph-magnifying-glass" style={{ fontSize: '2.4rem', color: '#C59239' }} />
-                  <h3 style={{ color: '#081D40', margin: '12px 0 6px' }}>We couldn't find an exact match.</h3>
-                  <p style={{ color: '#64748B', maxWidth: '520px', margin: '0 auto 18px' }}>Try a nearby city, broaden the filters, or let a V-DESK expert shortlist verified options for you.</p>
+                <div style={{ background: '#FFFFFF', border: '1px dashed #B8832F', borderRadius: '14px', padding: '36px 24px', textAlign: 'center' }}>
+                  <i className="ph-bold ph-magnifying-glass" style={{ fontSize: '2.4rem', color: '#B8832F' }} />
+                  <h3 style={{ color: '#2B1A0C', margin: '12px 0 6px' }}>We couldn't find an exact match.</h3>
+                  <p style={{ color: '#8A7560', maxWidth: '520px', margin: '0 auto 18px' }}>Try a nearby city, broaden the filters, or let a V-DESK expert shortlist verified options for you.</p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center', marginBottom: '18px' }}>
                     {similarCities.map((c) => (
                       <button key={c.slug} type="button" className="zero-tag" onClick={() => setParams({ q: `${filters.type === 'all' ? 'Virtual Office' : filters.type} in ${c.name}` })}>
@@ -286,16 +286,16 @@ export default function SearchResultsPage() {
 
               {guides.length > 0 && (
                 <div style={{ marginTop: '32px' }}>
-                  <h3 style={{ color: '#081D40', fontSize: '1.1rem', margin: '0 0 12px 0' }}>
+                  <h3 style={{ color: '#2B1A0C', fontSize: '1.1rem', margin: '0 0 12px 0' }}>
                     <i className="ph-bold ph-book-open" /> Guides
                   </h3>
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '8px' }}>
                     {guides.map((g) => (
                       <li key={g.slug}>
-                        <Link to={`/resources/${g.slug}`} style={{ color: '#081D40', fontWeight: '600' }}>
+                        <Link to={`/resources/${g.slug}`} style={{ color: '#2B1A0C', fontWeight: '600' }}>
                           {g.title}
                         </Link>{' '}
-                        <span style={{ color: '#64748B', fontSize: '0.82rem' }}>• {g.readTime} min read</span>
+                        <span style={{ color: '#8A7560', fontSize: '0.82rem' }}>• {g.readTime} min read</span>
                       </li>
                     ))}
                   </ul>
@@ -303,7 +303,7 @@ export default function SearchResultsPage() {
               )}
 
               <div style={{ marginTop: '32px' }}>
-                <span style={{ fontSize: '0.78rem', fontWeight: '700', letterSpacing: '0.08em', color: '#64748B', textTransform: 'uppercase' }}>Popular searches</span>
+                <span style={{ fontSize: '0.78rem', fontWeight: '700', letterSpacing: '0.08em', color: '#8A7560', textTransform: 'uppercase' }}>Popular searches</span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
                   {POPULAR.map((term) => (
                     <button key={term} type="button" className="zero-tag" onClick={() => setParams({ q: term })}>

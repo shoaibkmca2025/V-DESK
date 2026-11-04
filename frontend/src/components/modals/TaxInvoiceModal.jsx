@@ -47,7 +47,7 @@ export default function TaxInvoiceModal() {
                 <span
                   style={{
                     fontSize: '0.75rem',
-                    background: '#C59239',
+                    background: '#B8832F',
                     color: '#000',
                     padding: '2px 8px',
                     fontWeight: '800',
@@ -68,7 +68,7 @@ export default function TaxInvoiceModal() {
             <div className="tax-invoice-meta">
               <div>
                 Invoice No:{' '}
-                <strong id="invNumberDisplay" style={{ color: '#081D40' }}>
+                <strong id="invNumberDisplay" style={{ color: '#2B1A0C' }}>
                   INV-2026-8921
                 </strong>
               </div>
@@ -88,7 +88,7 @@ export default function TaxInvoiceModal() {
               <span
                 style={{
                   fontSize: '0.72rem',
-                  color: '#64748B',
+                  color: '#8A7560',
                   textTransform: 'uppercase',
                   fontWeight: '700',
                   display: 'block',
@@ -97,12 +97,12 @@ export default function TaxInvoiceModal() {
               >
                 Billed To (Customer):
               </span>
-              <strong id="invClientName" style={{ color: '#081D40', fontSize: '0.95rem' }}>
+              <strong id="invClientName" style={{ color: '#2B1A0C', fontSize: '0.95rem' }}>
                 Priya Kulkarni
               </strong>
               <br /> <span id="invClientCompany">Zenith D2C Brands Pvt Ltd</span>
               <br />{' '}
-              <span id="invClientEmail" style={{ color: '#64748B' }}>
+              <span id="invClientEmail" style={{ color: '#8A7560' }}>
                 priya@zenithd2c.com
               </span>
               <br /> <span>GSTIN: 27AAYCZ8921P1Z8</span>
@@ -111,7 +111,7 @@ export default function TaxInvoiceModal() {
               <span
                 style={{
                   fontSize: '0.72rem',
-                  color: '#64748B',
+                  color: '#8A7560',
                   textTransform: 'uppercase',
                   fontWeight: '700',
                   display: 'block',
@@ -123,7 +123,7 @@ export default function TaxInvoiceModal() {
               <strong>V-DESK Grade-A Partner Centre</strong>
               <br /> <span>BKC Business Center, G Block, Bandra Kurla Complex</span>
               <br /> <span>Mumbai, Maharashtra – 400051</span>
-              <br /> <span style={{ color: '#C59239', fontWeight: '600' }}>Dedicated Compliance Escrow Active</span>
+              <br /> <span style={{ color: '#B8832F', fontWeight: '600' }}>Dedicated Compliance Escrow Active</span>
             </div>
           </div>
           <table className="tax-invoice-table">
@@ -138,7 +138,7 @@ export default function TaxInvoiceModal() {
               <tr>
                 <td>
                   <strong id="invItemDesc">Virtual Office Infrastructure for GST (12-Month Plan)</strong>
-                  <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>
+                  <div style={{ fontSize: '0.75rem', color: '#8A7560', marginTop: '2px' }}>
                     Includes Notarized Lease Deed, Owner NOC, Electricity Bill & Signboard Compliance
                   </div>
                 </td>
@@ -171,7 +171,7 @@ export default function TaxInvoiceModal() {
             <div className="tax-invoice-qr">
               <div
                 ref={rawStyle(
-                  'width: 44px; height: 44px; background: #081D40; color: #C59239; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;',
+                  'width: 44px; height: 44px; background: #2B1A0C; color: #B8832F; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;',
                 )}
               >
                 <i className="ph-bold ph-qr-code" />

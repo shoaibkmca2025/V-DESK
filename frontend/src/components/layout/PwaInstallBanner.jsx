@@ -22,7 +22,7 @@ export default function PwaInstallBanner() {
         <button
           className="btn btn--ghost btn--sm"
           onClick={() => dismissPwaBanner()}
-          style={{ padding: '6px', fontSize: '0.75rem', color: '#94A3B8' }}
+          style={{ padding: '6px', fontSize: '0.75rem', color: '#BCA88F' }}
         >
           <i className="ph-bold ph-x" />
         </button>

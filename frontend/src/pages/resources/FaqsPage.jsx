@@ -38,7 +38,7 @@ export default function FaqsPage() {
         }
       />
 
-      <section className="section" style={{ padding: '60px 0', background: '#F8FAFC' }}>
+      <section className="section" style={{ padding: '60px 0', background: '#FBF5EA' }}>
         <div className="container" style={{ maxWidth: '960px' }}>
           <div style={{ display: 'flex', gap: '10px', marginBottom: '28px' }}>
             <input type="search" className="form-input" placeholder="Search questions, e.g. physical verification" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search FAQs" style={{ flex: 1 }} />
@@ -56,15 +56,15 @@ export default function FaqsPage() {
             ))}
           </div>
           {groups.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '40px', background: '#FFFFFF', border: '1px dashed #C59239', borderRadius: '12px' }}>
-              <h3 style={{ color: '#081D40' }}>We couldn't find an exact match.</h3>
-              <p style={{ color: '#64748B' }}>Try a different keyword or ask our expert on WhatsApp.</p>
+            <div style={{ textAlign: 'center', padding: '40px', background: '#FFFFFF', border: '1px dashed #B8832F', borderRadius: '12px' }}>
+              <h3 style={{ color: '#2B1A0C' }}>We couldn't find an exact match.</h3>
+              <p style={{ color: '#8A7560' }}>Try a different keyword or ask our expert on WhatsApp.</p>
             </div>
           )}
           {groups.map((g) => (
             <div key={g.id} id={`faq-${g.id}`} style={{ marginBottom: '40px' }}>
-              <h2 style={{ color: '#081D40', fontSize: '1.3rem', marginBottom: '14px' }}>
-                <i className={`ph-bold ${g.icon}`} style={{ color: '#C59239' }} /> {g.title}
+              <h2 style={{ color: '#2B1A0C', fontSize: '1.3rem', marginBottom: '14px' }}>
+                <i className={`ph-bold ${g.icon}`} style={{ color: '#B8832F' }} /> {g.title}
               </h2>
               <FaqAccordion items={g.items} openFirst={false} />
             </div>

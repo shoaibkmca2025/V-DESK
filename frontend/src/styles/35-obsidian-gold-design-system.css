@@ -12,11 +12,11 @@
 .pricing-hero-split,
 .compreg-hero-split,
 .contact-hero-split {
-  background: radial-gradient(circle at top right, #0B254E 0%, #05132B 65%, #020B18 100%) !important;
+  background: radial-gradient(circle at top right, #2E1C0D 0%, #1B1006 65%, #020B18 100%) !important;
   padding: 64px 0 74px 0;
   position: relative;
   overflow: hidden;
-  border-bottom: 1px solid rgba(197, 146, 57, 0.2);
+  border-bottom: 1px solid rgba(184, 131, 47, 0.2);
 }
 
 .site-hero-split::before,
@@ -32,7 +32,7 @@
   right: -10%;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(197, 146, 57, 0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(184, 131, 47, 0.08) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -54,9 +54,9 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(197, 146, 57, 0.15);
-  border: 1px solid rgba(197, 146, 57, 0.4);
-  color: #DFB15B !important;
+  background: rgba(184, 131, 47, 0.15);
+  border: 1px solid rgba(184, 131, 47, 0.4);
+  color: #D9A858 !important;
   border-radius: 30px;
   padding: 6px 14px;
   font-size: 0.82rem;
@@ -78,7 +78,7 @@
 .hero-luxury-desc {
   font-size: 1.06rem;
   line-height: 1.68;
-  color: #CBD5E1 !important;
+  color: #D9C4A3 !important;
   margin-bottom: 28px;
   max-width: 640px;
 }
@@ -92,7 +92,7 @@
 }
 
 .hero-stat-box {
-  background: rgba(5, 19, 43, 0.75);
+  background: rgba(27, 16, 6, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   padding: 14px 10px;
@@ -103,7 +103,7 @@
 .hero-stat-box strong {
   font-size: 1.25rem;
   font-weight: 800;
-  color: #DFB15B !important;
+  color: #D9A858 !important;
   display: block;
 }
 
@@ -111,7 +111,7 @@
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #9DB2CF !important;
+  color: #C9B393 !important;
   display: block;
   margin-top: 3px;
   font-weight: 600;
@@ -129,13 +129,13 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #E2E8F0 !important;
+  color: #ECDFC9 !important;
   font-size: 0.88rem;
   font-weight: 500;
 }
 
 .hero-trust-badge i {
-  color: #DFB15B !important;
+  color: #D9A858 !important;
   font-size: 1.1rem;
 }
 
@@ -149,8 +149,8 @@
 
 /* Embedded Luxury Lead Capture Cards (Right Column) */
 .hero-lead-card {
-  background: #081D40 !important;
-  border: 1px solid rgba(197, 146, 57, 0.35) !important;
+  background: #2B1A0C !important;
+  border: 1px solid rgba(184, 131, 47, 0.35) !important;
   border-radius: 16px !important;
   padding: 30px !important;
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45) !important;
@@ -161,15 +161,15 @@
   position: absolute;
   top: -12px;
   right: 24px;
-  background: linear-gradient(135deg, #DFB15B 0%, #C59239 100%);
-  color: #05132B !important;
+  background: linear-gradient(135deg, #D9A858 0%, #B8832F 100%);
+  color: #1B1006 !important;
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 4px 12px;
   border-radius: 20px;
-  box-shadow: 0 4px 12px rgba(197, 146, 57, 0.4);
+  box-shadow: 0 4px 12px rgba(184, 131, 47, 0.4);
 }
 
 .hero-card-header {
@@ -190,7 +190,7 @@
 
 .hero-card-header p {
   font-size: 0.82rem !important;
-  color: #CBD5E1 !important;
+  color: #D9C4A3 !important;
   margin: 0;
 }
 
@@ -202,7 +202,7 @@
   display: block;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #CBD5E1 !important;
+  color: #D9C4A3 !important;
   margin-bottom: 5px;
 }
 
@@ -211,7 +211,7 @@
 .hero-lead-form input {
   width: 100%;
   padding: 10px 14px;
-  background: rgba(5, 19, 43, 0.8) !important;
+  background: rgba(27, 16, 6, 0.8) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   border-radius: 8px !important;
   color: #FFFFFF !important;
@@ -225,18 +225,18 @@
 .hero-lead-form select:focus,
 .hero-lead-form input:focus {
   outline: none;
-  border-color: #DFB15B !important;
-  box-shadow: 0 0 0 2px rgba(223, 177, 91, 0.25) !important;
+  border-color: #D9A858 !important;
+  box-shadow: 0 0 0 2px rgba(217, 168, 88, 0.25) !important;
 }
 
 .hero-lead-form select option {
-  background: #081D40;
+  background: #2B1A0C;
   color: #FFFFFF;
 }
 
 /* 2. 4-PILLAR ECOSYSTEM SHOWCASE (HOMEPAGE & BEYOND) */
 .home-pillars-section {
-  background: #05132B !important;
+  background: #1B1006 !important;
   padding: 70px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -249,7 +249,7 @@
 }
 
 .pillar-card {
-  background: #081D40 !important;
+  background: #2B1A0C !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 14px;
   padding: 26px 20px;
@@ -261,7 +261,7 @@
 
 .pillar-card:hover {
   transform: translateY(-5px);
-  border-color: #DFB15B !important;
+  border-color: #D9A858 !important;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
 }
 
@@ -269,13 +269,13 @@
   width: 52px;
   height: 52px;
   border-radius: 12px;
-  background: rgba(197, 146, 57, 0.15);
-  border: 1px solid rgba(197, 146, 57, 0.35);
+  background: rgba(184, 131, 47, 0.15);
+  border: 1px solid rgba(184, 131, 47, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  color: #DFB15B;
+  color: #D9A858;
   margin-bottom: 18px;
 }
 
@@ -283,7 +283,7 @@
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: #DFB15B !important;
+  color: #D9A858 !important;
   letter-spacing: 0.05em;
   margin-bottom: 6px;
 }
@@ -298,7 +298,7 @@
 
 .pillar-desc {
   font-size: 0.86rem !important;
-  color: #94A3B8 !important;
+  color: #BCA88F !important;
   line-height: 1.55;
   margin-bottom: 18px;
 }
@@ -311,7 +311,7 @@
   flex-direction: column;
   gap: 8px;
   font-size: 0.82rem;
-  color: #CBD5E1;
+  color: #D9C4A3;
 }
 
 .pillar-features-list li {
@@ -321,7 +321,7 @@
 }
 
 .pillar-features-list li i {
-  color: #DFB15B;
+  color: #D9A858;
   font-size: 1rem;
 }
 
@@ -336,19 +336,19 @@
 
 .pillar-price-label {
   font-size: 0.72rem;
-  color: #94A3B8;
+  color: #BCA88F;
   display: block;
 }
 
 .pillar-price-value {
   font-size: 1.15rem;
   font-weight: 800;
-  color: #DFB15B;
+  color: #D9A858;
 }
 
 /* 3. DARK LUXURY CARDS FOR LOCATIONS, PRICING & COMPLIANCE */
 .dark-luxury-section {
-  background: #05132B !important;
+  background: #1B1006 !important;
   padding: 70px 0;
 }
 
@@ -363,12 +363,12 @@
 .process-flow-section .section__desc,
 .meeting-rooms-section .section__desc,
 .pricing-matrix-section .section__desc {
-  color: #CBD5E1 !important;
+  color: #D9C4A3 !important;
 }
 
 /* Dark Metro Hub Cards (locations.html & index.html) */
 .metro-hub-card {
-  background: #081D40 !important;
+  background: #2B1A0C !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 16px !important;
   overflow: hidden;
@@ -380,7 +380,7 @@
 
 .metro-hub-card:hover {
   transform: translateY(-5px);
-  border-color: #DFB15B !important;
+  border-color: #D9A858 !important;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45) !important;
 }
 
@@ -389,20 +389,20 @@
 }
 
 .metro-hub-card p {
-  color: #CBD5E1 !important;
+  color: #D9C4A3 !important;
 }
 
 .metro-hub-card strong {
-  color: #DFB15B !important;
+  color: #D9A858 !important;
 }
 
 /* Dark Pricing Entity Cards (pricing.html & company-registration.html) */
 .pricing-matrix-section {
-  background: #05132B !important;
+  background: #1B1006 !important;
 }
 
 .entity-card {
-  background: #081D40 !important;
+  background: #2B1A0C !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 16px !important;
   padding: 28px 24px !important;
@@ -412,7 +412,7 @@
 
 .entity-card:hover {
   transform: translateY(-4px);
-  border-color: #DFB15B !important;
+  border-color: #D9A858 !important;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4) !important;
 }
 
@@ -422,46 +422,46 @@
 }
 
 .entity-card p {
-  color: #CBD5E1 !important;
+  color: #D9C4A3 !important;
 }
 
 .entity-card strong,
 .entity-card .plan-price-val {
-  color: #DFB15B !important;
+  color: #D9A858 !important;
 }
 
 .entity-card ul li {
-  color: #E2E8F0 !important;
+  color: #ECDFC9 !important;
 }
 
 /* Meeting Scheduler Luxury Styling */
 .meeting-scheduler-box {
-  background: #081D40 !important;
-  border: 1px solid rgba(197, 146, 57, 0.3) !important;
+  background: #2B1A0C !important;
+  border: 1px solid rgba(184, 131, 47, 0.3) !important;
   border-radius: 16px !important;
   padding: 30px !important;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4) !important;
 }
 
 .meeting-scheduler-box .form-label {
-  color: #CBD5E1 !important;
+  color: #D9C4A3 !important;
 }
 
 .meeting-scheduler-box .form-select,
 .meeting-scheduler-box .form-input {
-  background: rgba(5, 19, 43, 0.9) !important;
+  background: rgba(27, 16, 6, 0.9) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   color: #FFFFFF !important;
 }
 
 .meeting-scheduler-box .form-select option {
-  background: #081D40;
+  background: #2B1A0C;
   color: #FFFFFF;
 }
 
 .mr-state-ticker {
-  background: rgba(5, 19, 43, 0.95) !important;
-  border: 1px solid rgba(197, 146, 57, 0.3) !important;
+  background: rgba(27, 16, 6, 0.95) !important;
+  border: 1px solid rgba(184, 131, 47, 0.3) !important;
   border-radius: 12px !important;
   padding: 16px 20px !important;
   display: flex;
@@ -476,11 +476,11 @@
 }
 
 .mr-pricing-tally .mr-rate-calc {
-  color: #94A3B8 !important;
+  color: #BCA88F !important;
 }
 
 .mr-pricing-tally .mr-final-cost {
-  color: #DFB15B !important;
+  color: #D9A858 !important;
 }
 
 /* 4. UNIVERSAL FLOATING ACTION HIERARCHY & COLLISION PREVENTION */
@@ -580,11 +580,11 @@
 
 .subpage-hero .subpage-hero__desc,
 .hero-luxury-desc {
-  color: #CBD5E1 !important;
+  color: #D9C4A3 !important;
 }
 
 .highlight-gold {
-  background: linear-gradient(135deg, #DFB15B 0%, #C59239 100%) !important;
+  background: linear-gradient(135deg, #D9A858 0%, #B8832F 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   display: inline-block !important;

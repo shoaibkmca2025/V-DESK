@@ -79,7 +79,7 @@ export default function CompanyRegistrationPage() {
 
       <Section id="entities" tone="white" kicker="Company types" title="Which company type is right for you?" lead="Professional fees shown. Government fees and stamp duty depend on your state.">
         <Plans plans={ENTITIES} />
-        <p style={{ textAlign: 'center', margin: '22px 0 0', color: '#64748B', fontSize: '0.92rem' }}>
+        <p style={{ textAlign: 'center', margin: '22px 0 0', color: '#8A7560', fontSize: '0.92rem' }}>
           Registering an NGO? Section 8 company registration starts at ₹11,999 + govt. fees.
         </p>
       </Section>

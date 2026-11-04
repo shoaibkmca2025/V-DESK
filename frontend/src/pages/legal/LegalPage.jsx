@@ -42,8 +42,8 @@ export default function LegalPage() {
 
         <section className="section" style={{ padding: '56px 0', background: '#FFFFFF' }}>
           <div className="container" style={{ maxWidth: '960px', display: 'grid', gridTemplateColumns: 'minmax(200px, 240px) 1fr', gap: '32px', alignItems: 'start' }}>
-            <nav aria-label="Legal documents" style={{ position: 'sticky', top: '100px', background: '#FAF8F3', border: '1px solid #E8E2D8', borderRadius: '12px', padding: '16px' }}>
-              <strong style={{ color: '#081D40', display: 'block', marginBottom: '10px', fontSize: '0.9rem' }}>Documents</strong>
+            <nav aria-label="Legal documents" style={{ position: 'sticky', top: '100px', background: '#FBF4E7', border: '1px solid #ECDFC9', borderRadius: '12px', padding: '16px' }}>
+              <strong style={{ color: '#2B1A0C', display: 'block', marginBottom: '10px', fontSize: '0.9rem' }}>Documents</strong>
               <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '6px' }}>
                 {Object.entries(LEGAL_ROUTES).map(([k, r]) => (
                   <li key={k}>
@@ -54,7 +54,7 @@ export default function LegalPage() {
                 ))}
               </ul>
             </nav>
-            <article className="legal-modal__body" style={{ fontSize: '0.98rem', lineHeight: '1.8', color: '#26344A' }} dangerouslySetInnerHTML={{ __html: content.content }} />
+            <article className="legal-modal__body" style={{ fontSize: '0.98rem', lineHeight: '1.8', color: '#4A3A28' }} dangerouslySetInnerHTML={{ __html: content.content }} />
           </div>
         </section>
       </main>

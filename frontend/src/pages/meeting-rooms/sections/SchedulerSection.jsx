@@ -7,7 +7,7 @@ export default function SchedulerSection() {
     <section
       className="section meeting-rooms-section dark-luxury-section"
       id="scheduler"
-      ref={rawStyle('padding: 70px 0; background: #05132B !important;')}
+      ref={rawStyle('padding: 70px 0; background: #1B1006 !important;')}
     >
       <div className="container">
         <div className="ui-section-head ui-section-head--center ui-section-head--dark">
