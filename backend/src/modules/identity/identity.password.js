@@ -42,9 +42,13 @@ export function isLegacyPasswordHash(stored) {
 /*
  * The same work for an unknown email as for a wrong password, so the answer's timing does not reveal which staff
  * emails exist. (It is microseconds either way now, but the two paths should stay alike.)
+ *
+ * Built on first use, not at import: Workers forbids generating random values in global scope, so a module-level
+ * `randomBytes` here fails the deployment outright (error 10021).
  */
-const dummyHash = hashPasswordKey(randomBytes(32).toString('base64url'));
+let dummyHash;
 export function verifyAgainstDummy(passwordKey) {
+  dummyHash ??= hashPasswordKey(randomBytes(32).toString('base64url'));
   verifyPasswordKey(dummyHash, passwordKey ?? '');
   return false;
 }
