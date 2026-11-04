@@ -56,6 +56,17 @@ export const LOCKOUT_MS = 15 * 60 * 1000;
 export const PASSWORD_MIN_LENGTH = 12;
 export const PASSWORD_MAX_LENGTH = 128;
 
+/**
+ * One-time setup codes (ADR-012): what a super admin hands a new staff member instead of a password.
+ * 12 characters from an alphabet without look-alikes (no 0/O, 1/I/L), shown as XXXX-XXXX-XXXX — about 58 bits,
+ * and the shared lockout allows 5 wrong tries, so guessing is hopeless. Valid until used or 72 hours.
+ */
+export const SETUP_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+export const SETUP_CODE_LENGTH = 12;
+export const SETUP_CODE_TTL_MS = 72 * 60 * 60 * 1000;
+/** Issued once the setup code checks out; long enough to choose a password. */
+export const SETUP_TOKEN_TTL_SECONDS = 15 * 60;
+
 export const TOTP_ISSUER = 'V-DESK';
 export const TOTP_DIGITS = 6;
 export const TOTP_PERIOD_SECONDS = 30;

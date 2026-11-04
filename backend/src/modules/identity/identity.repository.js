@@ -13,6 +13,8 @@ import { exec, row, rows, UNIQUE_VIOLATION } from '../../shared/lib/sql.js';
 const USER_COLUMNS = `
   ref, email, name, role, status,
   password_hash AS "passwordHash",
+  setup_code_hash AS "setupCodeHash",
+  setup_code_expires_at AS "setupCodeExpiresAt",
   jsonb_build_object(
     'enabled', mfa_enabled, 'secret', mfa_secret,
     'pendingSecret', mfa_pending_secret, 'lastStep', mfa_last_step
@@ -36,6 +38,8 @@ const COLUMN_FOR = {
   status: 'status',
   email: 'email',
   passwordHash: 'password_hash',
+  setupCodeHash: 'setup_code_hash',
+  setupCodeExpiresAt: 'setup_code_expires_at',
   failedAttempts: 'failed_attempts',
   lockedUntil: 'locked_until',
   lastLoginAt: 'last_login_at',
@@ -88,14 +92,26 @@ export async function findUserByRef(ref) {
   return row(`SELECT ${USER_COLUMNS} FROM users WHERE ref = $1 AND deleted_at IS NULL`, [ref]);
 }
 
-/** Inserts a user, or returns null when the email (or ref) is already taken. */
+/**
+ * Inserts a user — with a password hash (the bootstrap script) or a setup code (everyone else) — or returns
+ * null when the email (or ref) is already taken.
+ */
 export async function insertUser(data) {
   try {
     return await row(
-      `INSERT INTO users (ref, email, name, role, password_hash, created_by)
-            VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO users (ref, email, name, role, password_hash, setup_code_hash, setup_code_expires_at, created_by)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING ${USER_COLUMNS}`,
-      [data.ref, data.email, data.name, data.role, data.passwordHash, data.createdBy ?? null],
+      [
+        data.ref,
+        data.email,
+        data.name,
+        data.role,
+        data.passwordHash ?? null,
+        data.setupCodeHash ?? null,
+        data.setupCodeExpiresAt ?? null,
+        data.createdBy ?? null,
+      ],
     );
   } catch (err) {
     if (err.code === UNIQUE_VIOLATION) return null;
@@ -112,6 +128,23 @@ export async function findUsers({ after, limit }) {
       ORDER BY created_at DESC, ref DESC
       LIMIT $${cursor.next}`,
     [...cursor.params, limit + 1],
+  );
+}
+
+/**
+ * Stores the staff member's first password and spends their setup code in one statement — but only while
+ * the code is still the one the setup token was issued for (and unexpired), so a code works exactly once and
+ * a code an admin has since replaced works not at all. Returns the updated user, or null.
+ */
+export async function completeSetup(ref, codeHashPrefix, passwordHash, now) {
+  return row(
+    `UPDATE users
+        SET password_hash = $3, setup_code_hash = NULL, setup_code_expires_at = NULL,
+            failed_attempts = 0, locked_until = NULL
+      WHERE ref = $1 AND deleted_at IS NULL
+        AND left(setup_code_hash, 16) = $2 AND setup_code_expires_at > $4
+    RETURNING ${USER_COLUMNS}`,
+    [ref, codeHashPrefix, passwordHash, now],
   );
 }
 

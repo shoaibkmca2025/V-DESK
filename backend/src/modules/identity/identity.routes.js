@@ -17,6 +17,7 @@ import {
   mfaVerifyBody,
   otpRequestBody,
   otpVerifyBody,
+  setupPasswordBody,
   updateCustomerBody,
   updateUserBody,
   userRefParams,
@@ -31,6 +32,7 @@ const refreshLimit = rateLimit({ name: 'session refresh', windowMs: 60_000, max:
 
 // ── Sign-in & sessions ────────────────────────
 identityRouter.post('/login', signInLimit, validate({ body: loginBody }), controller.login);
+identityRouter.post('/password/setup', signInLimit, validate({ body: setupPasswordBody }), controller.setupPassword);
 identityRouter.post('/mfa/enroll', signInLimit, validate({ body: mfaEnrollBody }), controller.enrollMfa);
 identityRouter.post('/mfa/verify', signInLimit, validate({ body: mfaVerifyBody }), controller.verifyMfa);
 identityRouter.post('/refresh', refreshLimit, controller.refresh);

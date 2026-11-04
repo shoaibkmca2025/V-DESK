@@ -13,16 +13,25 @@ import {
 } from './identity.constants.js';
 
 const email = z.string().trim().toLowerCase().max(254).email('Enter a valid email');
-/** Never trimmed: leading/trailing spaces are part of a password. */
+/** Never trimmed: leading/trailing spaces are part of a password. Letters and numbers both required (ADR-012). */
 const newPassword = z
   .string()
   .min(PASSWORD_MIN_LENGTH, `Use at least ${PASSWORD_MIN_LENGTH} characters`)
-  .max(PASSWORD_MAX_LENGTH);
+  .max(PASSWORD_MAX_LENGTH)
+  .regex(/[A-Za-z]/, 'Include at least one letter')
+  .regex(/\d/, 'Include at least one number');
 const mfaToken = z.string().min(1, 'mfaToken is required').max(2000);
 
+/** `password` is the account's password — or, before the first sign-in, its one-time setup code. */
 export const loginBody = z.object({
   email,
   password: z.string().min(1, 'Password is required').max(PASSWORD_MAX_LENGTH),
+});
+
+/** Body for POST /auth/password/setup — the token from signing in with the setup code, and the new password. */
+export const setupPasswordBody = z.object({
+  setupToken: z.string().min(1, 'setupToken is required').max(2000),
+  newPassword,
 });
 
 export const mfaEnrollBody = z.object({ mfaToken });
@@ -41,12 +50,14 @@ export const changePasswordBody = z.object({
   newPassword,
 });
 
+/**
+ * No password here: the API generates a one-time setup code and returns it once (ADR-012), so an admin never
+ * knows a staff member's password. Unknown fields — including a `password` — are dropped.
+ */
 export const createUserBody = z.object({
   email,
   name: z.string().trim().min(1, 'Name is required').max(120),
   role: z.enum(STAFF_ROLES),
-  /** Temporary password the admin passes on; the user changes it with POST /auth/password. */
-  password: newPassword,
 });
 
 export const updateUserBody = z
@@ -54,12 +65,13 @@ export const updateUserBody = z
     name: z.string().trim().min(1).max(120).optional(),
     role: z.enum(STAFF_ROLES).optional(),
     status: z.enum(USER_STATUSES).optional(),
-    password: newPassword.optional(),
+    /** Forgotten password: a fresh setup code replaces the old password (returned once, like on creation). */
+    issueSetupCode: z.literal(true).optional(),
     resetMfa: z.literal(true).optional(),
     unlock: z.literal(true).optional(),
   })
   .refine((body) => Object.values(body).some((value) => value !== undefined), {
-    message: 'Send at least one of name, role, status, password, resetMfa or unlock',
+    message: 'Send at least one of name, role, status, issueSetupCode, resetMfa or unlock',
   });
 
 export const userRefParams = z.object({
