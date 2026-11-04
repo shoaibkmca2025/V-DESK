@@ -140,7 +140,7 @@
   .scroll-top-btn { display: none !important; }
 
   /* The action bar sits directly on the dock, not across it. */
-  .mobile-sticky-dock { bottom: 58px !important; box-shadow: 0 -8px 24px -12px rgba(8, 29, 64, 0.35); }
+  .mobile-sticky-dock { bottom: 58px !important; box-shadow: 0 -8px 24px -12px rgba(43, 26, 12, 0.35); }
 
   /* Nothing is left hidden underneath the two bars at the end of a page. */
   .ui-page { padding-bottom: 0; }
@@ -180,16 +180,16 @@
 @media (prefers-reduced-transparency: reduce) {
   /* Frost the glass into a solid surface rather than dropping the layer. */
   .site-header,
-  .site-header.is-scrolled { background: #ffffff !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .site-header.is-scrolled { background: #f6ead3 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
   .modal-overlay.active,
-  .modal-overlay.open { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(7, 26, 54, 0.92) !important; }
+  .modal-overlay.open { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(35, 21, 8, 0.92) !important; }
   .ui-hero__badge,
   .ui-chip,
   .ui-hero__stats,
   .ui-btn--glass {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    background: rgba(8, 29, 64, 0.88) !important;
+    background: rgba(43, 26, 12, 0.88) !important;
   }
   .ui-city-strip__bg { opacity: 0.12; }
 }
@@ -205,7 +205,7 @@
   .ui-lead,
   .ui-page .ui-card p,
   .ui-page .ui-step p { color: var(--ui-text) !important; }
-  .ui-chip { background: rgba(8, 29, 64, 0.92) !important; border-color: #fff !important; }
+  .ui-chip { background: rgba(43, 26, 12, 0.92) !important; border-color: #fff !important; }
 }
 
 /*
@@ -255,20 +255,20 @@
   border: 0;
   border-radius: 12px;
   background: transparent;
-  color: var(--ui-muted, #5a6b85);
+  color: var(--ui-muted, #75604b);
   font-size: 1.6rem;
   line-height: 1;
   cursor: pointer;
 }
 .modal-card:not(.modal-card--full-explorer):not(.modal-card--customer-portal):not(.modal-card--full-admin) .modal-card__close:hover {
-  background: rgba(8, 29, 64, 0.06);
-  color: var(--ui-ink, #0f2547);
+  background: rgba(43, 26, 12, 0.06);
+  color: var(--ui-ink, #33200f);
 }
 .modal-card__close:active { transform: scale(0.92); }
 
 .modal-card__subtitle {
   margin: 0 0 20px;
-  color: var(--ui-muted, #5a6b85);
+  color: var(--ui-muted, #75604b);
   font-size: 1rem;
   line-height: 1.55;
   max-width: 58ch;
@@ -419,7 +419,7 @@
   font: inherit;
   color: var(--ui-ink);
 }
-.ui-field input:focus-visible { outline: 3px solid rgba(0, 168, 150, 0.45); outline-offset: 1px; border-color: var(--ui-teal-dark); }
+.ui-field input:focus-visible { outline: 3px solid rgba(122, 78, 34, 0.45); outline-offset: 1px; border-color: var(--ui-teal-dark); }
 .ui-field__error { color: #b91c1c; font-size: 0.9375rem; margin: 0; }
 
 .ui-visually-hidden {
@@ -447,9 +447,9 @@
 .ui-plan__badge,
 .ui-city__flag,
 .btn--gold {
-  color: var(--ui-navy) !important;
+  color: #fff !important;
 }
-.ui-btn--gold:hover { background: var(--ui-gold-light); color: var(--ui-navy) !important; }
+.ui-btn--gold:hover { background: var(--ui-brand-dark); color: #fff !important; }
 .ui-btn--gold i,
 .ui-plan__badge i { color: inherit; }
 
@@ -469,7 +469,7 @@ a[class*='whatsapp'] { color: var(--ui-navy) !important; }
   gap: var(--sp-3, 12px);
   padding: var(--sp-3, 12px) var(--sp-4, 16px);
   margin-bottom: var(--sp-4, 16px);
-  background: var(--ui-navy-50, #f2f6fb);
+  background: var(--ui-navy-50, #f8f0e3);
   border: 1px solid #dbe6f3;
   border-radius: var(--ui-r-card, 12px);
 }
@@ -490,12 +490,12 @@ a[class*='whatsapp'] { color: var(--ui-navy) !important; }
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ui-muted, #5a6b85);
+  color: var(--ui-muted, #75604b);
 }
-.rb-account__who strong { color: var(--ui-ink, #0f2547); font-size: 1rem; }
+.rb-account__who strong { color: var(--ui-ink, #33200f); font-size: 1rem; }
 .rb-account__meta {
   font-size: 0.875rem;
-  color: var(--ui-muted, #5a6b85);
+  color: var(--ui-muted, #75604b);
   overflow-wrap: anywhere;
 }
 
@@ -507,9 +507,9 @@ a[class*='whatsapp'] { color: var(--ui-navy) !important; }
   height: 54px;
   margin: 0 auto var(--sp-3, 12px);
   border-radius: 50%;
-  background: var(--ui-navy-50, #f2f6fb);
-  color: var(--ui-navy, #081d40);
+  background: var(--ui-navy-50, #f8f0e3);
+  color: var(--ui-navy, #2b1a0c);
   font-size: 1.625rem;
 }
-.rb-signin h4 { font-family: var(--ui-display); font-size: 1.25rem; color: var(--ui-ink, #0f2547); margin: 0 0 6px; }
-.rb-signin p { color: var(--ui-muted, #5a6b85); margin: 0 auto var(--sp-4, 16px); max-width: 44ch; }
+.rb-signin h4 { font-family: var(--ui-display); font-size: 1.25rem; color: var(--ui-ink, #33200f); margin: 0 0 6px; }
+.rb-signin p { color: var(--ui-muted, #75604b); margin: 0 auto var(--sp-4, 16px); max-width: 44ch; }

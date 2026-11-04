@@ -77,7 +77,7 @@
 .subpage--checkout .checkout-tabs {
   display: flex;
   gap: 8px;
-  border-bottom: 1px solid #E2E8F0;
+  border-bottom: 1px solid #ECDFC9;
   padding-bottom: 14px;
   margin-bottom: 20px;
   flex-wrap: wrap;
@@ -89,9 +89,9 @@
   gap: 8px;
   padding: 10px 16px;
   border-radius: 10px;
-  border: 1px solid #E2E8F0;
-  background: #F8FAFC;
-  color: #334155;
+  border: 1px solid #ECDFC9;
+  background: #FBF5EA;
+  color: #574434;
   font-weight: 600;
   font-size: 0.88rem;
   cursor: pointer;
@@ -99,12 +99,12 @@
 }
 
 .subpage--checkout .pay-tab:hover {
-  border-color: #C59239;
+  border-color: #B8832F;
 }
 
 .subpage--checkout .pay-tab.active {
-  background: #081D40;
-  border-color: #081D40;
+  background: #2B1A0C;
+  border-color: #2B1A0C;
   color: #FFFFFF;
 }
 
@@ -119,24 +119,24 @@
   align-items: center;
   gap: 10px;
   padding: 28px;
-  border: 1px dashed #C59239;
+  border: 1px dashed #B8832F;
   border-radius: 12px;
-  background: #FAF8F3;
-  color: #64748B;
+  background: #FBF4E7;
+  color: #8A7560;
   font-size: 0.88rem;
   text-align: center;
 }
 
 .subpage--checkout .qr-big-icon {
   font-size: 3.5rem;
-  color: #081D40;
+  color: #2B1A0C;
 }
 
 .subpage--checkout .upi-id-row > span {
   display: block;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #081D40;
+  color: #2B1A0C;
   margin-bottom: 8px;
 }
 

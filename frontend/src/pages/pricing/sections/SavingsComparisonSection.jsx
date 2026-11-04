@@ -24,14 +24,14 @@ export default function SavingsComparisonSection() {
           >
             <thead>
               <tr>
-                <th ref={rawStyle('padding: 16px; background: #081D40; color: #FFF;')}>Expense Line Item</th>
-                <th ref={rawStyle('padding: 16px; background: #081D40; color: #EF4444;')}>
+                <th ref={rawStyle('padding: 16px; background: #2B1A0C; color: #FFF;')}>Expense Line Item</th>
+                <th ref={rawStyle('padding: 16px; background: #2B1A0C; color: #EF4444;')}>
                   Traditional Commercial Lease
                 </th>
-                <th ref={rawStyle('padding: 16px; background: #081D40; color: #10B981;')}>
+                <th ref={rawStyle('padding: 16px; background: #2B1A0C; color: #10B981;')}>
                   V-DESK Virtual Infrastructure
                 </th>
-                <th ref={rawStyle('padding: 16px; background: #081D40; color: #C59239;')}>Net Savings</th>
+                <th ref={rawStyle('padding: 16px; background: #2B1A0C; color: #B8832F;')}>Net Savings</th>
               </tr>
             </thead>
             <tbody>
@@ -95,7 +95,7 @@ export default function SavingsComparisonSection() {
                   <strong style={{ color: '#10B981' }}>₹1,80,000</strong>
                 </td>
               </tr>
-              <tr style={{ background: '#FAF8F3', fontWeight: '800', fontSize: '1.05rem' }}>
+              <tr style={{ background: '#FBF4E7', fontWeight: '800', fontSize: '1.05rem' }}>
                 <td>First Year Total Outflow:</td>
                 <td style={{ color: '#EF4444' }}>₹17,70,000</td>
                 <td style={{ color: '#10B981' }}>₹14,999</td>

@@ -28,9 +28,9 @@ export function copyToClipboard(text, label = 'Copied') {
       position: 'fixed',
       bottom: '24px',
       right: '24px',
-      background: '#05132B',
+      background: '#1B1006',
       color: '#FFFFFF',
-      border: '1px solid #C59239',
+      border: '1px solid #B8832F',
       borderRadius: '8px',
       padding: '12px 18px',
       zIndex: '999999',
@@ -41,7 +41,7 @@ export function copyToClipboard(text, label = 'Copied') {
     });
     document.body.appendChild(banner);
   }
-  banner.innerHTML = `<i class="ph-bold ph-check" style="color: #10B981;"></i> <strong>${escapeHtml(cleanLabel)} Copied to Clipboard!</strong> <span style="font-size: 0.8rem; color: #94A3B8;">(${escapeHtml(text)})</span>`;
+  banner.innerHTML = `<i class="ph-bold ph-check" style="color: #10B981;"></i> <strong>${escapeHtml(cleanLabel)} Copied to Clipboard!</strong> <span style="font-size: 0.8rem; color: #BCA88F;">(${escapeHtml(text)})</span>`;
   banner.style.display = 'flex';
 
   setTimeout(() => {

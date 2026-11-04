@@ -9,17 +9,17 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1.5px solid rgba(0, 168, 150, 0.3);
+  border: 1.5px solid rgba(122, 78, 34, 0.3);
   border-radius: 20px;
   padding: 28px 26px;
-  box-shadow: 0 20px 50px rgba(15, 59, 96, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  box-shadow: 0 20px 50px rgba(88, 56, 26, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
   position: relative;
   transition: all var(--transition-smooth);
 }
 
 .hero-lead-card:hover {
   border-color: var(--vd-teal-primary);
-  box-shadow: 0 24px 60px rgba(15, 59, 96, 0.16), 0 0 30px rgba(0, 168, 150, 0.15);
+  box-shadow: 0 24px 60px rgba(88, 56, 26, 0.16), 0 0 30px rgba(122, 78, 34, 0.15);
 }
 
 .hero-lead-card__header {
@@ -31,7 +31,7 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(0, 168, 150, 0.1);
+  background: rgba(122, 78, 34, 0.1);
   color: var(--vd-teal-primary);
   font-size: 0.72rem;
   font-weight: 700;
@@ -92,12 +92,12 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
 .hero-lead-input:focus,
 .hero-lead-select:focus {
   border-color: var(--vd-teal-primary);
-  box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.15);
+  box-shadow: 0 0 0 3px rgba(122, 78, 34, 0.15);
   background: #FFFFFF;
 }
 
 .hero-lead-submit {
-  background: linear-gradient(135deg, #00A896 0%, #028090 100%);
+  background: linear-gradient(135deg, #7A4E22 0%, #6D4A24 100%);
   color: #FFFFFF;
   font-family: var(--font-sans);
   font-weight: 700;
@@ -110,14 +110,14 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 6px 20px rgba(0, 168, 150, 0.35);
+  box-shadow: 0 6px 20px rgba(122, 78, 34, 0.35);
   transition: all var(--transition-smooth);
   margin-top: 4px;
 }
 
 .hero-lead-submit:hover {
-  background: linear-gradient(135deg, #02C39A 0%, #00A896 100%);
-  box-shadow: 0 8px 26px rgba(0, 168, 150, 0.45);
+  background: linear-gradient(135deg, #A06C33 0%, #7A4E22 100%);
+  box-shadow: 0 8px 26px rgba(122, 78, 34, 0.45);
   transform: translateY(-2px);
 }
 
@@ -181,7 +181,7 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
   transform: translateY(-6px);
   border-color: var(--vd-teal-primary);
   background: #FFFFFF;
-  box-shadow: 0 16px 36px rgba(15, 59, 96, 0.08);
+  box-shadow: 0 16px 36px rgba(88, 56, 26, 0.08);
 }
 
 .process-card__number {
@@ -189,7 +189,7 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
   font-size: 2.2rem;
   font-weight: 800;
   line-height: 1;
-  background: linear-gradient(135deg, #00A896 0%, #0F3B60 100%);
+  background: linear-gradient(135deg, #7A4E22 0%, #58381A 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -224,7 +224,7 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
   border-radius: 16px;
   border: 1px solid var(--vd-border-soft);
   background: #FFFFFF;
-  box-shadow: 0 10px 30px rgba(15, 59, 96, 0.06);
+  box-shadow: 0 10px 30px rgba(88, 56, 26, 0.06);
   margin-top: 36px;
 }
 
@@ -251,7 +251,7 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
 }
 
 .matrix-table thead th {
-  background: #0A2540;
+  background: #3A2410;
   color: #FFFFFF;
   font-family: var(--font-display);
   font-weight: 700;
@@ -260,7 +260,7 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
 }
 
 .matrix-table thead th:first-child {
-  background: #07172B;
+  background: #1B1006;
   color: var(--vd-teal-light);
 }
 
@@ -275,7 +275,7 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
 }
 
 .matrix-price-row td {
-  background: rgba(0, 168, 150, 0.04);
+  background: rgba(122, 78, 34, 0.04);
   padding: 20px 16px;
 }
 
@@ -293,13 +293,13 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
 }
 
 .matrix-check {
-  color: #00A896;
+  color: #7A4E22;
   font-size: 1.3rem;
   font-weight: 800;
 }
 
 .matrix-cross {
-  color: #CBD5E1;
+  color: #D9C4A3;
   font-size: 1.1rem;
 }
 
@@ -338,7 +338,7 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
   background: var(--vd-navy-deep);
   color: #FFFFFF;
   border-color: var(--vd-navy-deep);
-  box-shadow: 0 4px 16px rgba(15, 59, 96, 0.2);
+  box-shadow: 0 4px 16px rgba(88, 56, 26, 0.2);
 }
 
 .kyc-panes-container {
@@ -381,7 +381,7 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
 .kyc-doc-item:hover {
   border-color: var(--vd-teal-primary);
   background: #FFFFFF;
-  box-shadow: 0 6px 18px rgba(15, 59, 96, 0.05);
+  box-shadow: 0 6px 18px rgba(88, 56, 26, 0.05);
 }
 
 .kyc-doc-icon {
@@ -417,7 +417,7 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
 }
 
 .trust-pillars-section .section__desc {
-  color: #94A3B8;
+  color: #BCA88F;
 }
 
 .pillar-grid {
@@ -452,14 +452,14 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
   background: rgba(255, 255, 255, 0.08);
   border-color: var(--vd-teal-primary);
   transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0, 168, 150, 0.15);
+  box-shadow: 0 12px 30px rgba(122, 78, 34, 0.15);
 }
 
 .pillar-icon-wrap {
   width: 56px;
   height: 56px;
   border-radius: 12px;
-  background: rgba(0, 168, 150, 0.15);
+  background: rgba(122, 78, 34, 0.15);
   color: var(--vd-teal-light);
   display: flex;
   align-items: center;
@@ -477,7 +477,7 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
 
 .pillar-card p {
   font-size: 0.8rem;
-  color: #94A3B8;
+  color: #BCA88F;
   line-height: 1.45;
 }
 
@@ -520,13 +520,13 @@ ECHOSPACES REFERENCE & NEW V-DESK NAVY + TEAL COMPONENTS
   gap: 8px;
   background: var(--vd-navy-deep);
   color: #FFFFFF;
-  border: 1px solid rgba(0, 168, 150, 0.4);
+  border: 1px solid rgba(122, 78, 34, 0.4);
   padding: 10px 16px;
   border-radius: 9999px;
   font-weight: 600;
   font-size: 0.82rem;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(15, 59, 96, 0.25);
+  box-shadow: 0 6px 20px rgba(88, 56, 26, 0.25);
   transition: all var(--transition-smooth);
 }
 

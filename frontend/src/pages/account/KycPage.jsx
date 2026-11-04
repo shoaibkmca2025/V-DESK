@@ -70,13 +70,13 @@ export default function KycPage() {
         ]}
       />
 
-      <section className="section" style={{ padding: '60px 0', background: '#F8FAFC' }}>
+      <section className="section" style={{ padding: '60px 0', background: '#FBF5EA' }}>
         <div className="container" style={{ maxWidth: '980px' }}>
           {submitted ? (
-            <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '40px', textAlign: 'center' }}>
+            <div style={{ background: '#FFFFFF', border: '1px solid #ECDFC9', borderRadius: '16px', padding: '40px', textAlign: 'center' }}>
               <i className="ph-bold ph-seal-check" style={{ fontSize: '3rem', color: '#10B981' }} />
-              <h2 style={{ color: '#081D40', margin: '12px 0 6px' }}>Application Submitted</h2>
-              <p style={{ color: '#64748B', maxWidth: '520px', margin: '0 auto 22px' }}>Your dossier is with the compliance desk. You will receive a WhatsApp and email update once documents are approved; rejections always include the reason and a re-upload link.</p>
+              <h2 style={{ color: '#2B1A0C', margin: '12px 0 6px' }}>Application Submitted</h2>
+              <p style={{ color: '#8A7560', maxWidth: '520px', margin: '0 auto 22px' }}>Your dossier is with the compliance desk. You will receive a WhatsApp and email update once documents are approved; rejections always include the reason and a re-upload link.</p>
               <div className="booking-state-stepper" style={{ display: 'flex', justifyContent: 'center', gap: '14px', marginBottom: '24px' }}>
                 {STAGES.map((s, i) => (
                   <span key={s} className={`kyc-status-badge ${i < 2 ? 'verified' : ''}`}>
@@ -96,7 +96,7 @@ export default function KycPage() {
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr minmax(240px, 300px)', gap: '24px', alignItems: 'start' }} className="kyc-layout">
-              <div className="kyc-doc-uploader" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '24px' }}>
+              <div className="kyc-doc-uploader" style={{ background: '#FFFFFF', border: '1px solid #ECDFC9', borderRadius: '16px', padding: '24px' }}>
                 <div className="kyc-doc-list">
                   {DOCUMENTS.map(([key, icon, label, hint, required], index) => (
                     <div key={key} className="kyc-doc-row">
@@ -122,7 +122,7 @@ export default function KycPage() {
                     </div>
                   ))}
                 </div>
-                <label style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginTop: '20px', fontSize: '0.86rem', color: '#334155' }}>
+                <label style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginTop: '20px', fontSize: '0.86rem', color: '#574434' }}>
                   <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} style={{ marginTop: '3px' }} />
                   <span>
                     I authorise V-DESK Workspace & Consulting LLP to verify these documents with statutory authorities and issue the rent agreement, NOC and utility bill in my entity's name. See the <Link to="/legal/privacy">Privacy Policy</Link>.
@@ -133,13 +133,13 @@ export default function KycPage() {
                   Submit KYC Application →
                 </button>
               </div>
-              <aside style={{ background: '#081D40', borderRadius: '16px', padding: '22px', color: '#FFF', position: 'sticky', top: '100px' }}>
-                <strong style={{ color: '#DFB15B', fontSize: '0.78rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Progress</strong>
+              <aside style={{ background: '#2B1A0C', borderRadius: '16px', padding: '22px', color: '#FFF', position: 'sticky', top: '100px' }}>
+                <strong style={{ color: '#D9A858', fontSize: '0.78rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Progress</strong>
                 <div style={{ fontSize: '2rem', fontWeight: '800', margin: '6px 0' }}>{progress}%</div>
                 <div style={{ height: '8px', background: 'rgba(255,255,255,0.12)', borderRadius: '6px', overflow: 'hidden', marginBottom: '18px' }}>
-                  <div style={{ width: `${progress}%`, height: '100%', background: '#C59239', transition: 'width 0.3s' }} />
+                  <div style={{ width: `${progress}%`, height: '100%', background: '#B8832F', transition: 'width 0.3s' }} />
                 </div>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.84rem', lineHeight: '1.9', color: '#CBD5E1' }}>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.84rem', lineHeight: '1.9', color: '#D9C4A3' }}>
                   <li>
                     <i className="ph-bold ph-check-circle" style={{ color: '#10B981' }} /> Accepted: PDF, JPG, PNG (max 5 MB)
                   </li>

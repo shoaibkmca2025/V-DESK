@@ -363,14 +363,14 @@ export default function AuthPage({ mode }) {
                   {isLogin ? (
                     <>
                       New to V-DESK?{' '}
-                      <Link to="/register" style={{ color: '#DFB15B', fontWeight: '700' }}>
+                      <Link to="/register" style={{ color: '#D9A858', fontWeight: '700' }}>
                         Create an account
                       </Link>
                     </>
                   ) : (
                     <>
                       Already registered?{' '}
-                      <Link to="/login" style={{ color: '#DFB15B', fontWeight: '700' }}>
+                      <Link to="/login" style={{ color: '#D9A858', fontWeight: '700' }}>
                         Sign in
                       </Link>
                     </>

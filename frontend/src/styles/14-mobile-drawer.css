@@ -5,7 +5,7 @@
   display: block !important;
   width: 20px !important;
   height: 2px !important;
-  background: var(--vd-navy-deep, #0B1B33) !important;
+  background: var(--vd-navy-deep, #241509) !important;
   border-radius: 2px !important;
   transition: transform 0.25s ease, opacity 0.25s ease !important;
 }
@@ -13,9 +13,9 @@
 .mobile-nav-toggle {
   display: none;
   background: #FFFFFF !important;
-  border: 1px solid var(--vd-border-soft, #E2E8F0) !important;
+  border: 1px solid var(--vd-border-soft, #ECDFC9) !important;
   border-radius: 8px !important;
-  box-shadow: 0 1px 3px rgba(11, 27, 51, 0.06) !important;
+  box-shadow: 0 1px 3px rgba(36, 21, 9, 0.06) !important;
   padding: 0 !important;
   width: 42px !important;
   height: 42px !important;

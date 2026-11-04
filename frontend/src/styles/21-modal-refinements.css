@@ -5,7 +5,7 @@
 /* Universal Modal Backdrop & Card Core */
 .modal-overlay {
   z-index: 99999 !important;
-  background: rgba(5, 19, 43, 0.75) !important;
+  background: rgba(27, 16, 6, 0.75) !important;
   backdrop-filter: blur(10px) !important;
   -webkit-backdrop-filter: blur(10px) !important;
 }
@@ -13,7 +13,7 @@
 .modal-card {
   max-height: 92vh !important;
   border-radius: 16px !important;
-  box-shadow: 0 30px 80px rgba(5, 19, 43, 0.45) !important;
+  box-shadow: 0 30px 80px rgba(27, 16, 6, 0.45) !important;
   overflow-y: auto !important;
 }
 
@@ -22,21 +22,21 @@
   max-width: 720px !important;
   width: 100% !important;
   background: #FFFFFF !important;
-  border: 1px solid rgba(197, 146, 57, 0.25) !important;
+  border: 1px solid rgba(184, 131, 47, 0.25) !important;
 }
 
 .modal-card--customer-portal {
   max-width: 1060px !important;
   width: 95vw !important;
   background: #FFFFFF !important;
-  border: 1px solid rgba(197, 146, 57, 0.25) !important;
+  border: 1px solid rgba(184, 131, 47, 0.25) !important;
 }
 
 .modal-card--full-admin {
   max-width: 1260px !important;
   width: 96vw !important;
-  background: #05132B !important;
-  border: 1px solid rgba(197, 146, 57, 0.3) !important;
+  background: #1B1006 !important;
+  border: 1px solid rgba(184, 131, 47, 0.3) !important;
   color: #FFFFFF !important;
 }
 
@@ -44,7 +44,7 @@
   max-width: 1260px !important;
   width: 96vw !important;
   background: #FFFFFF !important;
-  border: 1px solid rgba(197, 146, 57, 0.25) !important;
+  border: 1px solid rgba(184, 131, 47, 0.25) !important;
 }
 
 .modal-card--kyc {
@@ -56,9 +56,9 @@
 /* Header Contrast Fixes: White on Navy */
 .modal-card--full-explorer .modal-card__header,
 .modal-card--customer-portal .modal-card__header {
-  background: linear-gradient(135deg, #05132B 0%, #081D40 100%) !important;
+  background: linear-gradient(135deg, #1B1006 0%, #2B1A0C 100%) !important;
   padding: 1.25rem 1.75rem !important;
-  border-bottom: 2px solid #C59239 !important;
+  border-bottom: 2px solid #B8832F !important;
   border-radius: 16px 16px 0 0 !important;
 }
 
@@ -72,7 +72,7 @@
 
 .modal-card--full-explorer .explorer-badge,
 .modal-card--customer-portal .portal-badge {
-  color: #C59239 !important;
+  color: #B8832F !important;
   font-weight: 600 !important;
   font-size: 0.8rem !important;
   letter-spacing: 0.05em !important;
@@ -118,8 +118,8 @@
 }
 
 .modal-card--full-admin .admin-tab-btn.active {
-  color: #C59239 !important;
-  border-bottom-color: #C59239 !important;
+  color: #B8832F !important;
+  border-bottom-color: #B8832F !important;
 }
 
 /* Booking State Stepper */
@@ -127,8 +127,8 @@
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  background: #F8FAFC !important;
-  border: 1px solid #E2E8F0 !important;
+  background: #FBF5EA !important;
+  border: 1px solid #ECDFC9 !important;
   border-radius: 12px !important;
   padding: 0.75rem 1.25rem !important;
   margin: 1.25rem 0 !important;
@@ -141,7 +141,7 @@
   gap: 0.5rem !important;
   font-size: 0.82rem !important;
   font-weight: 600 !important;
-  color: #64748B !important;
+  color: #8A7560 !important;
   white-space: nowrap !important;
 }
 
@@ -152,19 +152,19 @@
   width: 24px !important;
   height: 24px !important;
   border-radius: 50% !important;
-  background: #E2E8F0 !important;
-  color: #475569 !important;
+  background: #ECDFC9 !important;
+  color: #6E5A46 !important;
   font-size: 0.75rem !important;
   font-weight: 700 !important;
 }
 
 .state-step.active {
-  color: #081D40 !important;
+  color: #2B1A0C !important;
   font-weight: 700 !important;
 }
 
 .state-step.active span {
-  background: #081D40 !important;
+  background: #2B1A0C !important;
   color: #FFFFFF !important;
 }
 
@@ -178,7 +178,7 @@
 }
 
 .state-step-arrow {
-  color: #CBD5E1 !important;
+  color: #D9C4A3 !important;
   font-weight: 700 !important;
   font-size: 0.9rem !important;
 }
@@ -224,17 +224,17 @@
 
 /* KYC Dropzone */
 .kyc-upload-box {
-  border: 2px dashed #CBD5E1;
+  border: 2px dashed #D9C4A3;
   border-radius: 12px;
   padding: 1.5rem;
   text-align: center;
-  background: #F8FAFC;
+  background: #FBF5EA;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .kyc-upload-box:hover {
-  border-color: #00A896;
+  border-color: #7A4E22;
   background: #F0FDF4;
 }
 
@@ -244,7 +244,7 @@
   justify-content: space-between;
   padding: 1rem;
   background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #ECDFC9;
   border-radius: 10px;
   margin-bottom: 0.75rem;
 }

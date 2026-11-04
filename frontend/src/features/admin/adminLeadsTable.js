@@ -28,11 +28,11 @@ export function renderAdminLeads() {
       (l) => `
     <tr>
       <td>${new Date(l.createdAt).toLocaleDateString('en-IN')}</td>
-      <td><strong style="color:var(--vd-zinc-200, #FFF);">${escapeHtml(l.name)}</strong><br><span style="font-size:0.75rem; color:#94A3B8;">${escapeHtml(l.mobile)} • ${escapeHtml(l.email)}</span></td>
-      <td>${escapeHtml(l.city)}<br><span style="font-size:0.75rem; color:var(--vd-gold-primary, #C59239);">${escapeHtml(l.service)}</span></td>
-      <td><span style="font-size:0.75rem; color:#94A3B8;">${escapeHtml(l.source || '—')}</span></td>
+      <td><strong style="color:var(--vd-zinc-200, #FFF);">${escapeHtml(l.name)}</strong><br><span style="font-size:0.75rem; color:#BCA88F;">${escapeHtml(l.mobile)} • ${escapeHtml(l.email)}</span></td>
+      <td>${escapeHtml(l.city)}<br><span style="font-size:0.75rem; color:var(--vd-gold-primary, #B8832F);">${escapeHtml(l.service)}</span></td>
+      <td><span style="font-size:0.75rem; color:#BCA88F;">${escapeHtml(l.source || '—')}</span></td>
       <td>
-        <select ${changeAction('updateLeadStatus', l.id)} style="background:#05132B; color:#FFF; border:1px solid rgba(255,255,255,0.2); border-radius:4px; padding:3px 6px; font-size:0.75rem;">
+        <select ${changeAction('updateLeadStatus', l.id)} style="background:#1B1006; color:#FFF; border:1px solid rgba(255,255,255,0.2); border-radius:4px; padding:3px 6px; font-size:0.75rem;">
           ${statusOptions(l)}
         </select>
       </td>

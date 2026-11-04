@@ -58,11 +58,11 @@ export default function MeetingRoomsPage() {
                       <td>
                         <strong>{room.name}</strong>
                         <br />
-                        <span style={{ color: '#64748B', fontSize: '0.8rem' }}>{room.capacity}</span>
+                        <span style={{ color: '#8A7560', fontSize: '0.8rem' }}>{room.capacity}</span>
                       </td>
                       <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                         <strong>₹{room.priceHour.toLocaleString('en-IN')}</strong>
-                        <span style={{ color: '#64748B', fontSize: '0.8rem' }}> /hr</span>
+                        <span style={{ color: '#8A7560', fontSize: '0.8rem' }}> /hr</span>
                       </td>
                     </tr>
                   ))}

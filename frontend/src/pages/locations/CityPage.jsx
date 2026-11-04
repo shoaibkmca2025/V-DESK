@@ -55,11 +55,11 @@ export default function CityPage() {
               {CITY_PRODUCTS.map((product) => {
                 const price = cityStartingPrice(city, product);
                 return (
-                  <Link key={product.slug} to={`/locations/${city.slug}/${product.slug}`} className="spotlight-card" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '14px', padding: '24px', display: 'block', boxShadow: '0 10px 25px rgba(0,0,0,0.04)' }}>
-                    <i className={`ph-bold ${product.icon}`} style={{ fontSize: '1.6rem', color: '#C59239' }} />
-                    <h3 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#081D40', margin: '12px 0 6px 0' }}>{product.name}</h3>
-                    <p style={{ fontSize: '0.84rem', color: '#64748B', lineHeight: '1.5', margin: '0 0 12px 0' }}>{product.blurb}</p>
-                    <strong style={{ color: '#081D40' }}>{price ? `From ₹${price.toLocaleString('en-IN')}${product.unit}` : 'Price on request'}</strong>
+                  <Link key={product.slug} to={`/locations/${city.slug}/${product.slug}`} className="spotlight-card" style={{ background: '#FFFFFF', border: '1px solid #ECDFC9', borderRadius: '14px', padding: '24px', display: 'block', boxShadow: '0 10px 25px rgba(0,0,0,0.04)' }}>
+                    <i className={`ph-bold ${product.icon}`} style={{ fontSize: '1.6rem', color: '#B8832F' }} />
+                    <h3 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#2B1A0C', margin: '12px 0 6px 0' }}>{product.name}</h3>
+                    <p style={{ fontSize: '0.84rem', color: '#8A7560', lineHeight: '1.5', margin: '0 0 12px 0' }}>{product.blurb}</p>
+                    <strong style={{ color: '#2B1A0C' }}>{price ? `From ₹${price.toLocaleString('en-IN')}${product.unit}` : 'Price on request'}</strong>
                   </Link>
                 );
               })}
@@ -67,7 +67,7 @@ export default function CityPage() {
           </div>
         </section>
 
-        <section className="section" style={{ padding: '70px 0', background: '#F8FAFC' }}>
+        <section className="section" style={{ padding: '70px 0', background: '#FBF5EA' }}>
           <div className="container">
             <SectionHeader eyebrow="Verified Centres" title={`Business centres in ${city.name}`} description={centres.length ? 'Every centre holds a registered commercial lease, municipal tax receipt and utility bill for statutory use.' : `We are onboarding partner centres in ${city.name}. Request a quote and our team will confirm availability within a working day.`} />
             {centres.length > 0 ? (
@@ -104,7 +104,7 @@ export default function CityPage() {
           </section>
         )}
 
-        <section className="section" style={{ padding: '60px 0', background: '#F8FAFC' }}>
+        <section className="section" style={{ padding: '60px 0', background: '#FBF5EA' }}>
           <div className="container">
             <SectionHeader eyebrow="Localities" title={`Areas we cover in ${city.name}`} />
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginTop: '24px' }}>

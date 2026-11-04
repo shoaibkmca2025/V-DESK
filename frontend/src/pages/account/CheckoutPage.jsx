@@ -63,16 +63,16 @@ export default function CheckoutPage() {
         </div>
       </section>
 
-      <section className="section" style={{ padding: '56px 0', background: '#F8FAFC' }}>
+      <section className="section" style={{ padding: '56px 0', background: '#FBF5EA' }}>
         <div className="container" style={{ maxWidth: '1040px' }}>
           {done ? (
-            <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '40px', textAlign: 'center' }}>
+            <div style={{ background: '#FFFFFF', border: '1px solid #ECDFC9', borderRadius: '16px', padding: '40px', textAlign: 'center' }}>
               <i className="ph-bold ph-check-circle" style={{ fontSize: '3rem', color: '#10B981' }} />
-              <h2 style={{ color: '#081D40', margin: '12px 0 6px' }}>Payment Successful</h2>
-              <p style={{ color: '#64748B', margin: '0 0 6px' }}>
+              <h2 style={{ color: '#2B1A0C', margin: '12px 0 6px' }}>Payment Successful</h2>
+              <p style={{ color: '#8A7560', margin: '0 0 6px' }}>
                 Invoice <strong>{done.invoiceNo}</strong> • {rupees(amount)} paid for {item}
               </p>
-              <p style={{ color: '#64748B', maxWidth: '520px', margin: '0 auto 22px' }}>Next step: complete Digital KYC so we can issue your documents. Activation is confirmed once payment and KYC are both complete.</p>
+              <p style={{ color: '#8A7560', maxWidth: '520px', margin: '0 auto 22px' }}>Next step: complete Digital KYC so we can issue your documents. Activation is confirmed once payment and KYC are both complete.</p>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <button className="btn btn--gold" onClick={() => navigate('/kyc')}>
                   Complete KYC <i className="ph-bold ph-arrow-right" />
@@ -87,7 +87,7 @@ export default function CheckoutPage() {
             </div>
           ) : (
             <div className="checkout-layout" style={{ display: 'grid', gridTemplateColumns: '1fr minmax(280px, 360px)', gap: '24px', alignItems: 'start' }}>
-              <div className="checkout-methods" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '24px' }}>
+              <div className="checkout-methods" style={{ background: '#FFFFFF', border: '1px solid #ECDFC9', borderRadius: '16px', padding: '24px' }}>
                 <div className="checkout-tabs">
                   {METHODS.map(([key, icon, label]) => (
                     <button key={key} type="button" className={method === key ? 'pay-tab active' : 'pay-tab'} onClick={() => setMethod(key)}>
@@ -153,33 +153,33 @@ export default function CheckoutPage() {
                     </button>
                   </div>
                 )}
-                <p style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '16px' }}>
+                <p style={{ fontSize: '0.78rem', color: '#8A7560', marginTop: '16px' }}>
                   <i className="ph-bold ph-shield-check" style={{ color: '#10B981' }} /> Payments are processed by a PCI-DSS compliant gateway. V-DESK never stores card details. By paying you accept the <Link to="/legal/terms">Terms</Link> and <Link to="/legal/refund-policy">Refund Policy</Link>.
                 </p>
               </div>
 
-              <aside ref={rawStyle('background: #081D40; border-radius: 16px; padding: 24px; color: #FFF; position: sticky; top: 100px;')}>
-                <strong style={{ color: '#DFB15B', fontSize: '0.78rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Order Summary</strong>
+              <aside ref={rawStyle('background: #2B1A0C; border-radius: 16px; padding: 24px; color: #FFF; position: sticky; top: 100px;')}>
+                <strong style={{ color: '#D9A858', fontSize: '0.78rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Order Summary</strong>
                 <h3 style={{ color: '#FFF', fontSize: '1.05rem', margin: '10px 0 4px', lineHeight: '1.4' }}>{item}</h3>
-                <span style={{ display: 'block', color: '#CBD5E1', fontSize: '0.84rem', margin: '0 0 18px' }}>
+                <span style={{ display: 'block', color: '#D9C4A3', fontSize: '0.84rem', margin: '0 0 18px' }}>
                   {city}
                   {hub ? ` • ${hub}` : ''}
                 </span>
                 <div style={{ display: 'grid', gap: '8px', fontSize: '0.9rem', borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: '14px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#CBD5E1' }}>Subtotal</span>
+                    <span style={{ color: '#D9C4A3' }}>Subtotal</span>
                     <span>{rupees(base)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#CBD5E1' }}>GST (18%)</span>
+                    <span style={{ color: '#D9C4A3' }}>GST (18%)</span>
                     <span>{rupees(gst)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.25rem', fontWeight: '800', borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: '10px', marginTop: '4px' }}>
                     <span>Total</span>
-                    <span style={{ color: '#DFB15B' }}>{rupees(amount)}</span>
+                    <span style={{ color: '#D9A858' }}>{rupees(amount)}</span>
                   </div>
                 </div>
-                <ul style={{ listStyle: 'none', padding: 0, margin: '18px 0 0', fontSize: '0.8rem', color: '#CBD5E1', lineHeight: '1.9' }}>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '18px 0 0', fontSize: '0.8rem', color: '#D9C4A3', lineHeight: '1.9' }}>
                   <li>✓ GST tax invoice with input credit</li>
                   <li>✓ 100% refund if application rejected due to our documents</li>
                   <li>✓ Activation after payment + KYC</li>

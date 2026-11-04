@@ -66,9 +66,9 @@ export default function CityWorkspacesPage() {
           ]}
         />
 
-        <section className="section" style={{ padding: '60px 0', background: '#F8FAFC' }}>
+        <section className="section" style={{ padding: '60px 0', background: '#FBF5EA' }}>
           <div className="container">
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', justifyContent: 'space-between', background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '14px', padding: '16px 20px', marginBottom: '28px' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', justifyContent: 'space-between', background: '#FFFFFF', border: '1px solid #ECDFC9', borderRadius: '14px', padding: '16px 20px', marginBottom: '28px' }}>
               <div className="cw-amenities-filters" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                 {TYPES.map((t) => (
                   <button key={t} type="button" className={t === type ? 'cw-filter-pill active' : 'cw-filter-pill'} onClick={() => setType(t)}>
@@ -93,8 +93,8 @@ export default function CityWorkspacesPage() {
               </div>
             </div>
 
-            <p style={{ color: '#64748B', fontSize: '0.9rem', marginBottom: '20px' }}>
-              Showing <strong style={{ color: '#081D40' }}>{list.length}</strong> of {all.length} workspaces in {city.name}
+            <p style={{ color: '#8A7560', fontSize: '0.9rem', marginBottom: '20px' }}>
+              Showing <strong style={{ color: '#2B1A0C' }}>{list.length}</strong> of {all.length} workspaces in {city.name}
             </p>
 
             {list.length > 0 ? (
@@ -104,10 +104,10 @@ export default function CityWorkspacesPage() {
                 ))}
               </div>
             ) : (
-              <div style={{ textAlign: 'center', padding: '48px 20px', background: '#FAF8F3', border: '1px dashed #C59239', borderRadius: '12px' }}>
-                <i className="ph-bold ph-buildings" style={{ fontSize: '2.5rem', color: '#C59239', display: 'block', marginBottom: '12px' }} />
-                <h3 style={{ color: '#081D40', margin: '0 0 8px 0' }}>We couldn't find an exact match</h3>
-                <p style={{ color: '#64748B', maxWidth: '480px', margin: '0 auto 16px auto' }}>Over 50 partner spaces in {city.name} are available on request. Tell us your team size and we will shortlist options within a working day.</p>
+              <div style={{ textAlign: 'center', padding: '48px 20px', background: '#FBF4E7', border: '1px dashed #B8832F', borderRadius: '12px' }}>
+                <i className="ph-bold ph-buildings" style={{ fontSize: '2.5rem', color: '#B8832F', display: 'block', marginBottom: '12px' }} />
+                <h3 style={{ color: '#2B1A0C', margin: '0 0 8px 0' }}>We couldn't find an exact match</h3>
+                <p style={{ color: '#8A7560', maxWidth: '480px', margin: '0 auto 16px auto' }}>Over 50 partner spaces in {city.name} are available on request. Tell us your team size and we will shortlist options within a working day.</p>
                 <button className="btn btn--primary btn--sm" onClick={() => openQuoteModal(`Custom Workspace Search: ${city.name}`)}>
                   Talk to a V-DESK Expert
                 </button>

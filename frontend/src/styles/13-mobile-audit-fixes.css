@@ -38,7 +38,7 @@
     height: 40px !important;
     padding: 0 !important;
     background: #FFFFFF !important;
-    border: 1px solid var(--vd-border-soft, #E2E8F0) !important;
+    border: 1px solid var(--vd-border-soft, #ECDFC9) !important;
     border-radius: var(--radius-sm, 6px) !important;
     cursor: pointer !important;
   }
@@ -125,7 +125,7 @@
   }
   .trust-strip__item {
     padding: 12px 0 !important;
-    border-bottom: 1px dashed var(--vd-border-soft, #E2E8F0) !important;
+    border-bottom: 1px dashed var(--vd-border-soft, #ECDFC9) !important;
   }
   .trust-strip__item:last-child {
     border-bottom: none !important;

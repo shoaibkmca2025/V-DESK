@@ -39,7 +39,7 @@ export default function ResourcesPage() {
         }
       />
 
-      <section className="section" style={{ padding: '60px 0', background: '#F8FAFC' }}>
+      <section className="section" style={{ padding: '60px 0', background: '#FBF5EA' }}>
         <div className="container">
           <div className="cw-amenities-filters" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center', marginBottom: '32px' }}>
             {GUIDE_CATEGORIES.map((c) => (
@@ -50,21 +50,21 @@ export default function ResourcesPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
             {list.map((guide) => (
-              <article key={guide.slug} className="knowledge__card spotlight-card" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '14px', padding: '26px', display: 'flex', flexDirection: 'column', boxShadow: '0 10px 25px rgba(0,0,0,0.04)' }}>
+              <article key={guide.slug} className="knowledge__card spotlight-card" style={{ background: '#FFFFFF', border: '1px solid #ECDFC9', borderRadius: '14px', padding: '26px', display: 'flex', flexDirection: 'column', boxShadow: '0 10px 25px rgba(0,0,0,0.04)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(197,146,57,0.12)', color: '#C59239', fontSize: '0.72rem', fontWeight: '700', padding: '4px 10px', borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(184,131,47,0.12)', color: '#B8832F', fontSize: '0.72rem', fontWeight: '700', padding: '4px 10px', borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     <i className={`ph-bold ${CATEGORY_ICON[guide.category]}`} /> {guide.category}
                   </span>
-                  <span style={{ fontSize: '0.78rem', color: '#64748B' }}>{guide.readTime} min read</span>
+                  <span style={{ fontSize: '0.78rem', color: '#8A7560' }}>{guide.readTime} min read</span>
                 </div>
-                <h3 style={{ fontSize: '1.12rem', fontWeight: '700', color: '#081D40', margin: '0 0 10px 0', lineHeight: '1.35' }}>
+                <h3 style={{ fontSize: '1.12rem', fontWeight: '700', color: '#2B1A0C', margin: '0 0 10px 0', lineHeight: '1.35' }}>
                   <Link to={`/resources/${guide.slug}`} style={{ color: 'inherit' }}>
                     {guide.title}
                   </Link>
                 </h3>
-                <p style={{ fontSize: '0.88rem', color: '#64748B', lineHeight: '1.6', margin: '0 0 18px 0', flexGrow: 1 }}>{guide.excerpt}</p>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #F1F5F9', paddingTop: '14px' }}>
-                  <span style={{ fontSize: '0.78rem', color: '#64748B' }}>{formatDate(guide.date)}</span>
+                <p style={{ fontSize: '0.88rem', color: '#8A7560', lineHeight: '1.6', margin: '0 0 18px 0', flexGrow: 1 }}>{guide.excerpt}</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #F6ECDB', paddingTop: '14px' }}>
+                  <span style={{ fontSize: '0.78rem', color: '#8A7560' }}>{formatDate(guide.date)}</span>
                   <Link to={`/resources/${guide.slug}`} className="btn btn--ghost btn--sm">
                     Read Guide <i className="ph-bold ph-arrow-right" />
                   </Link>

@@ -5,7 +5,7 @@ import { asset } from '@/lib/assets.js';
 import { rawStyle } from '@/lib/domRefs.js';
 
 const BODY_STYLE =
-  "background: #05132B; color: #FFFFFF; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: 'Inter', sans-serif; text-align: center; padding: 20px;";
+  "background: #1B1006; color: #FFFFFF; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: 'Inter', sans-serif; text-align: center; padding: 20px;";
 
 /** Friendly aliases for mistyped or shortened URLs (e.g. /coworking → /coworking-spaces). */
 const ROUTE_ALIASES = {
@@ -43,7 +43,7 @@ export default function NotFoundPage() {
   return (
     <div
       ref={rawStyle(
-        'max-width: 620px; background: #081D40; border: 1px solid rgba(197, 146, 57, 0.3); border-radius: 20px; padding: 48px 36px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);',
+        'max-width: 620px; background: #2B1A0C; border: 1px solid rgba(184, 131, 47, 0.3); border-radius: 20px; padding: 48px 36px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);',
       )}
     >
       <Link to="/" style={{ display: 'inline-block', marginBottom: '24px' }}>
@@ -57,7 +57,7 @@ export default function NotFoundPage() {
         style={{
           fontSize: '5rem',
           fontWeight: '800',
-          color: '#C59239',
+          color: '#B8832F',
           lineHeight: '1',
           marginBottom: '12px',
           letterSpacing: '-0.03em',
@@ -66,14 +66,14 @@ export default function NotFoundPage() {
         404
       </div>
       <h1 style={{ fontSize: '1.6rem', color: '#FFFFFF', margin: '0 0 12px 0' }}>Commercial Destination Not Found</h1>
-      <p style={{ fontSize: '0.95rem', color: '#94A3B8', lineHeight: '1.6', margin: '0 0 28px 0' }}>
+      <p style={{ fontSize: '0.95rem', color: '#BCA88F', lineHeight: '1.6', margin: '0 0 28px 0' }}>
         The requested workspace route or document URL has moved, been archived, or requires verified portal access.
       </p>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center', marginBottom: '28px' }}>
         <Link
           to="/"
           className="btn btn--primary"
-          style={{ background: '#C59239', color: '#05132B', borderColor: '#C59239', fontWeight: '700' }}
+          style={{ background: '#B8832F', color: '#1B1006', borderColor: '#B8832F', fontWeight: '700' }}
         >
           <i className="ph-bold ph-house" />
           Return to Homepage
@@ -104,7 +104,7 @@ export default function NotFoundPage() {
           borderTop: '1px solid rgba(255,255,255,0.1)',
           paddingTop: '18px',
           fontSize: '0.8rem',
-          color: '#64748B',
+          color: '#8A7560',
         }}
       >
         Need immediate assistance?{' '}

@@ -48,7 +48,7 @@ function renderCommandPaletteItems() {
 
   if (!filteredItems.length) {
     container.innerHTML = `
-      <div style="padding: 28px 16px; text-align: center; color: var(--vd-text-muted, #5A6270);">
+      <div style="padding: 28px 16px; text-align: center; color: var(--vd-text-muted, #7D6A56);">
         <i class="ph-bold ph-magnifying-glass" style="font-size: 1.8rem; margin-bottom: 8px; opacity: 0.5;"></i>
         <div>No matching workspaces or services found</div>
         <small style="font-size: 0.78rem;">Try searching 'Mumbai', 'Coworking', 'GST', or 'Calculator'</small>

@@ -120,18 +120,18 @@ const ICONS = {
  * mistaken for a button.
  */
 export const CITY_COLOURS = {
-  mumbai: ['#1F6FB2', '#0C3C6B'],
+  mumbai: ['#C89A3C', '#7A5A14'],
   delhi: ['#C0563B', '#7A2E1E'],
-  gurgaon: ['#4E62B8', '#28306E'],
-  noida: ['#2E8C7E', '#14514A'],
-  bangalore: ['#3E8F4E', '#1C5130'],
-  pune: ['#8A5BB0', '#4A2A6B'],
-  hyderabad: ['#B07A2E', '#6B4415'],
-  nashik: ['#3F7FA6', '#1D4660'],
+  gurgaon: ['#8A6038', '#4A3119'],
+  noida: ['#8E8034', '#4C4316'],
+  bangalore: ['#6F7A33', '#3A4117'],
+  pune: ['#8D5747', '#4F2C22'],
+  hyderabad: ['#9A6B2E', '#5A3B12'],
+  nashik: ['#7E6A4E', '#453824'],
   chennai: ['#B2563F', '#6E2F20'],
 };
 
-export const colourFor = (slug) => CITY_COLOURS[slug] ?? ['#2A4A74', '#122A49'];
+export const colourFor = (slug) => CITY_COLOURS[slug] ?? ['#58381A', '#33200F'];
 
 /** Landmark icon for a city slug; falls back to a generic building. */
 export default function CityIcon({ slug }) {

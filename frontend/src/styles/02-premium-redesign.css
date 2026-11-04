@@ -12,26 +12,26 @@
 :root {
   /* Master White Theme Mappings (Eliminates All Invisible Text & Enforces Exact Palette) */
   --vd-black: #FFFFFF;          /* Backgrounds become white */
-  --vd-white: #0B2348;          /* Headings & prominent text become deep navy */
-  --vd-slate: #F8FAFC;          /* Secondary background & card base */
-  --vd-slate-light: #F1F5F9;    /* Soft cream warmth */
-  --vd-zinc-50: #0B2348;
-  --vd-zinc-100: #0B2348;
-  --vd-zinc-200: #0B2348;       /* Subheadings & strong labels become deep navy */
-  --vd-zinc-300: #1A1A1A;       /* Primary body text becomes dark charcoal */
-  --vd-zinc-400: #2D3748;       /* Descriptions become crisp dark slate */
-  --vd-zinc-500: #5A6270;       /* Secondary/muted text */
-  --vd-zinc-600: #718096;
+  --vd-white: #2E1C0D;          /* Headings & prominent text become deep navy */
+  --vd-slate: #FBF5EA;          /* Secondary background & card base */
+  --vd-slate-light: #F6ECDB;    /* Soft cream warmth */
+  --vd-zinc-50: #2E1C0D;
+  --vd-zinc-100: #2E1C0D;
+  --vd-zinc-200: #2E1C0D;       /* Subheadings & strong labels become deep navy */
+  --vd-zinc-300: #241A12;       /* Primary body text becomes dark charcoal */
+  --vd-zinc-400: #4A3A28;       /* Descriptions become crisp dark slate */
+  --vd-zinc-500: #7D6A56;       /* Secondary/muted text */
+  --vd-zinc-600: #94806A;
   --vd-zinc-700: #CBD5E0;
   --vd-zinc-800: #EDF2F7;       /* Form node & track backgrounds */
-  --vd-zinc-900: #F8FAFC;
+  --vd-zinc-900: #FBF5EA;
 
   /* Exact Brand Gold */
-  --vd-accent: #00A896;
-  --vd-accent-warm: #02C39A;
-  --vd-accent-dark: #9E6C1C;
-  --vd-accent-glow: rgba(0, 168, 150, 0.22);
-  --vd-accent-subtle: rgba(0, 168, 150, 0.08);
+  --vd-accent: #7A4E22;
+  --vd-accent-warm: #A06C33;
+  --vd-accent-dark: #8A5F18;
+  --vd-accent-glow: rgba(122, 78, 34, 0.22);
+  --vd-accent-subtle: rgba(122, 78, 34, 0.08);
 
   /* Status */
   --vd-emerald: #059669;
@@ -56,18 +56,18 @@
   --space-section: clamp(4rem, 8vw, 6.5rem);
 
   /* Borders (Warm Architectural) */
-  --border-subtle: #E2E8F0;
+  --border-subtle: #ECDFC9;
   --border-light: #E2DACF;
   --border-medium: #D5CBC0;
-  --border-accent: rgba(0, 168, 150, 0.35);
-  --border-on-light: rgba(11, 35, 72, 0.10);
+  --border-accent: rgba(122, 78, 34, 0.35);
+  --border-on-light: rgba(46, 28, 13, 0.10);
 
   /* Shadows (Tuned for Luxury White Theme) */
-  --shadow-sm: 0 2px 6px rgba(11, 35, 72, 0.04);
-  --shadow-md: 0 6px 20px rgba(11, 35, 72, 0.06);
-  --shadow-lg: 0 12px 36px rgba(11, 35, 72, 0.08);
-  --shadow-xl: 0 20px 48px rgba(11, 35, 72, 0.12);
-  --shadow-glow: 0 0 24px rgba(0, 168, 150, 0.20);
+  --shadow-sm: 0 2px 6px rgba(46, 28, 13, 0.04);
+  --shadow-md: 0 6px 20px rgba(46, 28, 13, 0.06);
+  --shadow-lg: 0 12px 36px rgba(46, 28, 13, 0.08);
+  --shadow-xl: 0 20px 48px rgba(46, 28, 13, 0.12);
+  --shadow-glow: 0 0 24px rgba(122, 78, 34, 0.20);
   --shadow-card-hover: 0 20px 60px rgba(0,0,0,0.3);
 
   /* Radii */
@@ -667,8 +667,8 @@ ul, ol { list-style: none; }
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 20% 80%, rgba(0, 168, 150, 0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(0, 168, 150, 0.04) 0%, transparent 60%);
+    radial-gradient(ellipse 80% 60% at 20% 80%, rgba(122, 78, 34, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(122, 78, 34, 0.04) 0%, transparent 60%);
 }
 
 /* Grid pattern */
@@ -795,12 +795,12 @@ ul, ol { list-style: none; }
 
 .wizard__step-node:hover {
   transform: scale(1.12) !important;
-  border-color: var(--vd-teal-primary, #00A896) !important;
-  box-shadow: 0 4px 14px rgba(0, 168, 150, 0.3) !important;
+  border-color: var(--vd-teal-primary, #7A4E22) !important;
+  box-shadow: 0 4px 14px rgba(122, 78, 34, 0.3) !important;
 }
 
 .wizard__step-node:focus-visible {
-  outline: 2px solid var(--vd-teal-primary, #00A896);
+  outline: 2px solid var(--vd-teal-primary, #7A4E22);
   outline-offset: 3px;
 }
 
@@ -812,9 +812,9 @@ ul, ol { list-style: none; }
    8. TRUST STRIP (CREDIBILITY BENCHMARKS)
    -------------------------------------------------------------------------- */
 .trust-strip {
-  background: var(--vd-bg-primary, #FAF8F3);
-  border-top: 1px solid var(--vd-border-soft, #E8E2D8);
-  border-bottom: 1px solid var(--vd-border-soft, #E8E2D8);
+  background: var(--vd-bg-primary, #FBF4E7);
+  border-top: 1px solid var(--vd-border-soft, #ECDFC9);
+  border-bottom: 1px solid var(--vd-border-soft, #ECDFC9);
   padding: 3rem 0;
 }
 
@@ -827,10 +827,10 @@ ul, ol { list-style: none; }
 
 .trust-strip__item {
   background: var(--vd-bg-secondary, #FFFFFF);
-  border: 1px solid var(--vd-border-soft, #E8E2D8);
+  border: 1px solid var(--vd-border-soft, #ECDFC9);
   border-radius: var(--radius-md, 12px);
   padding: 1.5rem 1rem;
-  box-shadow: var(--shadow-subtle, 0 4px 20px rgba(11, 27, 51, 0.04));
+  box-shadow: var(--shadow-subtle, 0 4px 20px rgba(36, 21, 9, 0.04));
   transition: transform var(--transition-smooth, 300ms cubic-bezier(0.16, 1, 0.3, 1)),
               box-shadow var(--transition-smooth, 300ms cubic-bezier(0.16, 1, 0.3, 1)),
               border-color var(--transition-smooth, 300ms cubic-bezier(0.16, 1, 0.3, 1));
@@ -838,32 +838,32 @@ ul, ol { list-style: none; }
 
 .trust-strip__item:hover {
   transform: translateY(-4px);
-  border-color: var(--vd-teal-primary, #00A896);
-  box-shadow: var(--shadow-hover, 0 16px 40px rgba(11, 27, 51, 0.09));
+  border-color: var(--vd-teal-primary, #7A4E22);
+  box-shadow: var(--shadow-hover, 0 16px 40px rgba(36, 21, 9, 0.09));
 }
 
 .trust-strip__value {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(1.75rem, 3vw, 2.25rem);
-  color: var(--vd-navy-deep, #0B1B33);
+  color: var(--vd-navy-deep, #241509);
   line-height: 1.1;
 }
 
 .trust-strip__value .accent {
-  color: var(--vd-teal-primary, #00A896);
+  color: var(--vd-teal-primary, #7A4E22);
 }
 
 .trust-strip__label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--vd-navy-deep, #0B1B33);
+  color: var(--vd-navy-deep, #241509);
   margin-top: 0.5rem;
 }
 
 .trust-strip__sub {
   font-size: 0.725rem;
-  color: var(--vd-text-muted, #5A6270);
+  color: var(--vd-text-muted, #7D6A56);
   margin-top: 0.2rem;
 }
 
@@ -1415,9 +1415,9 @@ ul, ol { list-style: none; }
 }
 
 .location-card__status--limited {
-  background: rgba(234, 179, 8, 0.1);
-  color: #EAB308;
-  border: 1px solid rgba(234, 179, 8, 0.2);
+  background: rgba(184, 131, 47, 0.1);
+  color: #B8832F;
+  border: 1px solid rgba(184, 131, 47, 0.2);
 }
 
 .location-card__name {
@@ -2190,7 +2190,7 @@ ul, ol { list-style: none; }
   align-items: center;
   justify-content: center;
   gap: 6px;
-  color: var(--vd-teal-primary, #00A896);
+  color: var(--vd-teal-primary, #7A4E22);
   font-size: 1.25rem;
   margin-bottom: 1.5rem;
 }
@@ -2419,7 +2419,7 @@ ul, ol { list-style: none; }
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 60% 50% at 50% 100%, rgba(0, 168, 150, 0.08) 0%, transparent 60%);
+  background: radial-gradient(ellipse 60% 50% at 50% 100%, rgba(122, 78, 34, 0.08) 0%, transparent 60%);
 }
 
 .final-cta__title {

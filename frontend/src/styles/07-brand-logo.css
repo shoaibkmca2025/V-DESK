@@ -19,24 +19,24 @@
   width: 46px;
   height: 46px;
   border-radius: 10px;
-  background: radial-gradient(circle at center, #0b1e42 0%, #06152f 100%);
-  border: 1.5px solid rgba(0, 168, 150, 0.45);
+  background: radial-gradient(circle at center, #28180b 0%, #1f1208 100%);
+  border: 1.5px solid rgba(122, 78, 34, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 5px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 
-              0 0 14px rgba(0, 168, 150, 0.2), 
-              inset 0 0 8px rgba(0, 168, 150, 0.15);
+              0 0 14px rgba(122, 78, 34, 0.2), 
+              inset 0 0 8px rgba(122, 78, 34, 0.15);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
 }
 
 .header-logo:hover .header-logo__emblem-wrap {
-  border-color: #00A896;
+  border-color: #7A4E22;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7), 
-              0 0 20px rgba(0, 168, 150, 0.4), 
-              inset 0 0 12px rgba(0, 168, 150, 0.25);
+              0 0 20px rgba(122, 78, 34, 0.4), 
+              inset 0 0 12px rgba(122, 78, 34, 0.25);
   transform: scale(1.04);
 }
 
@@ -64,7 +64,7 @@
 }
 
 .header-logo__brand span {
-  background: linear-gradient(135deg, #ffffff 10%, #02C39A 50%, #00A896 100%);
+  background: linear-gradient(135deg, #ffffff 10%, #A06C33 50%, #7A4E22 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -74,7 +74,7 @@
   font-size: 0.66rem;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: #00A896;
+  color: #7A4E22;
   font-weight: 600;
   margin-top: 3px;
 }
@@ -84,11 +84,11 @@
   width: 42px;
   height: 42px;
   border-radius: 9px;
-  background: radial-gradient(circle at center, #0b1e42 0%, #06152f 100%);
-  border: 1.5px solid rgba(0, 168, 150, 0.4);
+  background: radial-gradient(circle at center, #28180b 0%, #1f1208 100%);
+  border: 1.5px solid rgba(122, 78, 34, 0.4);
   padding: 4px;
   object-fit: contain;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 168, 150, 0.2);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5), 0 0 10px rgba(122, 78, 34, 0.2);
 }
 
 /* Obsolete Footer Brand Harmony removed */

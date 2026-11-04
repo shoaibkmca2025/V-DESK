@@ -45,7 +45,7 @@ export default function MarketplaceSection() {
             </button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <label htmlFor="mpCitySelect" style={{ fontSize: '0.85rem', fontWeight: '600', color: '#CBD5E1' }}>
+            <label htmlFor="mpCitySelect" style={{ fontSize: '0.85rem', fontWeight: '600', color: '#D9C4A3' }}>
               <i className="ph-bold ph-map-pin" /> City:
             </label>
             <select
@@ -53,7 +53,7 @@ export default function MarketplaceSection() {
               className="form-select"
               onChange={(event) => filterMarketplaceCity(event.currentTarget.value)}
               ref={rawStyle(
-                'padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; background: #081D40; color: #FFF; border-color: rgba(197, 146, 57, 0.3);',
+                'padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; background: #2B1A0C; color: #FFF; border-color: rgba(184, 131, 47, 0.3);',
               )}
             >
               <option value="all">All Metros (Pan-India)</option>

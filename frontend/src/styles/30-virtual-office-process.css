@@ -4,7 +4,7 @@
 
 .vo-process-section {
   padding: 5rem 0;
-  background: #081D40;
+  background: #2B1A0C;
 }
 
 .vo-process-steps-grid {
@@ -16,7 +16,7 @@
 }
 
 .vo-process-step-card {
-  background: rgba(5, 19, 43, 0.7);
+  background: rgba(27, 16, 6, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 16px;
   padding: 2rem 1.75rem;
@@ -39,14 +39,14 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #00A896, #028090);
+  background: linear-gradient(135deg, #7A4E22, #6D4A24);
   color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.4rem;
   margin-bottom: 1.25rem;
-  box-shadow: 0 4px 15px rgba(0, 168, 150, 0.3);
+  box-shadow: 0 4px 15px rgba(122, 78, 34, 0.3);
 }
 
 .vo-process-step-card h3 {
@@ -59,7 +59,7 @@
 
 .vo-process-step-card p {
   font-size: 0.86rem;
-  color: #9DB2CF;
+  color: #C9B393;
   line-height: 1.55;
   margin: 0;
 }

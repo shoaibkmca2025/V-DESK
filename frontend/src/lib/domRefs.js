@@ -8,7 +8,7 @@ const rawStyleRefs = new Map();
 /**
  * Sets a literal `style` attribute. Used where the exact declaration text matters:
  * `!important` declarations (unsupported by React style objects) and elements targeted by
- * `[style*="background: #081D40"]` attribute selectors in the design system.
+ * `[style*="background: #2B1A0C"]` attribute selectors in the design system.
  */
 export function rawStyle(cssText) {
   let ref = rawStyleRefs.get(cssText);

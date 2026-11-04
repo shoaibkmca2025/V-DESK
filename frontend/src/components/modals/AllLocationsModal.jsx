@@ -25,9 +25,9 @@ export default function AllLocationsModal() {
             <span
               className="legal-modal__badge"
               style={{
-                background: 'rgba(0, 168, 150, 0.12)',
+                background: 'rgba(122, 78, 34, 0.12)',
                 color: 'var(--vd-teal-primary)',
-                borderColor: 'rgba(0, 168, 150, 0.3)',
+                borderColor: 'rgba(122, 78, 34, 0.3)',
               }}
             >
               {' '}
@@ -560,9 +560,9 @@ export default function AllLocationsModal() {
             style={{
               marginTop: '24px',
               padding: '14px 18px',
-              background: 'rgba(0, 168, 150, 0.06)',
+              background: 'rgba(122, 78, 34, 0.06)',
               borderRadius: '12px',
-              border: '1px dashed rgba(0, 168, 150, 0.3)',
+              border: '1px dashed rgba(122, 78, 34, 0.3)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
