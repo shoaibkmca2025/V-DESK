@@ -64,10 +64,25 @@ function PlatformLayer() {
 /**
  * Shared page frame: header, drawer, footer and all global dialogs.
  * Overlay stacking follows DOM order, so the homepage keeps its original layer order.
+ *
+ * `chrome="staff"` is for the staff console, which is not the marketing site: someone working leads does not
+ * need "Co-Working Space" in the nav, a WhatsApp bubble or a footer full of city links, and showing them
+ * invites a staff member to click into the public site and lose what they were doing. The console carries its
+ * own heading and sign-out, so nothing here is load-bearing for it.
  */
-export default function SiteLayout({ page, meta, children }) {
+export default function SiteLayout({ page, meta, chrome = 'site', children }) {
   usePageDocument(page, meta);
   usePageRuntime(page);
+
+  if (chrome === 'staff') {
+    return (
+      <>
+        {children}
+        <AdminModal />
+        <ToastContainer />
+      </>
+    );
+  }
 
   const isHome = page === 'home';
 

@@ -44,6 +44,15 @@ const RouteFallback = () => <div className="ui-route-loading" role="status" aria
 /** Wraps a lazily-loaded page so React has something to show while it downloads. */
 const lazyPage = (element) => <Suspense fallback={<RouteFallback />}>{element}</Suspense>;
 
+/** The staff console: the same frame, minus the marketing nav, footer and lead-capture widgets. */
+const staffPage = (key, Component) => (
+  <SiteLayout page={key} chrome="staff">
+    <Suspense fallback={<RouteFallback />}>
+      <Component />
+    </Suspense>
+  </SiteLayout>
+);
+
 /** Static page: layout + component. Dynamic pages (services/:slug, locations/:city, …) render their own SiteLayout with computed meta. */
 const page = (key, Component, props) => (
   <SiteLayout page={key}>
@@ -106,7 +115,7 @@ export const routes = [
       { path: 'bookings', element: page('bookings', BookingsPage) },
       { path: 'quote/:ref', element: lazyPage(<QuotePage />) },
       { path: 'portal', element: page('portal', PortalPage) },
-      { path: 'admin', element: page('admin', AdminPage) },
+      { path: 'admin', element: staffPage('admin', AdminPage) },
 
       ...legacyRedirects,
       { path: '*', element: <NotFoundPage /> },
