@@ -59,55 +59,61 @@ const legacyRedirects = Object.entries(LEGACY_FILE_ROUTES).map(([file, to]) => (
   element: <Navigate to={to} replace />,
 }));
 
-export const router = createBrowserRouter(
-  [
-    {
-      path: '/',
-      element: <RootLayout />,
-      children: [
-        { index: true, element: page('home', HomePage) },
+/**
+ * The route table, separate from the router so tests can see it. `src/__tests__/pagesRender.test.jsx`
+ * walks it and fails when a route is neither smoke-tested nor explicitly listed as skipped, so a new
+ * page cannot quietly go uncovered.
+ */
+export const routes = [
+  {
+    path: '/',
+    element: <RootLayout />,
+    children: [
+      { index: true, element: page('home', HomePage) },
 
-        // Core product pages
-        { path: 'virtual-office', element: page('virtualOffice', VirtualOfficePage) },
-        { path: 'coworking-spaces', element: page('coworking', CoworkingPage) },
-        { path: 'meeting-rooms', element: page('meetingRooms', MeetingRoomsPage) },
-        { path: 'pricing', element: page('pricing', PricingPage) },
-        { path: 'company-registration', element: page('companyRegistration', CompanyRegistrationPage) },
-        { path: 'contact', element: page('contact', ContactPage) },
-        { path: 'list-your-space', element: page('listYourSpace', ListYourSpacePage) },
+      // Core product pages
+      { path: 'virtual-office', element: page('virtualOffice', VirtualOfficePage) },
+      { path: 'coworking-spaces', element: page('coworking', CoworkingPage) },
+      { path: 'meeting-rooms', element: page('meetingRooms', MeetingRoomsPage) },
+      { path: 'pricing', element: page('pricing', PricingPage) },
+      { path: 'company-registration', element: page('companyRegistration', CompanyRegistrationPage) },
+      { path: 'contact', element: page('contact', ContactPage) },
+      { path: 'list-your-space', element: page('listYourSpace', ListYourSpacePage) },
 
-        // SEO architecture (PRD §57)
-        { path: 'services', element: page('services', ServicesPage) },
-        { path: 'services/:slug', element: lazyPage(<ServicePage />) },
-        { path: 'locations', element: page('locations', LocationsPage) },
-        { path: 'locations/:city', element: lazyPage(<CityPage />) },
-        { path: 'locations/:city/:product', element: lazyPage(<CityProductPage />) },
-        { path: 'workspaces/:city', element: lazyPage(<CityWorkspacesPage />) },
-        { path: 'workspaces', element: <Navigate to="/coworking-spaces" replace /> },
+      // SEO architecture (PRD §57)
+      { path: 'services', element: page('services', ServicesPage) },
+      { path: 'services/:slug', element: lazyPage(<ServicePage />) },
+      { path: 'locations', element: page('locations', LocationsPage) },
+      { path: 'locations/:city', element: lazyPage(<CityPage />) },
+      { path: 'locations/:city/:product', element: lazyPage(<CityProductPage />) },
+      { path: 'workspaces/:city', element: lazyPage(<CityWorkspacesPage />) },
+      { path: 'workspaces', element: <Navigate to="/coworking-spaces" replace /> },
 
-        // Discovery & resources
-        { path: 'search', element: page('search', SearchResultsPage) },
-        { path: 'resources', element: page('resources', ResourcesPage) },
-        { path: 'resources/:slug', element: lazyPage(<GuidePage />) },
-        { path: 'faqs', element: page('faqs', FaqsPage) },
-        { path: 'legal/:doc', element: lazyPage(<LegalPage />) },
-        { path: 'privacy', element: <Navigate to="/legal/privacy" replace /> },
-        { path: 'terms', element: <Navigate to="/legal/terms" replace /> },
+      // Discovery & resources
+      { path: 'search', element: page('search', SearchResultsPage) },
+      { path: 'resources', element: page('resources', ResourcesPage) },
+      { path: 'resources/:slug', element: lazyPage(<GuidePage />) },
+      { path: 'faqs', element: page('faqs', FaqsPage) },
+      { path: 'legal/:doc', element: lazyPage(<LegalPage />) },
+      { path: 'privacy', element: <Navigate to="/legal/privacy" replace /> },
+      { path: 'terms', element: <Navigate to="/legal/terms" replace /> },
 
-        // Account & transaction flows
-        { path: 'login', element: page('login', AuthPage, { mode: 'login' }) },
-        { path: 'register', element: page('register', AuthPage, { mode: 'register' }) },
-        { path: 'kyc', element: page('kyc', KycPage) },
-        { path: 'checkout', element: page('checkout', CheckoutPage) },
-        { path: 'bookings', element: page('bookings', BookingsPage) },
-        { path: 'quote/:ref', element: lazyPage(<QuotePage />) },
-        { path: 'portal', element: page('portal', PortalPage) },
-        { path: 'admin', element: page('admin', AdminPage) },
+      // Account & transaction flows
+      { path: 'login', element: page('login', AuthPage, { mode: 'login' }) },
+      { path: 'register', element: page('register', AuthPage, { mode: 'register' }) },
+      { path: 'kyc', element: page('kyc', KycPage) },
+      { path: 'checkout', element: page('checkout', CheckoutPage) },
+      { path: 'bookings', element: page('bookings', BookingsPage) },
+      { path: 'quote/:ref', element: lazyPage(<QuotePage />) },
+      { path: 'portal', element: page('portal', PortalPage) },
+      { path: 'admin', element: page('admin', AdminPage) },
 
-        ...legacyRedirects,
-        { path: '*', element: <NotFoundPage /> },
-      ],
-    },
-  ],
-  { basename: import.meta.env.BASE_URL.replace(/\/$/, '') || '/' },
-);
+      ...legacyRedirects,
+      { path: '*', element: <NotFoundPage /> },
+    ],
+  },
+];
+
+export const router = createBrowserRouter(routes, {
+  basename: import.meta.env.BASE_URL.replace(/\/$/, '') || '/',
+});
