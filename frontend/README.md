@@ -113,10 +113,14 @@ UI. The `features/*` modules are the integration points when an API is added.
 
 Static hosting of `dist/` with an SPA fallback to `index.html`:
 
-- **GitHub Pages:** `.github/workflows/deploy-pages.yml` builds with `VITE_BASE_PATH=/<repo>/` and copies
-  `index.html` to `404.html` for deep links.
+- **Cloudflare Workers — this is where the site actually runs.** `npm run cf:deploy` (build + `wrangler
+  deploy`). `wrangler.jsonc` serves `dist/` from the edge and returns `index.html` for unknown paths, so
+  deep links survive a refresh. The runbook is `docs/deployment.md`.
 - **Netlify / Vercel / any static host:** build with `npm run build`, serve `dist/`, rewrite all routes to
   `/index.html`. Set `VITE_BASE_PATH` only when hosting under a sub-path.
+
+A second public copy of the site is a liability, not a backup: the API's `CORS_ORIGINS` lists one origin,
+so anywhere else the pages load but every call fails. Deploy to one place.
 
 Old URLs (`/virtual-office.html`, …) redirect to the new routes.
 

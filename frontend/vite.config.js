@@ -7,7 +7,8 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
-    // Set VITE_BASE_PATH=/V-DESK-Workspace/ when deploying under a sub-path (e.g. GitHub Pages).
+    // Set VITE_BASE_PATH=/sub-path/ when hosting somewhere that is not the domain root. Cloudflare serves
+    // the site at the root, so it is unset there.
     base: env.VITE_BASE_PATH || '/',
     // Production builds stop if the API address would not work for visitors (scripts/check-api-url.js).
     plugins: [react(), apiUrlGuard({ mode, apiUrl: env.VITE_API_URL })],

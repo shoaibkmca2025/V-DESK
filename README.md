@@ -39,4 +39,6 @@ Requires Node 22.12+ (Node 22 LTS recommended).
 
 - **Vercel (frontend):** in the Vercel project settings set **Root Directory** to `frontend`. Framework preset Vite,
   build command `npm run build`, output directory `dist`.
-- **GitHub Pages:** `.github/workflows/deploy-pages.yml` builds `frontend/` and publishes `frontend/dist`.
+- **Cloudflare Workers (live):** `npm run cf:deploy` in `frontend/`, `npx wrangler deploy` in `backend/`. Runbook in
+  `docs/deployment.md`. The API only accepts the origins in its `CORS_ORIGINS`, so the site is deployed
+  to one place.
