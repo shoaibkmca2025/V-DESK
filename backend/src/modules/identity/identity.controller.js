@@ -19,24 +19,9 @@ function sendSession(res, { refreshToken, refreshExpiresAt, ...session }) {
 
 // ── Sign-in & sessions ────────────────────────
 
-/** POST /api/v1/auth/login — never a session, always an MFA token (see identity.service.js). */
+/** POST /api/v1/auth/login — email + password → access token + refresh cookie. */
 export async function login(req, res) {
-  res.json({ data: await identityService.login(req.validated.body) });
-}
-
-/** POST /api/v1/auth/password/setup — first password from a setup code; answers like login (MFA next). */
-export async function setupPassword(req, res) {
-  res.json({ data: await identityService.setupPassword(req.validated.body) });
-}
-
-/** POST /api/v1/auth/mfa/enroll — new TOTP secret + otpauth:// URL for the authenticator app. */
-export async function enrollMfa(req, res) {
-  res.json({ data: await identityService.enrollMfa(req.validated.body) });
-}
-
-/** POST /api/v1/auth/mfa/verify — TOTP code → access token + refresh cookie. */
-export async function verifyMfa(req, res) {
-  sendSession(res, await identityService.verifyMfa(req.validated.body));
+  sendSession(res, await identityService.login(req.validated.body));
 }
 
 /** POST /api/v1/auth/refresh — rotates the refresh cookie. */

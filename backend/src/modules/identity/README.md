@@ -1,7 +1,11 @@
 # Identity module
 
-Staff sign-in (one-time setup code → own password → mandatory MFA), customer sign-in with Google at checkout,
-sessions, roles and permissions (PRD §69–70, rules.md §19–20, ADR-012).
+Staff sign-in (email + password), customer sign-in with Google at checkout, sessions, roles and permissions
+(PRD §69–70, rules.md §19–20, ADR-012).
+
+> The staff console has **no second factor**. A password is the only thing between an attacker and every
+> customer's name, phone, email and bookings, so the lockout below is the whole defence. This was asked for
+> deliberately on 2026-11-10; restoring MFA means restoring the TOTP code removed in that change.
 
 - **Mounted at:** `/api/v1/auth`
 - **Build phase:** 1 (staff) · 2 (customers)
@@ -10,26 +14,22 @@ sessions, roles and permissions (PRD §69–70, rules.md §19–20, ADR-012).
   `optionalCustomer`, `hasPermission`, `mapCustomer`, `createUser` — every module's staff routes use `requireStaff`
 - **Frontend that calls it:** admin console (`features/admin`, `features/auth/staffSession.js`), checkout and the
   portal (`features/auth/session.js`)
-- **Needs:** `JWT_SECRET` and `MFA_ENCRYPTION_KEY` (≥ 32 chars each) — unset → `503 AUTH_NOT_CONFIGURED`.
+- **Needs:** `JWT_SECRET` (≥ 32 chars) — unset → `503 AUTH_NOT_CONFIGURED`.
   Customer sign-in also needs `GOOGLE_CLIENT_ID` (public; the same value the website is built with).
 
 ## Staff endpoints (relative to the mount path)
 
-| Method  | Path              | Access                | What it does                                                                         |
-| ------- | ----------------- | --------------------- | ------------------------------------------------------------------------------------ |
-| `POST`  | `/login`          | public (rate-limited) | `{ email, passwordKey }` → `{ mfaToken, mfaRequired \| mfaEnrollmentRequired }`, or  |
-|         |                   |                       | `{ email, setupCode }` → `{ passwordSetupRequired: true, setupToken }`               |
-| `POST`  | `/password/setup` | setup token           | `{ setupToken, newPasswordKey }` → the MFA step, as `/login` answers it              |
-| `POST`  | `/mfa/enroll`     | MFA token             | `{ mfaToken }` → `{ secret, otpauthUrl }` (first sign-in only)                       |
-| `POST`  | `/mfa/verify`     | MFA token             | `{ mfaToken, code }` → `{ accessToken, expiresIn, user }` + refresh cookie           |
-| `POST`  | `/refresh`        | refresh cookie        | Rotates the cookie, returns a new access token                                       |
-| `POST`  | `/logout`         | refresh cookie        | Revokes the session, clears the cookie → 204                                         |
-| `GET`   | `/me`             | Bearer                | The signed-in user with `permissions`                                                |
-| `POST`  | `/password`       | Bearer                | `{ currentPasswordKey, newPasswordKey }` → 204; ends the user's other sessions       |
-| `GET`   | `/users`          | `users:manage`        | Staff list, newest first, `?cursor=&limit=`                                          |
-| `POST`  | `/users`          | `users:manage`        | `{ email, name, role }` → 201 with a one-time `setupCode` (shown only in this reply) |
-| `GET`   | `/users/:ref`     | `users:manage`        | One user (`passwordSet`, `setupCodeExpiresAt`, never the code)                       |
-| `PATCH` | `/users/:ref`     | `users:manage`        | Any of `{ name, role, status, issueSetupCode: true, resetMfa: true, unlock: true }`  |
+| Method  | Path          | Access                | What it does                                                                        |
+| ------- | ------------- | --------------------- | ----------------------------------------------------------------------------------- |
+| `POST`  | `/login`      | public (rate-limited) | `{ email, passwordKey }` → `{ accessToken, expiresIn, user }` + refresh cookie      |
+| `POST`  | `/refresh`    | refresh cookie        | Rotates the cookie, returns a new access token                                      |
+| `POST`  | `/logout`     | refresh cookie        | Revokes the session, clears the cookie → 204                                        |
+| `GET`   | `/me`         | Bearer                | The signed-in user with `permissions`                                               |
+| `POST`  | `/password`   | Bearer                | `{ currentPasswordKey, newPasswordKey }` → 204; ends the user's other sessions      |
+| `GET`   | `/users`      | `users:manage`        | Staff list, newest first, `?cursor=&limit=`                                         |
+| `POST`  | `/users`      | `users:manage`        | `{ email, name, role, passwordKey }` → 201 (the admin sets the first password)      |
+| `GET`   | `/users/:ref` | `users:manage`        | One user (`passwordSet`, `setupCodeExpiresAt`, never the code)                      |
+| `PATCH` | `/users/:ref` | `users:manage`        | Any of `{ name, role, status, issueSetupCode: true, resetMfa: true, unlock: true }` |
 
 ## Passwords never reach the API (ADR-013)
 
@@ -40,31 +40,25 @@ Cloudflare Workers free plan (10 ms of CPU per request). A leaked table still co
 per guess. The two halves must agree: `identity.passwordKey.js` (scripts, tests) and the frontend file check the
 same test vector. Consequences: a plain password in a request is refused (400); the password rule (12+
 characters, a letter and a number) is enforced by the page, since the API cannot see it; and a password stored
-before ADR-013 (`$argon2id$…`) answers `401 PASSWORD_RESET_REQUIRED` until the account gets a new setup code
+before ADR-013 (`$argon2id$…`) answers `401 PASSWORD_RESET_REQUIRED` until an admin sets a new password
 (`scripts/issue-setup-code.js <email>` when no admin can sign in).
 
 ## A new staff member's first sign-in
 
 1. A super admin creates the account (`POST /users`) and passes on the `setupCode`, e.g. `ABCD-EFGH-JKMN`. Nobody
    types a password for someone else, so an admin never knows a staff member's password.
-2. On the sign-in page they choose "I have a setup code" and enter their email and the code. `POST /login`
-   (`{ email, setupCode }`) answers `{ passwordSetupRequired: true, setupToken }` (15 minutes) — no session, no MFA
-   token.
-3. `POST /password/setup` stores the password they choose (12+ characters, at least one letter and one number) and
-   answers with the MFA step. The code is spent: it never works again.
-4. MFA as for everyone: `POST /mfa/enroll` (first time), then `POST /mfa/verify` with the authenticator code.
+2. They sign in on the admin page with that email and password. There is nothing to redeem and nothing
+   to enrol.
 
 A forgotten password: an admin sends `PATCH /users/:ref { issueSetupCode: true }`. That removes the old password,
-ends the person's sessions and returns a fresh code; their MFA stays as it was (add `resetMfa: true` for a lost
+ends the person's sessions (
 phone). Codes last 72 hours; a new code cancels the previous one and any setup already in progress.
 
 ## Every staff sign-in after that
 
-1. `POST /login` checks the password (as its key) and returns a 5-minute `mfaToken` — never a session.
-2. `POST /mfa/verify` with the 6-digit code returns a 15-minute `accessToken` (send as `Authorization: Bearer …`) and
-   sets the `vd_rt` refresh cookie (`HttpOnly`, `SameSite=Strict`, `Path=/api/v1/auth`, `Secure` in production,
-   7 days). The first good code also switches MFA on.
-3. `POST /refresh` before the access token expires. Each refresh replaces the cookie; a replaced cookie presented again
+1. `POST /login` checks the password (as its key) and returns a 15-minute `accessToken` (send as
+   `Authorization: Bearer …`) plus an HttpOnly refresh cookie (7 days).
+2. `POST /refresh` before the access token expires. Each refresh replaces the cookie; a replaced cookie presented again
    more than 10 s later revokes every session from that sign-in (theft signal).
 
 For manual testing, `npm run totp -- <secret>` prints the current code instead of a phone app.
@@ -93,18 +87,16 @@ Nobody needs an account to browse, ask for a quote or hold a room. A customer si
 
 ## Rules worth knowing
 
-- **Lockout:** wrong passwords, wrong setup codes and wrong TOTP codes share one counter — 5 failures lock the account
+- **Lockout:** 5 wrong passwords lock the account
   for 15 minutes (`429 ACCOUNT_LOCKED`). An admin can `PATCH { unlock: true }`.
 - **Same answer** (`401 INVALID_CREDENTIALS`) for unknown email, disabled account and wrong password, with equal timing.
-- **Codes are single-use:** each 30-second TOTP step is accepted once per user; a setup code works once.
 - **Changes apply at once:** every request reloads the user, so disabling or demoting someone takes effect on their
-  next call. Role change, disable, MFA reset and a new setup code also revoke their refresh tokens.
-- **Guards:** you can't change your own role/status/MFA or issue yourself a setup code
+  next call. Role change, disable and an admin-set password also revoke their refresh tokens.
+- **Guards:** you can't change your own role, status or password this way
   (`409 CANNOT_CHANGE_OWN_ACCESS`), and the last active `SUPER_ADMIN` can't be demoted or disabled
   (`409 LAST_SUPER_ADMIN`).
-- **Secrets at rest:** passwords are argon2id keys made in the browser, stored as salted SHA-256; setup codes and
-  refresh tokens are SHA-256 only; TOTP secrets are
-  AES-256-GCM sealed with `MFA_ENCRYPTION_KEY`.
+- **Secrets at rest:** passwords are argon2id keys made in the browser, stored as salted SHA-256; refresh
+  tokens are SHA-256 only.
 
 ## Permissions (`identity.constants.js` → `PERMISSIONS`)
 
@@ -134,10 +126,11 @@ Nobody needs an account to browse, ask for a quote or hold a room. A customer si
 ## First super admin
 
 - **Local:** `POST /api/v1/auth/users` with `x-admin-key` and `role: "SUPER_ADMIN"`.
-- **Servers without an admin key:** `node --env-file-if-exists=.env scripts/create-admin.js you@vdesk.in "Your Name"`
-  prints a one-time setup code; sign in on the admin page with it and choose your password.
-- **An admin who cannot sign in** (lost password, or one stored before ADR-013):
-  `node --env-file-if-exists=.env scripts/issue-setup-code.js you@vdesk.in` prints a fresh setup code.
+- **Servers without an admin key:**
+  `ADMIN_PASSWORD='<12+ chars>' node --env-file-if-exists=.env scripts/create-admin.js you@vdesk.in "Your Name"`,
+  then sign in with that email and password.
+- **An admin who cannot sign in** (lost password, or one stored before ADR-013): another super admin sets them
+  a new one from the Team panel, or `PATCH /auth/users/:ref` with a `passwordKey`.
 
 ## Not built yet
 

@@ -51,7 +51,7 @@
     // "GOOGLE_CLIENT_ID": "….apps.googleusercontent.com",
   },
 
-  // JWT_SECRET, MFA_ENCRYPTION_KEY and ADMIN_API_KEY are secrets, not vars:
+  // JWT_SECRET and ADMIN_API_KEY are secrets, not vars:
   //   npx wrangler secret put JWT_SECRET
   "observability": {
     "enabled": true,

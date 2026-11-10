@@ -8,6 +8,6 @@ export {
   requireStaff,
 } from './identity.middleware.js';
 export { hasPermission, mapCustomer, permissionsFor } from './identity.mapper.js';
-export { createUser, getUser, isAuthConfigured, issueSetupCodeByEmail, listUsers } from './identity.service.js';
+export { createUser, getUser, isAuthConfigured, listUsers } from './identity.service.js';
 export { derivePasswordKey } from './identity.passwordKey.js';
 export { PERMISSIONS, STAFF_ROLES } from './identity.constants.js';

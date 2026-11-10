@@ -31,8 +31,6 @@ const schema = z.object({
   ADMIN_API_KEY: z.preprocess(blankToUndefined, z.string().min(16).optional()),
   /** Signs staff access tokens (HS256). Unset → /auth answers 503 AUTH_NOT_CONFIGURED. */
   JWT_SECRET: z.preprocess(blankToUndefined, z.string().min(32).optional()),
-  /** Encrypts TOTP secrets at rest. Separate from JWT_SECRET so rotating one never breaks the other. */
-  MFA_ENCRYPTION_KEY: z.preprocess(blankToUndefined, z.string().min(32).optional()),
   /**
    * OAuth client ID of the website's "Continue with Google" button (ADR-012) — public, not a secret: the same
    * value the website is built with (VITE_GOOGLE_CLIENT_ID). Unset → customer sign-in answers 503.

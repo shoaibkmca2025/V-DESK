@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/index.js';
-import { createStaffUser, fetchStaffUsers, issueStaffSetupCode, setStaffStatus } from '@/features/admin/adminApi.js';
+import { createStaffUser, fetchStaffUsers, setStaffPassword, setStaffStatus } from '@/features/admin/adminApi.js';
+import { passwordProblem } from '@/features/auth/staffSession.js';
 import { showToast } from '@/features/ui/toast.js';
 
 /**
  * Team — staff accounts, for whoever holds users:manage (super admins).
  *
- * Adding someone never involves a password (ADR-012): the API makes a one-time setup code, shown here once, which
- * the admin passes on. The new staff member signs in with it, chooses their own password and sets up their
- * authenticator app. A forgotten password works the same way — "New setup code".
+ * Adding someone means choosing their first password here and telling them what it is. The password is turned
+ * into a key in this browser before it is sent (ADR-013), so the API never receives it. A forgotten password
+ * works the same way — "Set new password".
  */
 
 const ROLES = [
@@ -27,36 +28,32 @@ const formatWhen = (value) =>
 
 function accountState(user) {
   if (user.status !== 'active') return ['Disabled', 'is-bad'];
-  if (!user.passwordSet) {
-    const expired = user.setupCodeExpiresAt && new Date(user.setupCodeExpiresAt) <= new Date();
-    return expired ? ['Setup code expired', 'is-bad'] : ['Waiting for first sign-in', 'is-warn'];
-  }
-  return user.mfaEnabled ? ['Active', 'is-good'] : ['Active · no authenticator yet', 'is-warn'];
+  if (!user.passwordSet) return ['No password set', 'is-bad'];
+  return ['Active', 'is-good'];
 }
 
-/** The code, once. Copying is offered because it is long; the admin passes it on by phone or in person. */
-function SetupCodeCard({ issued, onDone }) {
+/** Repeats the password the admin just set, so it can be passed on before leaving the page. */
+function PasswordSetCard({ issued, onDone }) {
   async function copy() {
     try {
-      await navigator.clipboard.writeText(issued.setupCode);
+      await navigator.clipboard.writeText(issued.password);
       showToast('Copied', 'Send it to them directly — not in a group chat.', 'success');
     } catch {
-      showToast('Could not copy', 'Select the code and copy it by hand.', 'warning');
+      showToast('Could not copy', 'Select the password and copy it by hand.', 'warning');
     }
   }
   return (
     <div className="ui-card ui-setup-code" role="status">
-      <h3>One-time setup code for {issued.name}</h3>
+      <h3>Password set for {issued.name}</h3>
       <p>
-        Give this to <strong>{issued.email}</strong>. On this page they choose “I have a setup code”, enter their
-        email and this code, then choose their own password. It works once and expires{' '}
-        {formatWhen(issued.setupCodeExpiresAt)}.
+        Give this to <strong>{issued.email}</strong>. They sign in on this page with their email and this
+        password, and can change it afterwards from their account.
       </p>
-      <code className="ui-setup-code__value">{issued.setupCode}</code>
-      <p className="ui-table__sub">This is the only time the code is shown. If it is lost, issue a new one.</p>
+      <code className="ui-setup-code__value">{issued.password}</code>
+      <p className="ui-table__sub">It is not shown again. If it is lost, set a new one.</p>
       <div className="ui-actions">
         <Button variant="outline" icon="ph-copy" onClick={copy}>
-          Copy code
+          Copy password
         </Button>
         <Button variant="ghost" onClick={onDone}>
           Done
@@ -84,7 +81,8 @@ export default function StaffTeam({ me }) {
     setBusy(true);
     setError(null);
     try {
-      setIssued(await createStaffUser(form));
+      const created = await createStaffUser(form);
+      setIssued({ ...created, name: form.name, email: form.email, password: form.password });
       formEl.reset();
       load();
     } catch (err) {
@@ -94,16 +92,23 @@ export default function StaffTeam({ me }) {
     }
   }
 
-  async function newCode(user) {
-    const sure = globalThis.confirm?.(
-      `Issue a new setup code for ${user.name}? Their current password stops working and they are signed out everywhere.`,
+  async function newPassword(user) {
+    const password = globalThis.prompt?.(
+      `New password for ${user.name} (at least 12 characters, with letters and numbers).
+Their current password stops working and they are signed out everywhere.`,
     );
-    if (sure === false) return;
+    if (!password) return;
+    const problem = passwordProblem(password);
+    if (problem) {
+      showToast('That password will not do', problem, 'warning');
+      return;
+    }
     try {
-      setIssued(await issueStaffSetupCode(user.ref));
+      await setStaffPassword(user.ref, user.email, password);
+      setIssued({ name: user.name, email: user.email, password });
       load();
     } catch (err) {
-      showToast('Could not issue a code', err.message, 'warning');
+      showToast('Could not set the password', err.message, 'warning');
     }
   }
 
@@ -125,7 +130,7 @@ export default function StaffTeam({ me }) {
         <span className="ui-table__sub">{users ? `${users.length} staff accounts` : 'Loading…'}</span>
       </div>
 
-      {issued && <SetupCodeCard issued={issued} onDone={() => setIssued(null)} />}
+      {issued && <PasswordSetCard issued={issued} onDone={() => setIssued(null)} />}
 
       <form className="ui-card ui-team__add" onSubmit={addStaff}>
         <h3>Add a staff member</h3>
@@ -137,6 +142,20 @@ export default function StaffTeam({ me }) {
           <div className="ui-field">
             <label htmlFor="teamEmail">Work email</label>
             <input id="teamEmail" name="email" type="email" required autoComplete="off" placeholder="name@vdesk.in" />
+          </div>
+          <div className="ui-field">
+            <label htmlFor="teamPassword">First password</label>
+            <input
+              id="teamPassword"
+              name="password"
+              type="text"
+              required
+              minLength={12}
+              autoComplete="off"
+              spellCheck={false}
+              placeholder="at least 12 characters, with letters and numbers"
+            />
+            <p className="ui-table__sub">Shown as you type so you can pass it on. They can change it later.</p>
           </div>
           <div className="ui-field">
             <label htmlFor="teamRole">Role</label>
@@ -155,7 +174,7 @@ export default function StaffTeam({ me }) {
           </p>
         )}
         <Button type="submit" variant="primary" disabled={busy}>
-          {busy ? 'Creating…' : 'Create account & get setup code'}
+          {busy ? 'Creating…' : 'Create account'}
         </Button>
       </form>
 
@@ -193,8 +212,8 @@ export default function StaffTeam({ me }) {
                         <span className="ui-table__sub">Your own account</span>
                       ) : (
                         <div className="ui-actions">
-                          <Button variant="outline" size="sm" onClick={() => newCode(user)}>
-                            New setup code
+                          <Button variant="outline" size="sm" onClick={() => newPassword(user)}>
+                            Set new password
                           </Button>
                           <Button variant="ghost" size="sm" onClick={() => toggleStatus(user)}>
                             {user.status === 'active' ? 'Disable' : 'Enable'}

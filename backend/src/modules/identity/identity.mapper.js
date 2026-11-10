@@ -1,6 +1,6 @@
 /**
  * Identity mapper — shapes user and customer documents for API responses.
- * Password hashes, MFA secrets and attempt counters never leave the API (rules.md §15, §19).
+ * Password hashes and attempt counters never leave the API (rules.md §15, §19).
  */
 import { PERMISSIONS } from './identity.constants.js';
 
@@ -21,11 +21,8 @@ export function mapUser(doc) {
     role: doc.role,
     permissions: permissionsFor(doc.role),
     status: doc.status,
-    mfaEnabled: Boolean(doc.mfa?.enabled),
-    /** false until the staff member has used their setup code to choose a password (ADR-012). */
+    /** false only for accounts left over from before an admin set their password. */
     passwordSet: Boolean(doc.passwordHash),
-    /** When the unused setup code stops working; null once a password is set. The code itself is never shown again. */
-    setupCodeExpiresAt: doc.setupCodeExpiresAt ?? null,
     lockedUntil: doc.lockedUntil && doc.lockedUntil > new Date() ? doc.lockedUntil : null,
     lastLoginAt: doc.lastLoginAt ?? null,
     createdAt: doc.createdAt,

@@ -1,24 +1,17 @@
 /**
  * Identity repository — the only file that queries the database for this module's staff surface.
- * Returns plain objects shaped like the API's own fields (`createdAt`, `mfa.enabled`); soft-deleted
+ * Returns plain objects shaped like the API's own fields (`createdAt`); soft-deleted
  * users are invisible.
  */
 import { cursorClause } from '../../shared/lib/pagination.js';
 import { exec, row, rows, UNIQUE_VIOLATION } from '../../shared/lib/sql.js';
 
 /**
- * Every column the service and mapper read, named as they expect it. The `mfa` sub-document the code was
- * written against is rebuilt here, so nothing above this file knows it is four columns.
+ * Every column the service and mapper read, named as they expect it.
  */
 const USER_COLUMNS = `
   ref, email, name, role, status,
   password_hash AS "passwordHash",
-  setup_code_hash AS "setupCodeHash",
-  setup_code_expires_at AS "setupCodeExpiresAt",
-  jsonb_build_object(
-    'enabled', mfa_enabled, 'secret', mfa_secret,
-    'pendingSecret', mfa_pending_secret, 'lastStep', mfa_last_step
-  ) AS mfa,
   failed_attempts AS "failedAttempts",
   locked_until AS "lockedUntil",
   last_login_at AS "lastLoginAt",
@@ -28,9 +21,7 @@ const USER_COLUMNS = `
   updated_at AS "updatedAt"`;
 
 /**
- * The field names the service updates → their columns. `mfa` arrives either as one dotted field
- * ('mfa.pendingSecret') or as the whole sub-document (an admin resetting MFA), and both are spread
- * across the four columns here.
+ * The field names the service updates → their columns.
  */
 const COLUMN_FOR = {
   name: 'name',
@@ -38,32 +29,15 @@ const COLUMN_FOR = {
   status: 'status',
   email: 'email',
   passwordHash: 'password_hash',
-  setupCodeHash: 'setup_code_hash',
-  setupCodeExpiresAt: 'setup_code_expires_at',
   failedAttempts: 'failed_attempts',
   lockedUntil: 'locked_until',
   lastLoginAt: 'last_login_at',
-  'mfa.enabled': 'mfa_enabled',
-  'mfa.secret': 'mfa_secret',
-  'mfa.pendingSecret': 'mfa_pending_secret',
-  'mfa.lastStep': 'mfa_last_step',
 };
 
-const MFA_COLUMNS = {
-  enabled: 'mfa_enabled',
-  secret: 'mfa_secret',
-  pendingSecret: 'mfa_pending_secret',
-  lastStep: 'mfa_last_step',
-};
-
-/** `{ 'mfa.enabled': true, name: 'A' }` → `{ mfa_enabled: true, name: 'A' }`. Throws on an unknown field. */
+/** `{ name: 'A' }` → `{ name: 'A' }`, by the map above. Throws on an unknown field. */
 function columnsFor(set) {
   const columns = {};
   for (const [field, value] of Object.entries(set)) {
-    if (field === 'mfa') {
-      for (const [key, column] of Object.entries(MFA_COLUMNS)) columns[column] = value[key];
-      continue;
-    }
     const column = COLUMN_FOR[field];
     if (!column) throw new Error(`identity.repository: no column for user field '${field}'`);
     columns[column] = value;
@@ -92,26 +66,14 @@ export async function findUserByRef(ref) {
   return row(`SELECT ${USER_COLUMNS} FROM users WHERE ref = $1 AND deleted_at IS NULL`, [ref]);
 }
 
-/**
- * Inserts a user — with a password hash (the bootstrap script) or a setup code (everyone else) — or returns
- * null when the email (or ref) is already taken.
- */
+/** Inserts a user, or returns null when the email (or ref) is already taken. */
 export async function insertUser(data) {
   try {
     return await row(
-      `INSERT INTO users (ref, email, name, role, password_hash, setup_code_hash, setup_code_expires_at, created_by)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `INSERT INTO users (ref, email, name, role, password_hash, created_by)
+            VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING ${USER_COLUMNS}`,
-      [
-        data.ref,
-        data.email,
-        data.name,
-        data.role,
-        data.passwordHash ?? null,
-        data.setupCodeHash ?? null,
-        data.setupCodeExpiresAt ?? null,
-        data.createdBy ?? null,
-      ],
+      [data.ref, data.email, data.name, data.role, data.passwordHash, data.createdBy ?? null],
     );
   } catch (err) {
     if (err.code === UNIQUE_VIOLATION) return null;
@@ -131,23 +93,6 @@ export async function findUsers({ after, limit }) {
   );
 }
 
-/**
- * Stores the staff member's first password and spends their setup code in one statement — but only while
- * the code is still the one the setup token was issued for (and unexpired), so a code works exactly once and
- * a code an admin has since replaced works not at all. Returns the updated user, or null.
- */
-export async function completeSetup(ref, codeHashPrefix, passwordHash, now) {
-  return row(
-    `UPDATE users
-        SET password_hash = $3, setup_code_hash = NULL, setup_code_expires_at = NULL,
-            failed_attempts = 0, locked_until = NULL
-      WHERE ref = $1 AND deleted_at IS NULL
-        AND left(setup_code_hash, 16) = $2 AND setup_code_expires_at > $4
-    RETURNING ${USER_COLUMNS}`,
-    [ref, codeHashPrefix, passwordHash, now],
-  );
-}
-
 export async function updateUser(ref, set) {
   const { text, values } = assignments(columnsFor(set));
   return row(`UPDATE users SET ${text} WHERE ref = $1 AND deleted_at IS NULL RETURNING ${USER_COLUMNS}`, [
@@ -157,7 +102,7 @@ export async function updateUser(ref, set) {
 }
 
 /**
- * Counts a failed password/TOTP attempt and locks the account once `max` is reached. Returns the number of
+ * Counts a failed sign-in and locks the account once `max` is reached. Returns the number of
  * attempts this one made, which is what the log records — the counter itself goes back to zero with the
  * lock, so the next unlock starts clean.
  */
@@ -170,22 +115,6 @@ export async function recordFailedAttempt(ref, { max, lockUntil }) {
     await exec(`UPDATE users SET failed_attempts = 0, locked_until = $2 WHERE ref = $1`, [ref, lockUntil]);
   }
   return user?.attempts ?? 0;
-}
-
-/**
- * Accepts a TOTP step only if it is newer than the last one used — the condition in the WHERE clause is
- * what makes two simultaneous requests with the same code unable to both succeed. Returns the updated
- * user, or null.
- */
-export async function claimTotpStep(ref, step, extraSet = {}) {
-  const { text, values } = assignments(columnsFor(extraSet), 3);
-  return row(
-    `UPDATE users
-        SET mfa_last_step = $2, failed_attempts = 0, locked_until = NULL${text ? `, ${text}` : ''}
-      WHERE ref = $1 AND mfa_last_step < $2 AND deleted_at IS NULL
-      RETURNING ${USER_COLUMNS}`,
-    [ref, step, ...values],
-  );
 }
 
 export async function countActiveSuperAdmins() {

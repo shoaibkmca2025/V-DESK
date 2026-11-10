@@ -1,3 +1,4 @@
+import { derivePasswordKey } from '@/features/auth/passwordKey.js';
 import { staffHeaders } from '@/features/auth/staffSession.js';
 import { api, apiBaseUrl, isApiEnabled } from '@/lib/api.js';
 
@@ -78,8 +79,8 @@ export async function downloadLeadsCsv() {
 }
 
 // ── Staff accounts (users:manage — super admins) ──
-// A new account, or a forgotten password, gets a one-time setup code instead of a password (ADR-012). The API
-// returns the code once, in the reply to the call that made it; the console shows it and never stores it.
+// The admin sets the password, here in the browser: it is turned into a key (ADR-013) before it is sent, so
+// the API never receives it. The admin hands the password over to the person out of band.
 
 export async function fetchStaffUsers({ limit = 100 } = {}) {
   if (!isApiEnabled()) return null;
@@ -90,14 +91,16 @@ export async function fetchStaffUsers({ limit = 100 } = {}) {
   }
 }
 
-/** `{ email, name, role }` → the new user, with `setupCode` and `setupCodeExpiresAt`. Throws the API's answer. */
-export async function createStaffUser({ email, name, role }) {
-  return api.post('/auth/users', { body: { email, name, role }, headers: staffHeaders() });
+/** `{ email, name, role, password }` → the new user. Throws the API's answer. */
+export async function createStaffUser({ email, name, role, password }) {
+  const passwordKey = await derivePasswordKey(email, password);
+  return api.post('/auth/users', { body: { email, name, role, passwordKey }, headers: staffHeaders() });
 }
 
-/** A fresh setup code: the old password and code stop working, and the person's sessions end. */
-export async function issueStaffSetupCode(ref) {
-  return api.patch(`/auth/users/${ref}`, { body: { issueSetupCode: true }, headers: staffHeaders() });
+/** Sets a new password for someone who forgot theirs: the old one stops working and their sessions end. */
+export async function setStaffPassword(ref, email, password) {
+  const passwordKey = await derivePasswordKey(email, password);
+  return api.patch(`/auth/users/${ref}`, { body: { passwordKey }, headers: staffHeaders() });
 }
 
 export async function setStaffStatus(ref, status) {

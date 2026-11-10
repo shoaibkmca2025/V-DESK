@@ -13,46 +13,22 @@ const email = z.string().trim().toLowerCase().max(254).email('Enter a valid emai
 const passwordKey = z
   .string()
   .regex(/^[A-Za-z0-9_-]{43}$/, 'Expected the key the sign-in page derives from the password — reload the page');
-const mfaToken = z.string().min(1, 'mfaToken is required').max(2000);
 
-/** A password (as its key), or — before the first sign-in — the one-time setup code. Exactly one of the two. */
-export const loginBody = z
-  .object({
-    email,
-    passwordKey: passwordKey.optional(),
-    setupCode: z.string().trim().min(1, 'Enter your setup code').max(40).optional(),
-  })
-  .refine((body) => (body.passwordKey === undefined) !== (body.setupCode === undefined), {
-    message: 'Send either passwordKey or setupCode',
-  });
-
-/** Body for POST /auth/password/setup — the token from signing in with the setup code, and the new password's key. */
-export const setupPasswordBody = z.object({
-  setupToken: z.string().min(1, 'setupToken is required').max(2000),
-  newPasswordKey: passwordKey,
-});
-
-export const mfaEnrollBody = z.object({ mfaToken });
-
-export const mfaVerifyBody = z.object({
-  mfaToken,
-  /** Authenticator apps show "123 456"; accept it with or without the space. */
-  code: z.preprocess(
-    (value) => (typeof value === 'string' ? value.replace(/\s/g, '') : value),
-    z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your authenticator app'),
-  ),
-});
+/** Sign-in: the email, and the key the page derived from the password (ADR-013). */
+export const loginBody = z.object({ email, passwordKey });
 
 export const changePasswordBody = z.object({ currentPasswordKey: passwordKey, newPasswordKey: passwordKey });
 
 /**
- * No password here: the API generates a one-time setup code and returns it once (ADR-012), so an admin never
- * knows a staff member's password. Unknown fields — including a `password` — are dropped.
+ * The creating admin sets the password. As everywhere else, the API is sent the derived key and never the
+ * password itself, so length and character rules can only be enforced by the page. Unknown fields —
+ * including a plain `password` — are dropped.
  */
 export const createUserBody = z.object({
   email,
   name: z.string().trim().min(1, 'Name is required').max(120),
   role: z.enum(STAFF_ROLES),
+  passwordKey,
 });
 
 export const updateUserBody = z
@@ -60,13 +36,12 @@ export const updateUserBody = z
     name: z.string().trim().min(1).max(120).optional(),
     role: z.enum(STAFF_ROLES).optional(),
     status: z.enum(USER_STATUSES).optional(),
-    /** Forgotten password: a fresh setup code replaces the old password (returned once, like on creation). */
-    issueSetupCode: z.literal(true).optional(),
-    resetMfa: z.literal(true).optional(),
+    /** Forgotten password: the admin sets a new one, which also clears any lockout. */
+    passwordKey: passwordKey.optional(),
     unlock: z.literal(true).optional(),
   })
   .refine((body) => Object.values(body).some((value) => value !== undefined), {
-    message: 'Send at least one of name, role, status, issueSetupCode, resetMfa or unlock',
+    message: 'Send at least one of name, role, status, passwordKey or unlock',
   });
 
 export const userRefParams = z.object({

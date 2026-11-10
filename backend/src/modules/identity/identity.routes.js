@@ -14,9 +14,6 @@ import {
   googleSignInBody,
   listUsersQuery,
   loginBody,
-  mfaEnrollBody,
-  mfaVerifyBody,
-  setupPasswordBody,
   updateCustomerBody,
   updateUserBody,
   userRefParams,
@@ -24,16 +21,12 @@ import {
 
 export const identityRouter = Router();
 
-// One budget for the whole sign-in flow (password + enroll + code) per IP; the account lockout covers
-// guessing spread across many IPs.
+// One budget for sign-in attempts per IP; the account lockout covers guessing spread across many IPs.
 const signInLimit = rateLimit({ name: 'sign-in', windowMs: 60_000, max: 10 });
 const refreshLimit = rateLimit({ name: 'session refresh', windowMs: 60_000, max: 30 });
 
 // ── Sign-in & sessions ────────────────────────
 identityRouter.post('/login', signInLimit, validate({ body: loginBody }), controller.login);
-identityRouter.post('/password/setup', signInLimit, validate({ body: setupPasswordBody }), controller.setupPassword);
-identityRouter.post('/mfa/enroll', signInLimit, validate({ body: mfaEnrollBody }), controller.enrollMfa);
-identityRouter.post('/mfa/verify', signInLimit, validate({ body: mfaVerifyBody }), controller.verifyMfa);
 identityRouter.post('/refresh', refreshLimit, controller.refresh);
 identityRouter.post('/logout', controller.logout);
 

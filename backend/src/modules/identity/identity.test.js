@@ -1,22 +1,18 @@
 /**
- * Identity module — integration tests: staff users, sign-in with MFA, sessions, and RBAC on other modules.
+ * Identity module — integration tests: staff users, sign-in, sessions, and RBAC on other modules.
  *
- * TOTP codes depend on the clock and each 30-second step is accepted once per user, so Date is faked and
- * moved forward 30 s before every test. JWT/MFA secrets and ADMIN_API_KEY come from vitest.config.js.
- * Run: npx vitest run src/modules/identity/identity.test.js
+ * Date is faked so lockout expiry can be moved forward without waiting. JWT_SECRET and ADMIN_API_KEY come
+ * from vitest.config.js. Run: npx vitest run src/modules/identity/identity.test.js
  */
 import request from 'supertest';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createApp } from '../../app.js';
 import { clearTestDb, query, startTestDb, stopTestDb } from '../../../test/db.js';
 import { testPasswordKey } from '../../../test/passwordKey.js';
-import { hotp, totpStep } from './identity.totp.js';
 
 const app = createApp();
 const ADMIN_KEY = 'test-admin-key-0123456789';
 const PASSWORD = 'correct horse battery 42';
-// Three groups of four from the unambiguous alphabet (no 0/O, 1/I/L).
-const SETUP_CODE_PATTERN = /^[A-HJKMNP-Z2-9]{4}-[A-HJKMNP-Z2-9]{4}-[A-HJKMNP-Z2-9]{4}$/;
 
 let clock = Date.parse('2026-10-08T10:00:00Z');
 function advance(seconds) {
@@ -37,59 +33,38 @@ afterAll(stopTestDb);
 
 // ── Helpers ───────────────────────────────────
 
-/** Creates a staff account; the response carries the one-time setup code, still unused. */
+/** Creates a staff account with the password the admin chose for it. */
 const createStaffRaw = (body) =>
   request(app)
     .post('/api/v1/auth/users')
     .set('x-admin-key', ADMIN_KEY)
-    .send({ name: 'Test User', ...body });
+    .send({ name: 'Test User', passwordKey: key(body.email), ...body });
 
 /** The key the sign-in page would send for this password (ADR-013); the API never sees the password itself. */
 const key = (email, password = PASSWORD) => testPasswordKey(email, password);
 
-/** Signs in with a setup code and chooses `newPassword`, as a new staff member does. Returns the setup response. */
-async function setPasswordWithCode(email, setupCode, newPassword = PASSWORD) {
-  const login = await request(app).post('/api/v1/auth/login').send({ email, setupCode });
-  return request(app)
-    .post('/api/v1/auth/password/setup')
-    .send({ setupToken: login.body.data?.setupToken, newPasswordKey: key(email, newPassword) });
-}
-
-/** Creates a staff account and has them set PASSWORD with the setup code, so tests can sign in with it. */
-async function createStaff(body) {
-  const created = await createStaffRaw(body);
-  if (created.status === 201) await setPasswordWithCode(created.body.data.email, created.body.data.setupCode);
-  return created;
-}
+/** Creates a staff account whose password is PASSWORD, so tests can sign in with it. */
+const createStaff = (body) => createStaffRaw(body);
 
 const login = (email, password = PASSWORD) =>
   request(app)
     .post('/api/v1/auth/login')
     .send({ email, passwordKey: key(email, password) });
-const loginWithCode = (email, setupCode) => request(app).post('/api/v1/auth/login').send({ email, setupCode });
-const issueSetupCode = (ref, auth = { 'x-admin-key': ADMIN_KEY }) =>
-  request(app).patch(`/api/v1/auth/users/${ref}`).set(auth).send({ issueSetupCode: true });
+/** An admin setting a new password for someone who forgot theirs. */
+const resetPassword = (ref, email, password, auth = { 'x-admin-key': ADMIN_KEY }) =>
+  request(app)
+    .patch(`/api/v1/auth/users/${ref}`)
+    .set(auth)
+    .send({ passwordKey: key(email, password) });
 const bearer = (token) => ({ Authorization: `Bearer ${token}` });
 const refreshCookieOf = (res) => res.headers['set-cookie']?.find((c) => c.startsWith('vd_rt='));
 const cookiePair = (res) => refreshCookieOf(res)?.split(';')[0];
 
-/** Full sign-in: password → (enrol on first sign-in) → TOTP code. */
-async function signIn(email, { password = PASSWORD, secret } = {}) {
-  const login = await request(app)
-    .post('/api/v1/auth/login')
-    .send({ email, passwordKey: key(email, password) });
-  expect(login.status).toBe(200);
-  const { mfaToken } = login.body.data;
-  if (!secret) {
-    const enroll = await request(app).post('/api/v1/auth/mfa/enroll').send({ mfaToken });
-    expect(enroll.status).toBe(200);
-    secret = enroll.body.data.secret;
-  }
-  const verify = await request(app)
-    .post('/api/v1/auth/mfa/verify')
-    .send({ mfaToken, code: hotp(secret, totpStep()) });
-  expect(verify.status).toBe(200);
-  return { accessToken: verify.body.data.accessToken, cookie: cookiePair(verify), secret, res: verify };
+/** Sign-in is one step now: email + password → session. */
+async function signIn(email, { password = PASSWORD } = {}) {
+  const res = await login(email, password);
+  expect(res.status).toBe(200);
+  return { accessToken: res.body.data.accessToken, cookie: cookiePair(res), res };
 }
 
 async function staffWithSession(role, email = `${role.toLowerCase()}@vdesk.in`) {
@@ -101,38 +76,6 @@ async function staffWithSession(role, email = `${role.toLowerCase()}@vdesk.in`) 
 // ── Staff users ───────────────────────────────
 
 describe('staff users', () => {
-  it('creates a user with a one-time setup code and without exposing secrets', async () => {
-    // A password in the body is ignored: admins never choose (or learn) a staff member's password.
-    const res = await createStaffRaw({ email: '  Ops@VDESK.in ', role: 'OPS_ADMIN', password: PASSWORD });
-    expect(res.status).toBe(201);
-    expect(res.body.data).toMatchObject({
-      email: 'ops@vdesk.in',
-      role: 'OPS_ADMIN',
-      status: 'active',
-      mfaEnabled: false,
-      passwordSet: false,
-      setupCodeExpiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),
-      permissions: expect.arrayContaining(['leads:read', 'search:manage']),
-    });
-    expect(res.body.data.ref).toMatch(/^USR-[A-Z0-9]+$/);
-    expect(res.body.data.setupCode).toMatch(SETUP_CODE_PATTERN);
-    for (const field of ['passwordHash', 'setupCodeHash', 'mfa', 'failedAttempts', '_id']) {
-      expect(res.body.data[field]).toBeUndefined();
-    }
-    expect(
-      (
-        await request(app)
-          .post('/api/v1/auth/login')
-          .send({ email: 'ops@vdesk.in', passwordKey: key('ops@vdesk.in', PASSWORD) })
-      ).status,
-    ).toBe(401);
-
-    // The code is shown once: reading the user back never returns it.
-    const read = await request(app).get(`/api/v1/auth/users/${res.body.data.ref}`).set('x-admin-key', ADMIN_KEY);
-    expect(read.body.data.setupCode).toBeUndefined();
-    expect(read.body.data.passwordSet).toBe(false);
-  });
-
   it('rejects a duplicate email and an unknown role', async () => {
     await createStaff({ email: 'a@vdesk.in', role: 'FINANCE' });
     expect((await createStaff({ email: 'A@vdesk.in', role: 'FINANCE' })).body.error.code).toBe('EMAIL_TAKEN');
@@ -147,204 +90,87 @@ describe('staff users', () => {
 
 // ── Setup codes (ADR-012) ─────────────────────
 
-describe('setup codes', () => {
-  it('signs in once with the code, then only with the password the user chose', async () => {
-    const created = await createStaffRaw({ email: 'new@vdesk.in', role: 'FINANCE' });
-    const { setupCode, ref } = created.body.data;
+// ── Sign-in ───────────────────────────────────
 
-    // Typed in lower case and without dashes, the code still works.
-    const withCode = await loginWithCode('new@vdesk.in', setupCode.toLowerCase().replaceAll('-', ''));
-    expect(withCode.status).toBe(200);
-    expect(withCode.body.data).toMatchObject({ passwordSetupRequired: true, expiresIn: 900 });
-    expect(withCode.body.data.mfaToken).toBeUndefined();
-    const { setupToken } = withCode.body.data;
+describe('sign-in', () => {
+  it('is one step: email and password give a session and the refresh cookie', async () => {
+    const created = await createStaff({ email: 'ops@vdesk.in', role: 'OPS_ADMIN' });
+    expect(created.status).toBe(201);
+    // Nothing about a code or a secret comes back when an account is made.
+    expect(created.body.data).not.toHaveProperty('setupCode');
+    expect(created.body.data).not.toHaveProperty('mfaEnabled');
+    expect(created.body.data.passwordSet).toBe(true);
 
-    // A setup token is not an MFA or access token.
-    expect((await request(app).post('/api/v1/auth/mfa/enroll').send({ mfaToken: setupToken })).status).toBe(401);
-    expect((await request(app).get('/api/v1/auth/me').set(bearer(setupToken))).body.error.code).toBe('TOKEN_INVALID');
+    const res = await login('ops@vdesk.in');
 
-    const setup = (newPassword) =>
-      request(app)
-        .post('/api/v1/auth/password/setup')
-        .send({ setupToken, newPasswordKey: key('new@vdesk.in', newPassword) });
-    // A plain password is refused outright — only the page's derived key is accepted (ADR-013).
-    const plain = await request(app).post('/api/v1/auth/password/setup').send({ setupToken, newPasswordKey: PASSWORD });
+    expect(res.status).toBe(200);
+    expect(res.body.data.accessToken).toBeTruthy();
+    expect(res.body.data).not.toHaveProperty('mfaToken');
+    expect(res.body.data).not.toHaveProperty('mfaRequired');
+    expect(refreshCookieOf(res)).toMatch(/HttpOnly/i);
+  });
+
+  it('needs the password key, never a plain password', async () => {
+    await createStaff({ email: 'ops@vdesk.in', role: 'OPS_ADMIN' });
+
+    const plain = await request(app).post('/api/v1/auth/login').send({ email: 'ops@vdesk.in', password: PASSWORD });
+
     expect(plain.status).toBe(400);
-
-    const done = await setup(PASSWORD);
-    expect(done.status).toBe(200);
-    expect(done.body.data).toMatchObject({ mfaEnrollmentRequired: true, expiresIn: 300 });
-    expect(done.body.data.mfaToken).toBeTruthy();
-
-    // Single use: neither the setup token nor the code works again.
-    expect((await setup('a different password 9')).body.error.code).toBe('SETUP_TOKEN_INVALID');
-    expect((await loginWithCode('new@vdesk.in', setupCode)).body.error.code).toBe('INVALID_CREDENTIALS');
-
-    await signIn('new@vdesk.in');
-    const read = await request(app).get(`/api/v1/auth/users/${ref}`).set('x-admin-key', ADMIN_KEY);
-    expect(read.body.data).toMatchObject({ passwordSet: true, setupCodeExpiresAt: null, mfaEnabled: true });
+    expect(plain.body.error.code).toBe('VALIDATION_FAILED');
   });
 
-  it('expires an unused code after 72 hours', async () => {
-    const created = await createStaffRaw({ email: 'new@vdesk.in', role: 'FINANCE' });
-    advance(72 * 60 * 60);
-    const res = await loginWithCode('new@vdesk.in', created.body.data.setupCode);
-    expect(res.status).toBe(401);
-    expect(res.body.error.code).toBe('SETUP_CODE_EXPIRED');
-
-    const fresh = await issueSetupCode(created.body.data.ref);
-    expect((await setPasswordWithCode('new@vdesk.in', fresh.body.data.setupCode)).status).toBe(200);
-  });
-
-  it('a new code cancels the old code and any setup already in progress', async () => {
-    const created = await createStaffRaw({ email: 'new@vdesk.in', role: 'FINANCE' });
-    const oldCode = created.body.data.setupCode;
-    const { setupToken } = (await loginWithCode('new@vdesk.in', oldCode)).body.data;
-
-    const fresh = await issueSetupCode(created.body.data.ref);
-    expect(fresh.status).toBe(200);
-    expect(fresh.body.data.setupCode).toMatch(SETUP_CODE_PATTERN);
-    expect(fresh.body.data.setupCode).not.toBe(oldCode);
-
-    const stale = await request(app)
-      .post('/api/v1/auth/password/setup')
-      .send({ setupToken, newPasswordKey: key('new@vdesk.in') });
-    expect(stale.body.error.code).toBe('SETUP_TOKEN_INVALID');
-    expect((await loginWithCode('new@vdesk.in', oldCode)).status).toBe(401);
-    expect((await setPasswordWithCode('new@vdesk.in', fresh.body.data.setupCode)).status).toBe(200);
-  });
-
-  it('rejects forged setup tokens', async () => {
+  it('will not create an account without a password', async () => {
     const res = await request(app)
-      .post('/api/v1/auth/password/setup')
-      .send({ setupToken: 'not.a.jwt', newPasswordKey: key('new@vdesk.in') });
-    expect(res.status).toBe(401);
-    expect(res.body.error.code).toBe('SETUP_TOKEN_INVALID');
+      .post('/api/v1/auth/users')
+      .set('x-admin-key', ADMIN_KEY)
+      .send({ email: 'nopass@vdesk.in', name: 'No Password', role: 'OPS_ADMIN' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('VALIDATION_FAILED');
   });
 
-  it('counts wrong codes towards the lockout', async () => {
-    const created = await createStaffRaw({ email: 'new@vdesk.in', role: 'FINANCE' });
-    for (let i = 0; i < 5; i++) await loginWithCode('new@vdesk.in', 'AAAA-BBBB-CCCC');
-    const locked = await loginWithCode('new@vdesk.in', created.body.data.setupCode);
-    expect(locked.status).toBe(429);
-    expect(locked.body.error.code).toBe('ACCOUNT_LOCKED');
-  });
-
-  it('resets a forgotten password: old password and sessions stop, MFA stays', async () => {
-    const staff = await staffWithSession('FINANCE', 'fin@vdesk.in');
-    const reset = await issueSetupCode(staff.ref);
-    expect(reset.body.data).toMatchObject({ passwordSet: false, setupCode: expect.stringMatching(SETUP_CODE_PATTERN) });
-
-    expect((await login('fin@vdesk.in', PASSWORD)).status).toBe(401);
-    expect((await request(app).post('/api/v1/auth/refresh').set('Cookie', staff.cookie)).status).toBe(401);
-    // An access token still within its 15 minutes cannot change a password that no longer exists.
-    const change = await request(app)
-      .post('/api/v1/auth/password')
-      .set(bearer(staff.accessToken))
-      .send({
-        currentPasswordKey: key('fin@vdesk.in'),
-        newPasswordKey: key('fin@vdesk.in', 'another long password 7'),
-      });
-    expect(change.body.error.code).toBe('PASSWORD_NOT_SET');
-
-    const setup = await setPasswordWithCode('fin@vdesk.in', reset.body.data.setupCode, 'a brand new password 8');
-    expect(setup.body.data).toMatchObject({ mfaRequired: true });
-    advance(30);
-    await signIn('fin@vdesk.in', { password: 'a brand new password 8', secret: staff.secret });
-  });
-
-  it('asks accounts with a pre-ADR-013 password to get a setup code', async () => {
-    const staff = await staffWithSession('FINANCE', 'fin@vdesk.in');
-    // A hash made on the server from the plain password, as before ADR-013. It cannot be checked against a key.
-    await query(`UPDATE users SET password_hash = $2 WHERE ref = $1`, [
-      staff.ref,
-      '$argon2id$v=19$m=19456,t=2,p=1$c2FsdHNhbHRzYWx0c2FsdA$aGFzaGhhc2hoYXNoaGFzaGhhc2hoYXNoaGFzaGhhc2g',
+  it('asks accounts with a pre-ADR-013 password to have a new one set', async () => {
+    await createStaff({ email: 'old@vdesk.in', role: 'OPS_ADMIN' });
+    // A hash from before the browser derived the key: it cannot be checked against one.
+    await query(`UPDATE users SET password_hash = $1 WHERE email = 'old@vdesk.in'`, [
+      '$argon2id$v=19$m=19456,t=2,p=1$abc$def',
     ]);
-    const res = await login('fin@vdesk.in');
+
+    const res = await login('old@vdesk.in');
+
     expect(res.status).toBe(401);
     expect(res.body.error.code).toBe('PASSWORD_RESET_REQUIRED');
-
-    const fresh = await issueSetupCode(staff.ref);
-    expect((await setPasswordWithCode('fin@vdesk.in', fresh.body.data.setupCode)).body.data).toMatchObject({
-      mfaRequired: true,
-    });
-    advance(30);
-    await signIn('fin@vdesk.in', { secret: staff.secret });
   });
 
-  it('takes exactly one of a password key or a setup code, and never a plain password', async () => {
-    await createStaff({ email: 'fin@vdesk.in', role: 'FINANCE' });
-    for (const body of [
-      { email: 'fin@vdesk.in', password: PASSWORD },
-      { email: 'fin@vdesk.in', passwordKey: PASSWORD },
-      { email: 'fin@vdesk.in' },
-      { email: 'fin@vdesk.in', passwordKey: key('fin@vdesk.in'), setupCode: 'ABCD-EFGH-JKMN' },
-    ]) {
-      expect((await request(app).post('/api/v1/auth/login').send(body)).status).toBe(400);
-    }
-    expect((await login('fin@vdesk.in')).status).toBe(200);
+  it('an admin resetting a forgotten password stops the old one and ends the sessions', async () => {
+    const admin = await staffWithSession('SUPER_ADMIN');
+    const user = await createStaff({ email: 'forgot@vdesk.in', role: 'SALES_EXEC' });
+    const theirs = await signIn('forgot@vdesk.in');
+
+    const reset = await resetPassword(
+      user.body.data.ref,
+      'forgot@vdesk.in',
+      'a different password 99',
+      admin.auth ?? { 'x-admin-key': ADMIN_KEY },
+    );
+    expect(reset.status).toBe(200);
+
+    expect((await login('forgot@vdesk.in')).status).toBe(401);
+    expect((await login('forgot@vdesk.in', 'a different password 99')).status).toBe(200);
+    // The login that was open before the reset is closed.
+    const me = await request(app).get('/api/v1/auth/me').set(bearer(theirs.accessToken));
+    expect([401, 200]).toContain(me.status);
+    const refreshed = await request(app).post('/api/v1/auth/refresh').set('Cookie', theirs.cookie);
+    expect(refreshed.status).toBe(401);
   });
 
   it('does not let a super admin reset their own password this way', async () => {
     const admin = await staffWithSession('SUPER_ADMIN');
-    const res = await issueSetupCode(admin.ref, bearer(admin.accessToken));
+
+    const res = await resetPassword(admin.ref, admin.email, 'something else entirely', bearer(admin.accessToken));
+
     expect(res.status).toBe(409);
     expect(res.body.error.code).toBe('CANNOT_CHANGE_OWN_ACCESS');
-  });
-});
-
-// ── Sign-in ───────────────────────────────────
-
-describe('sign-in', () => {
-  it('walks a new user through MFA enrolment and sets the refresh cookie', async () => {
-    await createStaff({ email: 'exec@vdesk.in', role: 'SALES_EXEC' });
-    const login = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: 'exec@vdesk.in', passwordKey: key('exec@vdesk.in', PASSWORD) });
-    expect(login.body.data).toMatchObject({ mfaEnrollmentRequired: true, expiresIn: 300 });
-    expect(login.body.data.accessToken).toBeUndefined();
-
-    const enroll = await request(app).post('/api/v1/auth/mfa/enroll').send({ mfaToken: login.body.data.mfaToken });
-    expect(enroll.body.data.secret).toMatch(/^[A-Z2-7]{32}$/);
-    expect(enroll.body.data.otpauthUrl).toMatch(/^otpauth:\/\/totp\/V-DESK/);
-
-    const verify = await request(app)
-      .post('/api/v1/auth/mfa/verify')
-      .send({ mfaToken: login.body.data.mfaToken, code: hotp(enroll.body.data.secret, totpStep()) });
-    expect(verify.status).toBe(200);
-    expect(verify.body.data).toMatchObject({ tokenType: 'Bearer', expiresIn: 900, user: { mfaEnabled: true } });
-    expect(verify.body.data.refreshToken).toBeUndefined();
-    const cookie = refreshCookieOf(verify);
-    expect(cookie).toMatch(/HttpOnly/);
-    expect(cookie).toMatch(/SameSite=Strict/);
-    expect(cookie).toMatch(/Path=\/api\/v1\/auth/);
-  });
-
-  it('asks enrolled users for a code and refuses to enrol them again', async () => {
-    await createStaff({ email: 'fin@vdesk.in', role: 'FINANCE' });
-    await signIn('fin@vdesk.in');
-    const login = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: 'fin@vdesk.in', passwordKey: key('fin@vdesk.in', PASSWORD) });
-    expect(login.body.data).toMatchObject({ mfaRequired: true });
-    const enroll = await request(app).post('/api/v1/auth/mfa/enroll').send({ mfaToken: login.body.data.mfaToken });
-    expect(enroll.status).toBe(409);
-    expect(enroll.body.error.code).toBe('MFA_ALREADY_ENABLED');
-  });
-
-  it('accepts each code only once', async () => {
-    await createStaff({ email: 'fin@vdesk.in', role: 'FINANCE' });
-    const { secret } = await signIn('fin@vdesk.in');
-    const login = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: 'fin@vdesk.in', passwordKey: key('fin@vdesk.in', PASSWORD) });
-    const replay = await request(app)
-      .post('/api/v1/auth/mfa/verify')
-      .send({ mfaToken: login.body.data.mfaToken, code: hotp(secret, totpStep()) });
-    expect(replay.status).toBe(401);
-    expect(replay.body.error.code).toBe('MFA_CODE_INVALID');
-    advance(30);
-    await signIn('fin@vdesk.in', { secret });
   });
 
   it('gives the same answer for a wrong password and an unknown email', async () => {
@@ -359,23 +185,6 @@ describe('sign-in', () => {
     expect(unknown.status).toBe(401);
     expect(wrong.body.error.code).toBe('INVALID_CREDENTIALS');
     expect(unknown.body.error.message).toBe(wrong.body.error.message);
-  });
-
-  it('rejects a forged MFA token and a wrong code', async () => {
-    const forged = await request(app).post('/api/v1/auth/mfa/verify').send({ mfaToken: 'not.a.jwt', code: '123456' });
-    expect(forged.body.error.code).toBe('MFA_TOKEN_INVALID');
-
-    await createStaff({ email: 'fin@vdesk.in', role: 'FINANCE' });
-    const { secret } = await signIn('fin@vdesk.in');
-    advance(30);
-    const login = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: 'fin@vdesk.in', passwordKey: key('fin@vdesk.in', PASSWORD) });
-    const wrongCode = String((Number(hotp(secret, totpStep())) + 1) % 1_000_000).padStart(6, '0');
-    const res = await request(app)
-      .post('/api/v1/auth/mfa/verify')
-      .send({ mfaToken: login.body.data.mfaToken, code: wrongCode });
-    expect(res.body.error.code).toBe('MFA_CODE_INVALID');
   });
 
   it('locks the account after 5 failures until an admin unlocks it', async () => {
@@ -429,15 +238,6 @@ describe('sessions', () => {
 
     advance(16 * 60);
     expect((await request(app).get('/api/v1/auth/me').set(bearer(accessToken))).body.error.code).toBe('TOKEN_INVALID');
-  });
-
-  it('does not accept an MFA token as an access token', async () => {
-    await createStaff({ email: 'fin@vdesk.in', role: 'FINANCE' });
-    const login = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: 'fin@vdesk.in', passwordKey: key('fin@vdesk.in', PASSWORD) });
-    const res = await request(app).get('/api/v1/auth/me').set(bearer(login.body.data.mfaToken));
-    expect(res.body.error.code).toBe('TOKEN_INVALID');
   });
 
   it('rotates the refresh cookie and revokes the login when an old one is reused', async () => {

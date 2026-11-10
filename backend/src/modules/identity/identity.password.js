@@ -11,7 +11,7 @@ import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
  * never look equal in the table.
  *
  * Hashes made before ADR-013 (`$argon2id$…`, hashed on the server from the plain password) cannot be checked
- * against a key. Those accounts need a new setup code (`isLegacyPasswordHash`).
+ * against a key. Those accounts need an admin to set them a new password (`isLegacyPasswordHash`).
  */
 
 const PREFIX = '$vdk-key$v=1$';

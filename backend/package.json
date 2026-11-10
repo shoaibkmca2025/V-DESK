@@ -18,8 +18,7 @@
     "test:watch": "vitest",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "totp": "node scripts/totp.js"
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@noble/hashes": "^2.0.1",
