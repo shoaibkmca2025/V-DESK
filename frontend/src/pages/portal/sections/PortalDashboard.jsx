@@ -10,7 +10,7 @@ import { openTaxInvoiceModal } from '@/features/checkout/taxInvoice.js';
 import { openMeetingBookingModal } from '@/features/meetingRooms/roomBooking.js';
 import { showToast } from '@/features/ui/toast.js';
 import { isApiEnabled } from '@/lib/api.js';
-import { readJson } from '@/lib/storage.js';
+import { readOrders } from '@/features/orders/orderHistory.js';
 
 /**
  * Customer dashboard.
@@ -95,7 +95,7 @@ export default function PortalDashboard() {
   const { customer, ready } = useCustomer();
   const [apiBookings, setApiBookings] = useState(null);
   const [localBookings, setLocalBookings] = useState(() => getBookings());
-  const orders = useMemo(() => readJson('VDESK_ORDERS', []), []);
+  const orders = useMemo(() => readOrders(), []);
 
   const loadBookings = useCallback(async () => {
     if (!customer) return;

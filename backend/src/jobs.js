@@ -18,7 +18,8 @@ export function messagingProviders() {
 
 export function buildJobs({ providers = messagingProviders() } = {}) {
   const jobs = [
-    // Delivers outbox events to their handlers (shared/events/bus.js).
+    // Delivers outbox events to their handlers (shared/events/bus.js). `everyMs` is the Node worker's
+    // interval; on Cloudflare there is no loop, so the minute cron runs this once a minute instead.
     { name: 'events.dispatch', everyMs: 1_000, run: () => dispatchDueEvents({ limit: 50 }) },
     // Deletes rows MongoDB used to expire with TTL indexes (shared/jobs/purge.js). Hourly is plenty: none
     // of them is still honoured once it is past its time, so this is housekeeping, not a rule.

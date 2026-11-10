@@ -129,3 +129,14 @@ describe('customer session', () => {
     expect(signInPath('/meeting-rooms')).toBe('/login?next=%2Fmeeting-rooms');
   });
 });
+
+describe('signing out on a shared computer', () => {
+  it('takes the order history with it', async () => {
+    localStorage.setItem('VDESK_ORDERS', JSON.stringify([{ invoiceNo: 'INV-1', item: 'Virtual Office', amount: 21499 }]));
+    const { signOut } = await loadSession('');
+
+    await signOut();
+
+    expect(localStorage.getItem('VDESK_ORDERS')).toBeNull();
+  });
+});

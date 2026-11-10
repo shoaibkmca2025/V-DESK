@@ -91,6 +91,11 @@ use `data-action="…"` attributes (see `lib/html.js` → `action()`), dispatche
   Human Interface Guidelines for legibility (17px body, no weights under 400), materials (the header is a
   translucent control layer over opaque content), motion (short, purposeful, disabled under
   `prefers-reduced-motion`) and accessibility (WCAG AA contrast, 44px minimum control size, visible focus).
+- **Dead rules:** the stylesheet is one render-blocking file for every visitor, so unused rules cost
+  everyone. `node scripts/prune-css.mjs src/styles/<file>.css` lists the rules whose class names
+  appear nowhere in `src/`; add `--write` to remove them. It is deliberately timid — it only touches
+  rules made purely of unused classes, never anything matching by element, id or attribute — but it
+  cannot see your eyes, so check the affected pages in a browser before committing.
 - **Page layout pattern:** hero with one message → plans/options → what's included → steps → cities → FAQ → CTA.
   Compose new pages from `src/components/ui` rather than one-off inline styles.
 - **Markup:** `src/pages/<page>/sections/*.jsx` for page content, `src/components/` for shared chrome/modals.

@@ -1,4 +1,5 @@
 import { api, isApiEnabled } from '@/lib/api.js';
+import { clearOrders } from '@/features/orders/orderHistory.js';
 
 /**
  * The customer's portal session.
@@ -108,6 +109,9 @@ export async function signOut() {
   }
   setHint(false);
   save(null);
+  // The simulated order history lives in this browser, so it leaves with the session — otherwise the
+  // next person on a shared computer opens the portal and reads the last customer's invoices.
+  clearOrders();
 }
 
 /**

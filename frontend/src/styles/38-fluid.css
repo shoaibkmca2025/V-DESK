@@ -180,12 +180,22 @@
 @media (prefers-reduced-transparency: reduce) {
   /* Frost the glass into a solid surface rather than dropping the layer. */
   .site-header,
-  .site-header.is-scrolled { background: #ffffff !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .site-header.is-scrolled { background: #f6ead3 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
   .modal-overlay.active,
   .modal-overlay.open { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(35, 21, 8, 0.92) !important; }
   .ui-hero__badge,
   .ui-chip,
-  .ui-hero__stats,
+  .ui-hero__stat {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #fffdf6 !important;
+  }
+  /* Shows through the 1px grid gaps, so it stays the hairline tone, not a surface. */
+  .ui-hero__stats {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--ui-border-strong) !important;
+  }
   .ui-btn--glass {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -205,7 +215,7 @@
   .ui-lead,
   .ui-page .ui-card p,
   .ui-page .ui-step p { color: var(--ui-text) !important; }
-  .ui-chip { background: rgba(43, 26, 12, 0.92) !important; border-color: #fff !important; }
+  .ui-chip { background: #fffdf6 !important; border-color: var(--ui-ink) !important; }
 }
 
 /*

@@ -9,7 +9,7 @@ import { openTaxInvoiceModal } from '@/features/checkout/taxInvoice.js';
 import { showToast } from '@/features/ui/toast.js';
 import { isApiEnabled } from '@/lib/api.js';
 import { rawStyle } from '@/lib/domRefs.js';
-import { readJson, writeJson } from '@/lib/storage.js';
+import { addOrder } from '@/features/orders/orderHistory.js';
 
 const METHODS = [
   ['upi', 'ph-qr-code', 'UPI / QR'],
@@ -25,15 +25,25 @@ const rupees = (n) => '₹' + Math.round(n).toLocaleString('en-IN');
  * Paying is the one step that needs an account (ADR-012), so the payment options appear once the customer has
  * continued with Google. Payment itself is simulated — test mode, no money is taken — until a gateway is live.
  */
+/** A link's amount in whole rupees, or 0 when it carries none we could charge. Exported for the test. */
+export const parseAmount = (raw) => Math.max(0, Math.round(Number(raw) || 0));
+
 export default function CheckoutPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const item = params.get('item') || 'Virtual Office for GST Registration (12-Mo Plan)';
-  const amount = Number(params.get('amount')) || 21499;
+  /*
+   * shortcut: the amount is whatever the link carries, so the page cannot be trusted with real money.
+   * That is safe only while payment is simulated. Before a gateway is connected, price the order on the
+   * server (orderApi / previewQuote) and show that total instead of this one.
+   * There is no default: a link without a usable amount gets no payable total, rather than a made-up one.
+   */
+  const amount = parseAmount(params.get('amount'));
   const city = params.get('city') || 'Mumbai (BKC)';
   const hub = params.get('hub') || '';
   const base = Math.round(amount / (1 + GST_RATE));
   const gst = amount - base;
+  const payable = amount > 0;
 
   const [method, setMethod] = useState('upi');
   const [processing, setProcessing] = useState(false);
@@ -42,15 +52,13 @@ export default function CheckoutPage() {
   const needsSignIn = isApiEnabled() && !customer;
 
   function pay(label) {
-    if (processing || needsSignIn) return;
+    if (processing || needsSignIn || !payable) return;
     setProcessing(true);
     showToast('Processing test payment…', `Simulating ${label} — no money is taken.`, 'info');
     trackSearchEvent('checkout_started', { amount, item });
     setTimeout(() => {
       const invoiceNo = 'INV-2026-' + Math.floor(1000 + Math.random() * 9000);
-      const orders = readJson('VDESK_ORDERS', []);
-      orders.unshift({ ref: 'ORD-' + Date.now().toString(36).toUpperCase(), invoiceNo, item, city, hub, amount, method: label, status: 'TEST', customerRef: customer?.ref ?? null, createdAt: new Date().toISOString() });
-      writeJson('VDESK_ORDERS', orders);
+      addOrder({ ref: 'ORD-' + Date.now().toString(36).toUpperCase(), invoiceNo, item, city, hub, amount, method: label, status: 'TEST', customerRef: customer?.ref ?? null, createdAt: new Date().toISOString() });
       trackSearchEvent('payment_success', { method: label, amount });
       setProcessing(false);
       setDone({ invoiceNo });
@@ -95,6 +103,18 @@ export default function CheckoutPage() {
                 </Link>
               </div>
             </div>
+          ) : !payable ? (
+            // A bookmarked or hand-typed /checkout carries no price. Say so, rather than offering ₹0.
+            <div className="chk-gate">
+              <div className="rb-signin__icon">
+                <i className="ph-bold ph-tag" />
+              </div>
+              <h4>Pick a plan to continue</h4>
+              <p>This checkout link does not carry a price. Choose a plan and the amount comes through with it.</p>
+              <Link to="/pricing" className="btn btn--primary">
+                See pricing <i className="ph-bold ph-arrow-right" />
+              </Link>
+            </div>
           ) : (
             <>
             <p className="chk-testmode" role="note">
@@ -131,7 +151,7 @@ export default function CheckoutPage() {
                         <span>Or enter UPI VPA ID:</span>
                         <div className="upi-input-flex">
                           <input type="text" className="form-input" placeholder="username@okhdfcbank" />{' '}
-                          <button type="button" className="btn btn--primary btn--sm" disabled={processing} onClick={() => pay('UPI ID')}>
+                          <button type="button" className="btn btn--primary btn--sm" disabled={processing || !payable} onClick={() => pay('UPI ID')}>
                             Pay Now
                           </button>
                         </div>
@@ -159,7 +179,7 @@ export default function CheckoutPage() {
                       <label className="form-label">Name on Card</label>
                       <input type="text" className="form-input" placeholder="As printed on card" />
                     </div>
-                    <button type="button" className="btn btn--primary btn--full" disabled={processing} onClick={() => pay('Credit / Debit Card')}>
+                    <button type="button" className="btn btn--primary btn--full" disabled={processing || !payable} onClick={() => pay('Credit / Debit Card')}>
                       <i className="ph-bold ph-lock-key" /> Pay {rupees(amount)} Securely
                     </button>
                   </div>
@@ -174,7 +194,7 @@ export default function CheckoutPage() {
                         ))}
                       </select>
                     </div>
-                    <button type="button" className="btn btn--primary btn--full" disabled={processing} onClick={() => pay('Net Banking')}>
+                    <button type="button" className="btn btn--primary btn--full" disabled={processing || !payable} onClick={() => pay('Net Banking')}>
                       <i className="ph-bold ph-bank" /> Proceed to Bank Login
                     </button>
                   </div>

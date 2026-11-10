@@ -16,3 +16,11 @@ export function writeJson(key, value, storage = globalThis.localStorage) {
     /* storage unavailable: keep in-memory state only */
   }
 }
+
+export function removeKey(key, storage = globalThis.localStorage) {
+  try {
+    storage?.removeItem(key);
+  } catch {
+    /* storage unavailable: nothing was written either */
+  }
+}

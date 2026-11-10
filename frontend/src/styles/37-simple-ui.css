@@ -1052,3 +1052,173 @@ a.ui-card:hover .ui-card__link i { transform: translateX(4px); }
   .ui-topbar__links a:first-child span,
   .ui-topbar__links a:first-child { font-size: 0.75rem; }
 }
+
+/* ── Centre address card ────────────────────────────────────────────────────
+   Photograph on the left under a soft arc, the address's uses and prices on the
+   right. The arc is a border-radius on the media, not a clip-path, so it keeps
+   its shape at every width and degrades to a plain rounded corner when stacked.
+   ──────────────────────────────────────────────────────────────────────── */
+.ui-addr {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: clamp(10px, 1.6vw, 22px);
+  padding: 10px;
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-r-panel);
+  box-shadow: var(--ui-e2);
+}
+
+.ui-addr__media {
+  position: relative;
+  isolation: isolate;
+  min-height: 320px;
+  overflow: hidden;
+  background: var(--ui-navy);
+  border-radius: 20px 44% 44% 20px / 20px 50% 50% 20px;
+}
+.ui-addr__media > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+/* Keeps the place name legible whatever the photograph does behind it. */
+.ui-addr__media::after {
+  content: '';
+  position: absolute;
+  inset: 45% 0 0 0;
+  background: linear-gradient(to top, rgba(27, 16, 6, 0.9) 0%, rgba(27, 16, 6, 0.45) 55%, transparent 100%);
+}
+
+.ui-addr__flag {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 8px 14px;
+  border-radius: 0 999px 999px 0;
+  background: var(--ui-gold);
+  color: var(--ui-navy);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.ui-addr__flag i { font-size: 0.95rem; }
+
+.ui-addr__place {
+  position: absolute;
+  z-index: 1;
+  left: 20px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+}
+.ui-addr__place i { font-size: 1.4rem; color: var(--ui-gold-light); }
+.ui-addr__place strong { display: block; font-family: var(--ui-display); font-size: 1.2rem; font-weight: 600; line-height: 1.2; }
+.ui-addr__place span { font-size: 0.8125rem; color: #e6d8bf; }
+
+.ui-addr__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-4) var(--sp-3) 0;
+}
+.ui-addr__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--ui-border);
+}
+.ui-addr__brand {
+  font-family: var(--ui-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ui-ink);
+  letter-spacing: -0.02em;
+}
+.ui-addr__brand small {
+  display: block;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  color: var(--ui-muted);
+  text-transform: uppercase;
+}
+.ui-addr__city {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--ui-cream);
+  border: 1px solid var(--ui-border);
+  color: var(--ui-ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.ui-addr__city i { color: var(--ui-gold-ink); }
+
+.ui-addr__title {
+  margin: 0;
+  font-family: var(--ui-display);
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: var(--ui-ink);
+  text-wrap: balance;
+}
+
+.ui-addr__rows { margin: 0; display: grid; gap: 2px; }
+.ui-addr__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--ui-border);
+}
+.ui-addr__row:last-child { border-bottom: 0; }
+.ui-addr__row dt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: var(--ui-text);
+  font-size: 0.9375rem;
+}
+.ui-addr__row dt i { color: var(--ui-gold-ink); font-size: 1.05rem; flex: none; }
+.ui-addr__row dd {
+  margin: 0;
+  color: var(--ui-ink);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.ui-addr__row dd small { font-weight: 500; color: var(--ui-muted); margin-left: 2px; }
+.ui-addr__row dd.is-na { color: var(--ui-muted); font-weight: 500; }
+
+.ui-addr__actions { display: flex; gap: var(--sp-3); margin-top: auto; padding-top: var(--sp-2); }
+.ui-addr__actions > * { flex: 1; justify-content: center; }
+
+@media (max-width: 860px) {
+  .ui-addr { grid-template-columns: 1fr; }
+  .ui-addr__media { min-height: 220px; border-radius: 20px; }
+  .ui-addr__media::after { inset: 40% 0 0 0; }
+  .ui-addr__panel { padding: 0 var(--sp-3) var(--sp-3); }
+}
+@media (max-width: 460px) {
+  .ui-addr__actions { flex-direction: column; }
+}
