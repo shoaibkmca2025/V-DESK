@@ -4,16 +4,23 @@
  * once, because each claims one row at a time with SELECT ... FOR UPDATE SKIP LOCKED and a lease.
  */
 import './events.js';
+import { env } from './config/env.js';
+import { createEmailProvider } from './integrations/email.js';
 import { processDueNotifications } from './modules/notifications/index.js';
 import { dispatchDueEvents } from './shared/events/bus.js';
 import { purgeExpiredRows } from './shared/jobs/purge.js';
 
 /**
- * Messaging adapters by channel (integrations/messaging.js contract). None exist yet — the vendors are undecided
- * (memory.md §6) — so notifications stay PENDING until one is added here, e.g. `{ email: createEmailProvider(env) }`.
+ * Messaging adapters by channel (integrations/messaging.js contract).
+ *
+ * Email is live once RESEND_API_KEY and MAIL_FROM are both set; without them no provider is registered and
+ * notifications stay PENDING, which is what a deployment with no vendor does. WhatsApp and SMS have no
+ * provider chosen yet (memory.md §6), so messages on those channels still queue and wait.
  */
 export function messagingProviders() {
-  return {};
+  const providers = {};
+  if (env.RESEND_API_KEY && env.MAIL_FROM) providers.email = createEmailProvider();
+  return providers;
 }
 
 export function buildJobs({ providers = messagingProviders() } = {}) {

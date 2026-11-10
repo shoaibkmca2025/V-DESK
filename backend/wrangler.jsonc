@@ -32,6 +32,20 @@
     // Set to the deployed site once it has a domain; sitemap.xml needs it.
     "SITE_URL": "https://vdesk.shoaibk-mca2024.workers.dev",
     "CORS_ORIGINS": "https://vdesk.shoaibk-mca2024.workers.dev,http://localhost:5173,http://localhost:4173",
+
+    // ── Not set yet; the product works without them, but two things stay switched off. ──
+    //
+    // 1. Email delivery. Confirmations and sales alerts queue and wait until BOTH of these exist:
+    //      "MAIL_FROM": "V-DESK <hello@your-verified-domain>"   ← add here, it is not a secret
+    //      npx wrangler secret put RESEND_API_KEY               ← never put the key in this file
+    //    The From domain has to be verified with the provider first, or every send is rejected.
+    //
+    // 2. "Continue with Google" at checkout. Until GOOGLE_CLIENT_ID is set, POST /auth/google answers 503
+    //    and customers cannot pay. It is public, not a secret, and must be the same value the website is
+    //    built with (frontend/.env.production → VITE_GOOGLE_CLIENT_ID):
+    //      "GOOGLE_CLIENT_ID": "....apps.googleusercontent.com"
+    //
+    // A third, optional: "SALES_ALERT_EMAIL": "sales@…" turns on the internal new-enquiry alert.
     // "Continue with Google" for customers (ADR-012): add the OAuth client ID here once it exists — it is public,
     // and the same value as the website's VITE_GOOGLE_CLIENT_ID. Until then POST /auth/google answers 503.
     // "GOOGLE_CLIENT_ID": "….apps.googleusercontent.com",

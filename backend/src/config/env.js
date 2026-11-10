@@ -42,6 +42,13 @@ const schema = z.object({
   TURNSTILE_SECRET_KEY: z.preprocess(blankToUndefined, z.string().min(1).optional()),
   /** The public website's address, e.g. https://vdesk.in — used for sitemap.xml links. Unset → sitemap 503. */
   SITE_URL: z.preprocess(blankToUndefined, z.string().url().optional()),
+  /**
+   * Resend API key (integrations/email.js). Set together with MAIL_FROM → email is delivered; either unset →
+   * no email provider is registered and notifications stay PENDING, which is the state before a vendor exists.
+   */
+  RESEND_API_KEY: z.preprocess(blankToUndefined, z.string().trim().min(1).optional()),
+  /** The From address, e.g. `V-DESK <hello@vdesk.in>`. Its domain must be verified with the email provider. */
+  MAIL_FROM: z.preprocess(blankToUndefined, z.string().trim().min(1).optional()),
   /** Internal inbox for new-lead alerts (template `lead.sales_alert`). Unset → no sales alert is queued. */
   SALES_ALERT_EMAIL: z.preprocess(blankToUndefined, z.string().trim().toLowerCase().email().optional()),
   /** Proxy hops in front of the API (Cloudflare, load balancer). Needed so rate limits see the visitor's IP. */
