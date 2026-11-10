@@ -10,6 +10,7 @@ import { showToast } from '@/features/ui/toast.js';
 import { isApiEnabled } from '@/lib/api.js';
 import { rawStyle } from '@/lib/domRefs.js';
 import { addOrder } from '@/features/orders/orderHistory.js';
+import { parseAmount, rupees } from '@/lib/money.js';
 
 const METHODS = [
   ['upi', 'ph-qr-code', 'UPI / QR'],
@@ -17,7 +18,6 @@ const METHODS = [
   ['netbanking', 'ph-bank', 'Net Banking'],
 ];
 
-const rupees = (n) => '₹' + Math.round(n).toLocaleString('en-IN');
 
 /**
  * /checkout?item=&amount=&city=&hub= — standalone checkout (PRD §48). Amount is GST-inclusive.
@@ -25,9 +25,6 @@ const rupees = (n) => '₹' + Math.round(n).toLocaleString('en-IN');
  * Paying is the one step that needs an account (ADR-012), so the payment options appear once the customer has
  * continued with Google. Payment itself is simulated — test mode, no money is taken — until a gateway is live.
  */
-/** A link's amount in whole rupees, or 0 when it carries none we could charge. Exported for the test. */
-export const parseAmount = (raw) => Math.max(0, Math.round(Number(raw) || 0));
-
 export default function CheckoutPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();

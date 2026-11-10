@@ -1,5 +1,6 @@
 import { openActiveModal } from '@/features/modals/modalManager.js';
 import { showToast } from '@/features/ui/toast.js';
+import { parseAmount, rupees } from '@/lib/money.js';
 
 /* GST tax invoice sheet (PRD §48, §73): CGST + SGST split of an inclusive amount. */
 
@@ -16,7 +17,7 @@ export function openTaxInvoiceModal(invoiceData = {}) {
   const email = invoiceData.email || 'finance@acme.io';
   const city = invoiceData.city || 'Mumbai (BKC)';
   const item = invoiceData.item || 'Virtual Office for GST (12 Months) + Landlord NOC';
-  const amount = invoiceData.amount || 21499;
+  const amount = parseAmount(invoiceData.amount);
 
   const basePrice = Math.round(amount / 1.18);
   const cgst = Math.round((amount - basePrice) / 2);
@@ -24,7 +25,6 @@ export function openTaxInvoiceModal(invoiceData = {}) {
 
   activeInvoiceRecord = { invNo, client, company, email, city, item, amount, basePrice, cgst, sgst, date: now.toLocaleDateString('en-IN') };
 
-  const rupees = (value) => '₹' + value.toLocaleString('en-IN');
   const fields = {
     invNumberDisplay: invNo,
     invDateDisplay: now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),

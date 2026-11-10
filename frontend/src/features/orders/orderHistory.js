@@ -14,9 +14,19 @@ const KEY = 'VDESK_ORDERS';
 
 const store = () => (isApiEnabled() ? globalThis.sessionStorage : globalThis.localStorage);
 
+/**
+ * Builds before this change wrote receipts to localStorage even with an API. Clear that copy the first
+ * time anything looks, not on sign-out: someone who never signs out would otherwise keep it for good.
+ */
+let legacyCopyCleared = false;
+function clearLegacyCopy() {
+  if (legacyCopyCleared || !isApiEnabled()) return;
+  removeKey(KEY, globalThis.localStorage);
+  legacyCopyCleared = true;
+}
+
 export function readOrders() {
-  // Builds before this change wrote to localStorage even with an API; clear what they left behind.
-  if (isApiEnabled()) removeKey(KEY, globalThis.localStorage);
+  clearLegacyCopy();
   return readJson(KEY, [], store());
 }
 

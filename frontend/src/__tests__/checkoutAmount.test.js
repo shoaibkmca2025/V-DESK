@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { parseAmount } from '@/pages/account/CheckoutPage.jsx';
+import { parseAmount, rupees } from '@/lib/money.js';
 
 /** Loads the order history with VITE_API_URL set (or not) for that test. */
 async function loadOrders(baseUrl) {
@@ -24,6 +24,13 @@ describe('checkout amount', () => {
   it('is whole rupees', () => {
     expect(parseAmount('21499.6')).toBe(21500);
     expect(parseAmount('1249')).toBe(1249);
+  });
+
+  // One formatter now serves the checkout and the tax invoice, so the grouping has to be the Indian one.
+  it('formats with Indian digit grouping, and never shows a figure for a missing one', () => {
+    expect(rupees(124999)).toBe('₹1,24,999');
+    expect(rupees(1249)).toBe('₹1,249');
+    expect(rupees(undefined)).toBe('₹0');
   });
 });
 
