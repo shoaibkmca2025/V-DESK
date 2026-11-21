@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { COVERAGE_CLAIM } from '@/data/coverage.js';
 import { useCustomer } from '@/features/auth/useCustomer.js';
 
 /** Slim contact bar above the header. Its last link is the way in and out of the client portal. */
@@ -11,7 +12,7 @@ export default function TopUtilityBar() {
     <div className="ui-topbar">
       <div className="ui-container ui-topbar__inner">
         <span className="ui-topbar__note">
-          <i className="ph-bold ph-shield-check" /> GST & MCA compliant addresses in 10+ cities
+          <i className="ph-bold ph-shield-check" /> GST & MCA compliant addresses at {COVERAGE_CLAIM} locations
         </span>
         <div className="ui-topbar__links">
           <a href="tel:+919876543210">

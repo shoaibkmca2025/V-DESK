@@ -48,35 +48,23 @@ export default function CentreAddressCard({ centre }) {
         <img
           src={remote ? image : asset(image)}
           srcSet={remote ? undefined : srcSetFor(image)}
-          sizes="(max-width: 860px) 100vw, 42vw"
+          sizes="(max-width: 860px) 100vw, 25vw"
           alt={centre.fullName}
           loading="lazy"
         />
+        <span className="ui-addr__city">
+          <i className="ph-fill ph-map-pin" /> {centre.city}
+        </span>
         {centre.flagship && (
           <span className="ui-addr__flag">
-            <i className="ph-fill ph-star" /> Popular Location
+            <i className="ph-fill ph-star" /> Popular
           </span>
         )}
-        <div className="ui-addr__place">
-          <i className="ph-fill ph-map-pin" />
-          <div>
-            <strong>{centre.city}</strong>
-            <span>A prime business address</span>
-          </div>
-        </div>
       </div>
 
       <div className="ui-addr__panel">
-        <header className="ui-addr__head">
-          <span className="ui-addr__brand">
-            V&#8209;DESK <small>Workspace</small>
-          </span>
-          <span className="ui-addr__city">
-            <i className="ph-fill ph-map-pin" /> {centre.city}
-          </span>
-        </header>
-
         <h3 className="ui-addr__title">{centre.areaName} Business Address</h3>
+        <p className="ui-addr__sub">A prime business address in {centre.city}</p>
 
         <dl className="ui-addr__rows">
           {rowsFor(centre).map(([icon, label, price, unit]) => (

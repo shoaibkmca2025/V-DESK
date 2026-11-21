@@ -36,8 +36,8 @@ describe('centre address card', () => {
   });
 
   it('flags only the centres marked popular', () => {
-    expect(render(FLAGSHIP)).toContain('Popular Location');
-    expect(render(BKC)).not.toContain('Popular Location');
+    expect(render(FLAGSHIP)).toContain('Popular');
+    expect(render(BKC)).not.toContain('Popular');
   });
 
   it('renders every real centre without throwing', () => {

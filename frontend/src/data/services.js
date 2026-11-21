@@ -8,13 +8,13 @@ export const SERVICES = [
     title: 'Virtual Office for GST,',
     titleHighlight: 'MCA & Business Address',
     description:
-      'A verified commercial address in 10+ prime Indian metros with notarized rent agreement, landlord NOC and utility bill — everything a tax officer or the MCA asks for, delivered digitally within 24 hours.',
+      'A verified commercial address at 120+ locations across India with notarized rent agreement, landlord NOC and utility bill — everything a tax officer or the MCA asks for, delivered digitally within 24 hours.',
     startingPrice: 1249,
     priceUnit: '/mo',
     stats: [
       ['24 Hrs', 'Document Delivery'],
       ['100%', 'GST Approval Guarantee'],
-      ['10+', 'Prime Metros'],
+      ['120+', 'Locations'],
       ['₹0', 'Deposit & Brokerage'],
     ],
     trust: ['Notarized 12-Month Lease', 'Landlord NOC & Utility Bill', 'Physical Name Board', 'Inspection Support'],
@@ -77,7 +77,7 @@ export const SERVICES = [
     ],
     faqs: [
       ['Which documents are required?', 'PAN, Aadhaar and photo of promoters, bank proof, and address proof (rent agreement + NOC + utility bill).'],
-      ['Do I need a separate GSTIN for each state?', 'Yes — every state of supply requires its own registration; V-DESK provides addresses in 10+ states.'],
+      ['Do I need a separate GSTIN for each state?', 'Yes — every state of supply requires its own registration; V-DESK provides addresses in 25+ states.'],
       ['How is APOB different from PPOB?', 'PPOB is the principal place of business on the GSTIN; APOB is an additional address (e.g. a marketplace warehouse) under the same GSTIN.'],
       ['What if the officer raises a query?', 'Our compliance desk drafts and files the response within the statutory window at no extra cost.'],
     ],

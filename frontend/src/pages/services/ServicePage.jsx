@@ -78,7 +78,7 @@ export default function ServicePage() {
 
         <section className="section" style={{ padding: '70px 0', background: '#FBF5EA' }}>
           <div className="container">
-            <SectionHeader eyebrow="Available Across India" title={`${service.name} in`} highlight="10+ cities" />
+            <SectionHeader eyebrow="Available Across India" title={`${service.name} in`} highlight="120+ locations" />
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginTop: '28px' }}>
               {CITIES.map((city) => (
                 <Link key={city.slug} to={service.slug === 'virtual-office' ? `/locations/${city.slug}/virtual-office` : `/locations/${city.slug}`} className="btn btn--outline btn--sm">

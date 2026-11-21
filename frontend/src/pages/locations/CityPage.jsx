@@ -71,7 +71,7 @@ export default function CityPage() {
           <div className="container">
             <SectionHeader eyebrow="Verified Centres" title={`Business centres in ${city.name}`} description={centres.length ? 'Every centre holds a registered commercial lease, municipal tax receipt and utility bill for statutory use.' : `We are onboarding partner centres in ${city.name}. Request a quote and our team will confirm availability within a working day.`} />
             {centres.length > 0 ? (
-              <div className="locations__grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(540px, 100%), 1fr))', gap: '24px', marginTop: '36px' }}>
+              <div className="locations__grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '24px', marginTop: '36px' }}>
                 {centres.map((centre) => (
                   <CentreAddressCard key={centre.id} centre={centre} />
                 ))}

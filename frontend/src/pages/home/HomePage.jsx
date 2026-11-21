@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import FaqAccordion from '@/components/page/FaqAccordion.jsx';
 import { Button, CityGrid, CityStrip, CtaBand, Plans, SearchHero, Section, Steps, Testimonials } from '@/components/ui/index.js';
+import { COVERAGE_CLAIM } from '@/data/coverage.js';
 import { FAQ_GROUPS } from '@/data/faqs.js';
 import { GUIDES } from '@/data/guides.js';
 import { asset, photo, srcSetFor } from '@/lib/assets.js';
@@ -91,7 +92,7 @@ export default function HomePage() {
             Your business address & workspace, <em>ready in 24 hours</em>
           </>
         }
-        description="Virtual offices, coworking desks, meeting rooms and company registration in 10+ cities — with every document you need for GST and MCA."
+        description={`Virtual offices, coworking desks, meeting rooms and company registration at ${COVERAGE_CLAIM} locations — with every document you need for GST and MCA.`}
         placeholder="Try “virtual office in Mumbai” or “meeting room for 8”"
         chips={[
           { label: 'Virtual Office', icon: 'ph-buildings', to: '/virtual-office' },
@@ -105,7 +106,7 @@ export default function HomePage() {
         imageSrcSet={photo('vdesk-reception').srcSet}
         stats={[
           ['10,000+', 'Businesses served'],
-          ['10+', 'Cities'],
+          [`${COVERAGE_CLAIM}`, 'Locations'],
           ['24 hrs', 'Activation'],
           ['4.9★', 'Client rating'],
         ]}

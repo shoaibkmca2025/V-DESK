@@ -1,3 +1,5 @@
+import { COVERAGE_CLAIM } from '@/data/coverage.js';
+
 /*
  * Navigation structure for the header, mobile drawer and footer.
  * On the homepage most entries scroll to in-page sections (`href`); on every other page they link to
@@ -24,7 +26,7 @@ export const HEADER_NAV = [
       { icon: 'ph-certificate', title: 'Company Registration', subtitle: 'Pvt Ltd, LLP, OPC', to: '/company-registration', activeOn: ['companyRegistration'] },
       { icon: 'ph-receipt', title: 'GST Registration', subtitle: 'GSTIN with a compliant address', to: '/services/gst-registration' },
       { icon: 'ph-check-square-offset', title: 'Track GST Application', subtitle: 'Check your ARN status', action: 'openGstTrackerModal' },
-      { icon: 'ph-map-pin', title: 'Locations', subtitle: 'Centres in 10+ cities', to: '/locations', activeOn: ['locations', 'city', 'cityProduct'] },
+      { icon: 'ph-map-pin', title: 'Locations', subtitle: `Addresses at ${COVERAGE_CLAIM} locations`, to: '/locations', activeOn: ['locations', 'city', 'cityProduct'] },
       { icon: 'ph-tag', title: 'Pricing', subtitle: 'Plans and what they include', to: '/pricing', activeOn: ['pricing'] },
       { icon: 'ph-briefcase', title: 'Enterprise Solutions', subtitle: 'Multi-city teams', action: 'openEnterpriseSuiteModal' },
       { icon: 'ph-book-open', title: 'Guides & FAQs', subtitle: 'How GST and MCA filings work', to: '/resources', activeOn: ['resources', 'guide', 'faqs'] },

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import PageHero from '@/components/page/PageHero.jsx';
 import { CityGrid, CityStrip, CtaBand, FeatureCards, Section } from '@/components/ui/index.js';
+import { COVERAGE, COVERAGE_CITIES, COVERAGE_CLAIM, COVERAGE_STATES } from '@/data/coverage.js';
 import { LOCATIONS } from '@/data/locations.js';
 
 const WHY = [
@@ -64,6 +65,27 @@ export default function LocationsPage() {
 
       <Section kicker="Every centre" title="The same standard, in every city">
         <FeatureCards items={WHY} />
+      </Section>
+
+      <Section
+        id="coverage"
+        tone="tint"
+        kicker="Full coverage"
+        title={`Where we can give you an address`}
+        lead={`${COVERAGE_CLAIM} locations in ${COVERAGE_CITIES} cities across ${COVERAGE_STATES} states and union territories. Ask for any of them — the ones with live pricing are listed above.`}
+      >
+        <div className="ui-coverage">
+          {COVERAGE.map(([state, entries]) => (
+            <div key={state} className="ui-coverage__state">
+              <h3>{state}</h3>
+              <ul>
+                {[...new Set(entries.map(([city]) => city))].map((city) => (
+                  <li key={city}>{city}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </Section>
 
       <section className="ui-section ui-section--tight">

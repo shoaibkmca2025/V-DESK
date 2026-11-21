@@ -7,7 +7,7 @@ export const PAGES = {
     path: '/',
     title: 'V-DESK — Business Infrastructure & Workspace Platform',
     description:
-      'Your business deserves a better address. V-DESK provides premium virtual offices, coworking spaces, meeting rooms, company registration and GST infrastructure across 10+ prime commercial hubs in India.',
+      'Your business deserves a better address. V-DESK provides premium virtual offices, coworking spaces, meeting rooms, company registration and GST infrastructure at 120+ locations across India.',
     htmlClass: '',
     bodyClass: '',
   },

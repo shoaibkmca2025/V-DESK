@@ -50,7 +50,7 @@ export default function EnterpriseSuiteModal() {
               Enterprise Multi-City Workspace Platform
             </h3>
             <p style={{ margin: '2px 0 0 0', fontSize: '0.82rem', color: '#BCA88F' }}>
-              Bulk desk allocation, custom master services agreements (MSA), and centralized billing across 10+ Indian
+              Bulk desk allocation, custom master services agreements (MSA), and centralized billing across 120+ Indian
               metros.
             </p>
           </div>

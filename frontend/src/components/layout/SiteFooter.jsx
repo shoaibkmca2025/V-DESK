@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { COVERAGE_CLAIM } from '@/data/coverage.js';
 import { FOOTER_COLUMNS } from '@/config/navigation.js';
 import { asset } from '@/lib/assets.js';
 
@@ -19,7 +20,7 @@ export default function SiteFooter() {
             <Link to="/" className="ui-footer__logo" aria-label="V-DESK Home">
               <img src={asset('assets/vdesk-logo-compact-white.png')} alt="V-DESK Workspace & Consulting LLP" />
             </Link>
-            <p>Virtual offices, coworking, meeting rooms and company registration across 10+ Indian cities.</p>
+            <p>Virtual offices, coworking, meeting rooms and company registration at {COVERAGE_CLAIM} locations across India.</p>
             <ul className="ui-footer__contact">
               <li>
                 <a href="tel:+919876543210">

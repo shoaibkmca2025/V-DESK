@@ -13,7 +13,7 @@ export const GUIDES = [
       ['Is a virtual office a valid place of business?', 'Yes. Section 2(85) of the CGST Act defines a place of business as any premises from which business is ordinarily carried on. A commercial address held under a valid rent agreement with owner consent qualifies. What matters is documentation, not desk usage.'],
       ['The three documents', 'Every application under Form REG-01 needs (1) a registered or notarized rent/lease agreement in the entity name, (2) a no-objection certificate from the property owner and (3) a recent utility bill or municipal tax receipt for the same premises. Mismatched addresses across the three are the most common rejection reason.'],
       ['Physical verification', 'Under Rule 25 the proper officer may visit the premises. Centres must display a name board with the taxpayer name and GSTIN, keep a visitor register, and have staff who can confirm the tenancy. V-DESK centres host these visits and share a visit report.'],
-      ['APOB for marketplace sellers', 'Amazon, Flipkart and Meesho sellers storing goods in fulfilment centres must add those warehouses as additional places of business. Each state needs its own GSTIN; V-DESK provides addresses in 10+ states so onboarding is not blocked.'],
+      ['APOB for marketplace sellers', 'Amazon, Flipkart and Meesho sellers storing goods in fulfilment centres must add those warehouses as additional places of business. Each state needs its own GSTIN; V-DESK provides addresses in 25+ states so onboarding is not blocked.'],
     ],
   },
   {

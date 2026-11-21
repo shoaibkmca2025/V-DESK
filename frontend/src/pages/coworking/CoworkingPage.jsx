@@ -89,7 +89,7 @@ export default function CoworkingPage() {
 
       <TeamSavingsCalculator />
 
-      <Section id="cities" tone="white" kicker="Locations" title="Coworking in 10+ cities">
+      <Section id="cities" tone="white" kicker="Locations" title="Coworking in 45+ cities">
         <CityGrid limit={8} productSlug="coworking" />
       </Section>
 
