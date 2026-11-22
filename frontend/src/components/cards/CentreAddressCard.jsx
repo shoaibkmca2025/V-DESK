@@ -1,5 +1,4 @@
 import { Link } from 'react-router';
-import CityIcon from '@/components/ui/cityIcons.jsx';
 import { CITIES } from '@/data/cities.js';
 import { getService } from '@/data/services.js';
 import { catalog } from '@/features/catalog/catalogStore.js';
@@ -73,10 +72,6 @@ export default function CentreAddressCard({ centre }) {
             <i className="ph-fill ph-star" /> Popular
           </span>
         )}
-        <span className="ui-addr__arc" aria-hidden="true" />
-        <span className="ui-addr__seal">
-          <CityIcon slug={citySlug} />
-        </span>
       </div>
 
       <div className="ui-addr__panel">

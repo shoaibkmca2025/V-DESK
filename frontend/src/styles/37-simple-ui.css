@@ -1165,10 +1165,11 @@ a.ui-card:hover .ui-card__link i { transform: translateX(4px); }
 .ui-addr__row dt {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   min-width: 0;
   color: var(--ui-text);
-  font-size: 0.875rem;
+  font-size: 0.8438rem;
+  line-height: 1.3;
 }
 .ui-addr__row dt i { color: var(--ui-gold-ink); font-size: 1rem; flex: none; }
 .ui-addr__row dd {
@@ -1182,8 +1183,20 @@ a.ui-card:hover .ui-card__link i { transform: translateX(4px); }
 .ui-addr__row dd small { font-weight: 500; color: var(--ui-muted); margin-left: 2px; }
 .ui-addr__row dd.is-na { color: var(--ui-muted); font-weight: 500; }
 
-.ui-addr__actions { display: flex; gap: var(--sp-2); margin-top: auto; padding-top: var(--sp-2); }
-.ui-addr__actions > * { flex: 1; justify-content: center; }
+.ui-addr__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: auto;
+  padding-top: var(--sp-3);
+}
+.ui-addr__actions > * {
+  flex: 1 1 120px;
+  min-width: 0; /* without this a flex item will not shrink below its text, and overflows the card */
+  justify-content: center;
+  padding-inline: 12px;
+  white-space: nowrap;
+}
 
 @media (hover: hover) {
   .ui-addr:hover { transform: translateY(-4px); box-shadow: var(--ui-e3); }
@@ -1280,8 +1293,9 @@ a.ui-card:hover .ui-card__link i { transform: translateX(4px); }
 
 .ui-locplans__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(270px, 100%), 1fr));
-  gap: var(--sp-5);
+  /* 300px is what the longest row label ("Business Registration" + its price) needs on one line. */
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: var(--sp-4);
 }
 
 /* ── Trust strip ── */
@@ -1332,30 +1346,91 @@ a.ui-card:hover .ui-card__link i { transform: translateX(4px); }
   .ui-locplans__cta { justify-content: space-between; }
 }
 
-/* ── The landmark medallion on the card ── */
-.ui-addr__seal {
-  position: absolute;
-  z-index: 2;
-  left: 16px;
-  bottom: -26px;
+
+/* ── Plan cards ─────────────────────────────────────────────────────────────
+   Icon, the annual-billing pill, a ticked feature list that collapses, and the
+   price pinned to the bottom so it sits level across cards of different length.
+   ──────────────────────────────────────────────────────────────────────── */
+.ui-plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: var(--sp-5);
+  align-items: stretch;
+}
+.ui-plan {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-r-panel);
+  box-shadow: var(--ui-e1);
+}
+.ui-plan--popular { border-color: var(--ui-gold); box-shadow: var(--ui-e2); }
+
+.ui-plan__top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-3); }
+.ui-plan__icon {
   width: 54px;
   height: 54px;
   display: grid;
   place-items: center;
-  border-radius: 50%;
-  background: var(--ui-surface);
-  box-shadow: 0 6px 18px -8px rgba(43, 26, 12, 0.5);
+  border-radius: var(--ui-r-control);
+  background: var(--ui-gold-50);
+  color: var(--ui-gold-ink);
+  font-size: 1.5rem;
 }
-.ui-addr__seal svg { width: 26px; height: 26px; fill: none; stroke: var(--ui-gold-ink); stroke-width: 2.1; }
-/* The arc the medallion sits on, sweeping out of the photo as in the reference. */
-.ui-addr__arc {
-  position: absolute;
-  z-index: 1;
-  left: -14px;
-  bottom: -30px;
-  width: 128px;
-  height: 56px;
-  border-radius: 0 999px 0 0;
+.ui-plan__billed {
+  padding: 6px 13px;
+  border-radius: 999px;
   background: var(--ui-gold);
+  color: var(--ui-navy);
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
-.ui-addr__panel { padding-top: calc(var(--sp-4) + 22px); }
+
+.ui-plan__name {
+  margin: 0;
+  font-family: var(--ui-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ui-ink);
+}
+.ui-plan__desc { margin: -6px 0 0; font-size: 0.9375rem; color: var(--ui-muted); }
+
+.ui-plan__features { margin: 0; padding: 0; list-style: none; display: grid; gap: 11px; }
+.ui-plan__features li { display: flex; gap: 10px; font-size: 0.9375rem; line-height: 1.45; color: var(--ui-text); }
+.ui-plan__features li i { color: var(--ui-gold-ink); font-size: 1.05rem; flex: none; margin-top: 1px; }
+.ui-plan__features li.is-off { color: var(--ui-muted); text-decoration: line-through; }
+.ui-plan__features li.is-off i { color: var(--ui-muted); }
+
+.ui-plan__toggle {
+  align-self: flex-start;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--ui-gold-ink);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* `margin-top: auto` is what keeps the price level across cards of different height. */
+.ui-plan__foot { margin-top: auto; padding-top: var(--sp-4); border-top: 1px solid var(--ui-border); }
+.ui-plan__price { margin: 0 0 var(--sp-4); display: flex; align-items: baseline; flex-wrap: wrap; gap: 7px; }
+.ui-plan__price small { font-size: 0.875rem; color: var(--ui-muted); }
+.ui-plan__price strong {
+  font-family: var(--ui-display);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ui-ink);
+  font-variant-numeric: tabular-nums;
+}
+.ui-plan__price span { font-size: 0.875rem; color: var(--ui-muted); }
+.ui-plan__note { margin: -10px 0 var(--sp-3); font-size: 0.8125rem; color: var(--ui-muted); }

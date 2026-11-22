@@ -5,32 +5,8 @@ import { Button, CtaBand, Plans, Section } from '@/components/ui/index.js';
 import { CITIES, cityStartingPrice, getCityProduct } from '@/data/cities.js';
 import { FAQ_GROUPS } from '@/data/faqs.js';
 import SavingsComparisonSection from './sections/SavingsComparisonSection.jsx';
+import { PLANS } from '@/data/plans.js';
 
-const VO_PLANS = [
-  {
-    name: 'Mailing Address',
-    description: 'A prime address for letters and couriers.',
-    price: 849,
-    features: [['Commercial business address'], ['Mail & courier receiving'], ['WhatsApp photo alerts'], ['GST registration documents', false]],
-    source: 'Pricing - Mailing Plan',
-  },
-  {
-    name: 'GST Registration',
-    description: 'Everything needed to get your GSTIN.',
-    price: 1249,
-    popular: true,
-    features: [['Rent agreement, NOC & utility bill'], ['Company name board'], ['Officer inspection support'], ['Full refund if rejected']],
-    cta: 'Get this plan',
-    source: 'Pricing - GST Plan',
-  },
-  {
-    name: 'All-Inclusive',
-    description: 'For Pvt Ltd companies that also meet clients.',
-    price: 1999,
-    features: [['Everything in GST plan'], ['MCA incorporation proofs'], ['10 free boardroom hours / month'], ['Dedicated concierge']],
-    source: 'Pricing - Enterprise Plan',
-  },
-];
 
 const OTHER_PRICES = [
   ['ph-laptop', 'Coworking day pass', '₹299', '/day', '/coworking-spaces'],
@@ -67,7 +43,7 @@ export default function PricingPage() {
       />
 
       <Section id="plans" tone="white" kicker="Virtual office" title="Virtual office plans" lead="Per month, billed annually. Prices exclude 18% GST.">
-        <Plans plans={VO_PLANS} />
+        <Plans plans={PLANS} />
       </Section>
 
       <Section id="other" kicker="Other services" title="Workspaces & registration">

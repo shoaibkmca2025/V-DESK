@@ -5,6 +5,9 @@ import { COVERAGE_CLAIM } from '@/data/coverage.js';
 import { FAQ_GROUPS } from '@/data/faqs.js';
 import { GUIDES } from '@/data/guides.js';
 import { asset, photo, srcSetFor } from '@/lib/assets.js';
+import LocationsPlans from '@/components/page/LocationsPlans.jsx';
+import { LOCATIONS } from '@/data/locations.js';
+import { PLANS } from '@/data/plans.js';
 
 const SERVICES = [
   {
@@ -46,31 +49,6 @@ const STEPS = [
   { title: 'Receive your documents', text: 'Rent agreement, NOC and utility bill arrive in your portal, ready to file.', time: 'Within 24 hours' },
 ];
 
-const PLANS = [
-  {
-    name: 'Mailing Address',
-    description: 'A prime address for letters and couriers.',
-    price: 849,
-    features: [['Commercial business address'], ['Mail & courier handling'], ['WhatsApp photo alerts'], ['GST registration documents', false], ['Name board at centre', false]],
-    source: 'Home - Mailing Plan',
-  },
-  {
-    name: 'GST Registration',
-    description: 'Everything you need to get your GSTIN approved.',
-    price: 1249,
-    popular: true,
-    features: [['Everything in Mailing'], ['Rent agreement, NOC & utility bill'], ['Officer verification support'], ['Company name board'], ['Documents in 24 hours']],
-    cta: 'Get this plan',
-    source: 'Home - GST Plan',
-  },
-  {
-    name: 'All-Inclusive',
-    description: 'For Pvt Ltd companies that also need meeting space.',
-    price: 1999,
-    features: [['Everything in GST plan'], ['MCA-compliant incorporation proofs'], ['10 free boardroom hours / month'], ['Dedicated concierge'], ['Bank account verification desk']],
-    source: 'Home - Enterprise Plan',
-  },
-];
 
 const WHY = [
   { icon: 'ph-seal-check', title: '100% approval support', text: 'If your GST or MCA application is rejected because of our documents, you get a full refund.' },
@@ -174,14 +152,18 @@ export default function HomePage() {
         </p>
       </Section>
 
-      <Section id="locations" kicker="Locations" title="Choose your city" lead="Grade-A business centres in India’s top commercial areas. Tap a city to see centres and prices.">
-        <CityGrid limit={8} />
-        <div className="ui-actions ui-actions--center" style={{ marginTop: '28px' }}>
-          <Button to="/locations" variant="outline" iconRight="ph-arrow-right">
-            See all locations
-          </Button>
-        </div>
-      </Section>
+      <LocationsPlans
+        city="India"
+        subtitle="Premium business addresses at prime locations across India"
+        centres={LOCATIONS}
+        limit={4}
+        footer={false}
+      />
+      <div className="ui-actions ui-actions--center" style={{ margin: '-28px 0 56px' }}>
+        <Button to="/locations" variant="outline" iconRight="ph-arrow-right">
+          See all locations
+        </Button>
+      </div>
 
       <Section id="why" tone="navy" kicker="Why V-DESK" title="Built so you don’t have to worry about compliance" lead="Ten thousand businesses have used a V-DESK address to register, file and grow.">
         <div className="ui-stat-row">

@@ -2,32 +2,8 @@ import FaqAccordion from '@/components/page/FaqAccordion.jsx';
 import VirtualOfficeConfigurator from '@/components/sections/VirtualOfficeConfigurator.jsx';
 import DocumentChecklist from '@/components/ui/DocumentChecklist.jsx';
 import { AcceptedFor, Button, CityGrid, Comparison, CtaBand, FeatureCards, Plans, Section, SplitHero, Steps } from '@/components/ui/index.js';
+import { PLANS } from '@/data/plans.js';
 
-const PLANS = [
-  {
-    name: 'Mailing Address',
-    description: 'For freelancers and remote teams who need a prime address for mail.',
-    price: 849,
-    features: [['Commercial business address'], ['Mail & courier receiving'], ['WhatsApp photo alerts'], ['GST registration documents', false], ['Name board at centre', false]],
-    source: 'Virtual Office - Mailing Plan',
-  },
-  {
-    name: 'GST Registration',
-    description: 'Everything needed for a PPOB or APOB GST registration.',
-    price: 1249,
-    popular: true,
-    features: [['Notarized rent agreement'], ['Landlord NOC & electricity bill'], ['Company name board'], ['Officer inspection support'], ['Full refund if rejected']],
-    cta: 'Get this plan',
-    source: 'Virtual Office - GST Plan',
-  },
-  {
-    name: 'All-Inclusive',
-    description: 'For Pvt Ltd companies with directors and client meetings.',
-    price: 1999,
-    features: [['Everything in GST plan'], ['MCA incorporation proofs'], ['10 free boardroom hours / month'], ['Dedicated concierge'], ['Bank account verification desk']],
-    source: 'Virtual Office - Enterprise Plan',
-  },
-];
 
 const INCLUDED = [
   { icon: 'ph-file-text', title: 'Rent agreement', text: 'A notarized commercial rent agreement in your business name.' },

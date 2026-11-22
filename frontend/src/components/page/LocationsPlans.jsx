@@ -16,11 +16,14 @@ const TRUST = [
   ['ph-calendar-check', 'Flexible Plans', 'For every business'],
 ];
 
-export default function LocationsPlans({ city, centres }) {
-  const zones = useMemo(() => [...new Set(centres.map((c) => c.zone).filter(Boolean))], [centres]);
+export default function LocationsPlans({ city, subtitle, centres, limit, footer = true }) {
+  // A city with zones tabs by zone; a nationwide list tabs by city. Same control, same component.
+  const groupOf = (c) => c.zone ?? c.city;
+  const zones = useMemo(() => [...new Set(centres.map(groupOf))], [centres]);
   const [zone, setZone] = useState('all');
 
-  const shown = zone === 'all' ? centres : centres.filter((c) => c.zone === zone);
+  const matching = zone === 'all' ? centres : centres.filter((c) => groupOf(c) === zone);
+  const shown = limit ? matching.slice(0, limit) : matching;
 
   return (
     <section className="ui-locplans" id="centres">
@@ -29,10 +32,11 @@ export default function LocationsPlans({ city, centres }) {
           <h2>
             Our <em>Locations</em> &amp; Plans
           </h2>
-          <p>Premium business addresses at prime locations in {city}</p>
+          <p>{subtitle ?? `Premium business addresses at prime locations in ${city}`}</p>
         </header>
 
-        {zones.length > 1 && (
+        {/* A trimmed showcase has nothing useful to filter — tabs only earn their place on the full list. */}
+        {!limit && zones.length > 1 && (
           <div className="ui-locplans__tabs" role="tablist" aria-label={`Areas in ${city}`}>
             <button
               type="button"
@@ -64,6 +68,7 @@ export default function LocationsPlans({ city, centres }) {
           ))}
         </div>
 
+        {footer && (
         <div className="ui-locplans__trust">
           <ul>
             {TRUST.map(([icon, title, note]) => (
@@ -86,6 +91,7 @@ export default function LocationsPlans({ city, centres }) {
             </Link>
           </div>
         </div>
+        )}
       </div>
     </section>
   );

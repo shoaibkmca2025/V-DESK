@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
+import LocationsPlans from '@/components/page/LocationsPlans.jsx';
 import PageHero from '@/components/page/PageHero.jsx';
 import { CityGrid, CityStrip, CtaBand, FeatureCards, Section } from '@/components/ui/index.js';
 import { COVERAGE, COVERAGE_CITIES, COVERAGE_CLAIM, COVERAGE_STATES } from '@/data/coverage.js';
@@ -35,6 +36,12 @@ export default function LocationsPage() {
       />
 
       <CityStrip limit={0} />
+
+      <LocationsPlans
+        city="India"
+        subtitle="Premium business addresses at prime locations across India"
+        centres={LOCATIONS}
+      />
 
       {q && (
         <Section tight title={matches.length ? `${matches.length} centre${matches.length > 1 ? 's' : ''} found` : 'No centres match that search'} lead={matches.length ? undefined : 'Try a city name like Mumbai, Pune or Delhi.'}>
