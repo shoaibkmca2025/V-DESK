@@ -92,7 +92,7 @@ export default function LocationsFeature({ city, subtitle, centres }) {
           <div className="ui-locfeat__plans">
             <h3>Available plans at {groupOf(featured)}</h3>
             <div className="ui-locfeat__tiles">
-              {rowsFor(featured).map(([icon, label, price, unit], i) => (
+              {rowsFor(featured).map(([icon, label, price, unit]) => (
                 <div key={label} className="ui-locfeat__tile">
                   <span className="ui-locfeat__tileIcon">
                     <i className={`ph-bold ${icon}`} />
@@ -108,11 +108,8 @@ export default function LocationsFeature({ city, subtitle, centres }) {
                       <span className="is-na">Not at this centre</span>
                     )}
                   </p>
-                  {i === rowsFor(featured).length - 1 && citySlug ? (
-                    <Link to={`/locations/${citySlug}/virtual-office`} className="ui-btn ui-btn--gold ui-btn--sm">
-                      Book now <i className="ph-bold ph-arrow-right" />
-                    </Link>
-                  ) : (
+                  {/* No quote button on a plan this centre does not sell. */}
+                  {price && (
                     <button
                       type="button"
                       className="ui-btn ui-btn--outline ui-btn--sm"
@@ -124,6 +121,12 @@ export default function LocationsFeature({ city, subtitle, centres }) {
                 </div>
               ))}
             </div>
+
+            {citySlug && (
+              <Link to={`/locations/${citySlug}/virtual-office`} className="ui-btn ui-btn--gold ui-locfeat__book">
+                Book now <i className="ph-bold ph-arrow-right" />
+              </Link>
+            )}
           </div>
         </div>
 

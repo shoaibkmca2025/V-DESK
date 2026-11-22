@@ -15,13 +15,14 @@ const render = (centre) => renderToStaticMarkup(
   </MemoryRouter>,
 );
 
-const BKC = LOCATIONS.find((c) => c.id === 'MUM-002');
+// A Mumbai centre that does not sell every plan, so the N/A path is exercised.
+const BKC = LOCATIONS.find((c) => c.id === 'MUM-003');
 const FLAGSHIP = LOCATIONS.find((c) => c.flagship);
 
 describe('centre address card', () => {
   it('names the locality and the city', () => {
     const html = render(BKC);
-    expect(html).toContain('BKC');
+    expect(html).toContain(BKC.areaName);
     expect(html).toContain('Mumbai');
   });
 
@@ -30,8 +31,8 @@ describe('centre address card', () => {
   });
 
   it('shows N/A for a service the centre does not offer', () => {
-    // BKC has no Coworking, so the desk row has no price to show.
-    expect(BKC.services).not.toContain('Coworking');
+    // This centre does not offer company registration, so that row has no price to show.
+    expect(BKC.services).not.toContain('Company Registration');
     expect(render(BKC)).toContain('N/A');
   });
 
