@@ -1434,3 +1434,196 @@ a.ui-card:hover .ui-card__link i { transform: translateX(4px); }
 }
 .ui-plan__price span { font-size: 0.875rem; color: var(--ui-muted); }
 .ui-plan__note { margin: -10px 0 var(--sp-3); font-size: 0.8125rem; color: var(--ui-muted); }
+
+/* ── Locations: the landing-page layout ─────────────────────────────────────
+   One centre shown large with its plans beside it, then the rest of the area
+   as a strip. The city pages use the four-up grid (.ui-locplans) instead.
+   ──────────────────────────────────────────────────────────────────────── */
+.ui-locfeat { padding: clamp(48px, 7vw, 84px) 0; background: var(--ui-bg); }
+
+.ui-locfeat__main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+  gap: var(--sp-5);
+  align-items: stretch;
+}
+
+.ui-locfeat__photo {
+  position: relative;
+  margin: 0;
+  min-height: 300px;
+  border-radius: var(--ui-r-panel);
+  overflow: hidden;
+  background: var(--ui-navy);
+}
+.ui-locfeat__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ui-locfeat__photo::after {
+  content: '';
+  position: absolute;
+  inset: 40% 0 0 0;
+  background: linear-gradient(180deg, rgba(27, 16, 6, 0) 0%, rgba(27, 16, 6, 0.86) 100%);
+}
+.ui-locfeat__pin {
+  position: absolute;
+  z-index: 1;
+  top: 16px;
+  left: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 15px;
+  border-radius: 999px;
+  background: var(--ui-gold);
+  color: var(--ui-navy);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+.ui-locfeat__photo figcaption {
+  position: absolute;
+  z-index: 1;
+  left: var(--sp-5);
+  right: var(--sp-5);
+  bottom: var(--sp-5);
+  color: #fff;
+}
+.ui-locfeat__photo figcaption strong {
+  display: block;
+  font-family: var(--ui-display);
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.ui-locfeat__photo figcaption span { font-size: 0.9375rem; color: #e6d8bf; }
+
+.ui-locfeat__plans {
+  padding: var(--sp-5);
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-r-panel);
+  box-shadow: var(--ui-e1);
+}
+.ui-locfeat__plans h3 {
+  margin: 0 0 var(--sp-4);
+  text-align: center;
+  font-family: var(--ui-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ui-ink);
+}
+.ui-locfeat__tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr));
+  gap: var(--sp-3);
+}
+.ui-locfeat__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: var(--sp-3);
+  text-align: center;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-r-card);
+  background: var(--ui-cream);
+}
+.ui-locfeat__tileIcon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ui-gold-50);
+  color: var(--ui-gold-ink);
+  font-size: 1.15rem;
+}
+.ui-locfeat__tileName { margin: 0; font-size: 0.8125rem; color: var(--ui-muted); line-height: 1.3; }
+.ui-locfeat__tilePrice {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ui-ink);
+  font-variant-numeric: tabular-nums;
+}
+.ui-locfeat__tilePrice small { font-size: 0.75rem; font-weight: 500; color: var(--ui-muted); }
+.ui-locfeat__tilePrice .is-na { font-size: 0.8125rem; font-weight: 500; color: var(--ui-muted); }
+.ui-locfeat__tile .ui-btn { width: 100%; justify-content: center; min-width: 0; padding-inline: 10px; }
+
+.ui-locfeat__explore {
+  margin: var(--sp-7) 0 var(--sp-4);
+  text-align: center;
+  font-family: var(--ui-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--ui-ink);
+}
+.ui-locfeat__others {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
+  gap: var(--sp-4);
+}
+.ui-locfeat__other {
+  position: relative;
+  height: 128px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ui-r-card);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--ui-navy);
+}
+.ui-locfeat__other img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ui-locfeat__other::after {
+  content: '';
+  position: absolute;
+  inset: 35% 0 0 0;
+  background: linear-gradient(180deg, rgba(27, 16, 6, 0) 0%, rgba(27, 16, 6, 0.85) 100%);
+}
+.ui-locfeat__other > span {
+  position: absolute;
+  z-index: 1;
+  left: 12px;
+  right: 34px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: left;
+}
+.ui-locfeat__other > span i { color: var(--ui-gold-light); flex: none; }
+.ui-locfeat__other > i {
+  position: absolute;
+  z-index: 1;
+  right: 12px;
+  bottom: 12px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--ui-surface);
+  color: var(--ui-ink);
+  font-size: 0.75rem;
+}
+.ui-locfeat__more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: var(--sp-4);
+  text-align: center;
+  border: 1px dashed var(--ui-border-strong);
+  border-radius: var(--ui-r-card);
+  background: var(--ui-cream);
+}
+.ui-locfeat__more > i { font-size: 1.6rem; color: var(--ui-gold-ink); }
+.ui-locfeat__more p { margin: 0; font-weight: 600; font-size: 0.9375rem; color: var(--ui-ink); line-height: 1.3; }
+.ui-locfeat__more p span { display: block; font-weight: 400; color: var(--ui-muted); }
+
+@media (max-width: 900px) {
+  .ui-locfeat__main { grid-template-columns: 1fr; }
+  .ui-locfeat__photo { min-height: 230px; }
+}

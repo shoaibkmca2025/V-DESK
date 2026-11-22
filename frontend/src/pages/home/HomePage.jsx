@@ -5,7 +5,7 @@ import { COVERAGE_CLAIM } from '@/data/coverage.js';
 import { FAQ_GROUPS } from '@/data/faqs.js';
 import { GUIDES } from '@/data/guides.js';
 import { asset, photo, srcSetFor } from '@/lib/assets.js';
-import LocationsPlans from '@/components/page/LocationsPlans.jsx';
+import LocationsFeature from '@/components/page/LocationsFeature.jsx';
 import { LOCATIONS } from '@/data/locations.js';
 import { PLANS } from '@/data/plans.js';
 
@@ -152,18 +152,13 @@ export default function HomePage() {
         </p>
       </Section>
 
-      <LocationsPlans
-        city="India"
-        subtitle="Premium business addresses at prime locations across India"
-        centres={LOCATIONS}
-        limit={4}
-        footer={false}
+      {/* The landing section features one city — Delhi, which has the zones and the published rate card.
+          Every other city is a click away on /locations. */}
+      <LocationsFeature
+        city="Delhi"
+        subtitle="Premium business addresses at prime locations in Delhi"
+        centres={LOCATIONS.filter((c) => c.city === 'Delhi')}
       />
-      <div className="ui-actions ui-actions--center" style={{ margin: '-28px 0 56px' }}>
-        <Button to="/locations" variant="outline" iconRight="ph-arrow-right">
-          See all locations
-        </Button>
-      </div>
 
       <Section id="why" tone="navy" kicker="Why V-DESK" title="Built so you don’t have to worry about compliance" lead="Ten thousand businesses have used a V-DESK address to register, file and grow.">
         <div className="ui-stat-row">

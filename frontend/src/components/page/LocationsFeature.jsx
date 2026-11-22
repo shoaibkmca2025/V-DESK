@@ -40,7 +40,8 @@ export default function LocationsFeature({ city, subtitle, centres }) {
 
   const inGroup = centres.filter((c) => groupOf(c) === group);
   const featured = inGroup.find((c) => c.id === pickedId) ?? inGroup[0];
-  const others = inGroup.filter((c) => c.id !== featured?.id).slice(0, 3);
+  // Drawn from the whole city, not just the open tab — a zone with one centre would otherwise show nothing.
+  const others = centres.filter((c) => c.id !== featured?.id).slice(0, 3);
 
   if (!featured) return null;
 
