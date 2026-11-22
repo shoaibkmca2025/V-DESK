@@ -1217,3 +1217,145 @@ a.ui-card:hover .ui-card__link i { transform: translateX(4px); }
 }
 .ui-coverage__state ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; }
 .ui-coverage__state li { font-size: 0.875rem; color: var(--ui-muted); }
+
+/* ── Our Locations & Plans ──────────────────────────────────────────────────
+   The city's centres and what each address costs. Caramel does the work the
+   reference design gives orange: the heading accent, the live tab, the arc
+   behind each medallion and the primary button.
+   ──────────────────────────────────────────────────────────────────────── */
+.ui-locplans { padding: clamp(48px, 7vw, 84px) 0; background: var(--ui-bg); }
+
+.ui-locplans__head { text-align: center; max-width: 640px; margin: 0 auto var(--sp-6); }
+.ui-locplans__head h2 {
+  margin: 0;
+  font-family: var(--ui-display);
+  font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: var(--ui-ink);
+}
+.ui-locplans__head h2 em { font-style: normal; color: var(--ui-gold-ink); }
+/* The rules either side of the heading in the reference, drawn rather than imaged. */
+.ui-locplans__head h2::before,
+.ui-locplans__head h2::after {
+  content: '';
+  display: inline-block;
+  width: clamp(28px, 7vw, 76px);
+  height: 2px;
+  margin-bottom: 0.32em;
+  background: var(--ui-gold);
+  vertical-align: middle;
+}
+.ui-locplans__head h2::before { margin-right: 18px; }
+.ui-locplans__head h2::after { margin-left: 18px; }
+.ui-locplans__head p { margin: 10px 0 0; color: var(--ui-muted); }
+
+.ui-locplans__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-6);
+}
+.ui-locplans__tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--ui-border);
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--ui-fast) var(--ui-ease), color var(--ui-fast) var(--ui-ease);
+}
+.ui-locplans__tabs button i { color: var(--ui-gold-ink); }
+.ui-locplans__tabs button.is-on { background: var(--ui-brand); border-color: var(--ui-brand); color: #fff; }
+.ui-locplans__tabs button.is-on i { color: var(--ui-gold-light); }
+
+.ui-locplans__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(270px, 100%), 1fr));
+  gap: var(--sp-5);
+}
+
+/* ── Trust strip ── */
+.ui-locplans__trust {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--sp-5);
+  margin-top: var(--sp-7);
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--ui-cream);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-r-panel);
+}
+.ui-locplans__trust ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--sp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ui-locplans__trust li { display: flex; align-items: center; gap: 11px; }
+.ui-locplans__trust li i { font-size: 1.35rem; color: var(--ui-gold-ink); flex: none; }
+.ui-locplans__trust strong { display: block; font-size: 0.9375rem; color: var(--ui-ink); }
+.ui-locplans__trust span { font-size: 0.8125rem; color: var(--ui-muted); }
+
+.ui-locplans__cta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  border-radius: var(--ui-r-card);
+  background: var(--ui-navy);
+}
+.ui-locplans__cta p {
+  margin: 0;
+  font-family: var(--ui-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #fff;
+}
+.ui-locplans__cta p span { display: block; font-weight: 400; color: #e6d8bf; }
+
+@media (max-width: 860px) {
+  .ui-locplans__trust { grid-template-columns: 1fr; }
+  .ui-locplans__cta { justify-content: space-between; }
+}
+
+/* ── The landmark medallion on the card ── */
+.ui-addr__seal {
+  position: absolute;
+  z-index: 2;
+  left: 16px;
+  bottom: -26px;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ui-surface);
+  box-shadow: 0 6px 18px -8px rgba(43, 26, 12, 0.5);
+}
+.ui-addr__seal svg { width: 26px; height: 26px; fill: none; stroke: var(--ui-gold-ink); stroke-width: 2.1; }
+/* The arc the medallion sits on, sweeping out of the photo as in the reference. */
+.ui-addr__arc {
+  position: absolute;
+  z-index: 1;
+  left: -14px;
+  bottom: -30px;
+  width: 128px;
+  height: 56px;
+  border-radius: 0 999px 0 0;
+  background: var(--ui-gold);
+}
+.ui-addr__panel { padding-top: calc(var(--sp-4) + 22px); }

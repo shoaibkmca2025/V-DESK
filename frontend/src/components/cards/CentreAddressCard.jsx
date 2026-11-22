@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import CityIcon from '@/components/ui/cityIcons.jsx';
 import { CITIES } from '@/data/cities.js';
 import { getService } from '@/data/services.js';
 import { catalog } from '@/features/catalog/catalogStore.js';
@@ -25,6 +26,18 @@ const priceOf = (slug) => getService(slug)?.startingPrice ?? null;
 
 export function rowsFor(centre) {
   const has = (service) => centre.services.includes(service);
+
+  // A centre with its own rate card wins: those are the prices the client quotes, per year.
+  if (centre.plans) {
+    const { businessReg, gstReg, mailing, virtualDesk } = centre.plans;
+    return [
+      ['ph-file-text', 'Business Registration', businessReg ? inr(businessReg) : null, '/year'],
+      ['ph-percent', 'GST Registration', gstReg ? inr(gstReg) : null, '/year'],
+      ['ph-envelope-simple', 'Mailing Address', mailing ? inr(mailing) : null, '/year'],
+      ['ph-laptop', 'Virtual Desk Plan', virtualDesk ? inr(virtualDesk) : null, '/year'],
+    ];
+  }
+
   const company = priceOf('company-registration');
   const gst = priceOf('gst-registration');
   return [
@@ -53,18 +66,22 @@ export default function CentreAddressCard({ centre }) {
           loading="lazy"
         />
         <span className="ui-addr__city">
-          <i className="ph-fill ph-map-pin" /> {centre.city}
+          <i className="ph-fill ph-map-pin" /> {centre.zone ?? centre.city}
         </span>
         {centre.flagship && (
           <span className="ui-addr__flag">
             <i className="ph-fill ph-star" /> Popular
           </span>
         )}
+        <span className="ui-addr__arc" aria-hidden="true" />
+        <span className="ui-addr__seal">
+          <CityIcon slug={citySlug} />
+        </span>
       </div>
 
       <div className="ui-addr__panel">
-        <h3 className="ui-addr__title">{centre.areaName} Business Address</h3>
-        <p className="ui-addr__sub">A prime business address in {centre.city}</p>
+        <h3 className="ui-addr__title">{centre.areaName}</h3>
+        <p className="ui-addr__sub">{centre.tagline ?? `A prime business address in ${centre.city}`}</p>
 
         <dl className="ui-addr__rows">
           {rowsFor(centre).map(([icon, label, price, unit]) => (

@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router';
 import { describe, expect, it } from 'vitest';
-import CentreAddressCard from '@/components/cards/CentreAddressCard.jsx';
+import CentreAddressCard, { rowsFor } from '@/components/cards/CentreAddressCard.jsx';
 import { LOCATIONS } from '@/data/locations.js';
 
 /*
@@ -21,7 +21,7 @@ const FLAGSHIP = LOCATIONS.find((c) => c.flagship);
 describe('centre address card', () => {
   it('names the locality and the city', () => {
     const html = render(BKC);
-    expect(html).toContain('BKC Business Address');
+    expect(html).toContain('BKC');
     expect(html).toContain('Mumbai');
   });
 
@@ -43,9 +43,40 @@ describe('centre address card', () => {
   it('renders every real centre without throwing', () => {
     for (const centre of LOCATIONS) {
       const html = render(centre);
-      expect(html).toContain('Business Address');
+      expect(html).toContain(centre.areaName);
       // A price that failed to resolve would reach the page as "₹undefined" or "₹NaN".
       expect(html).not.toMatch(/₹(undefined|NaN)/);
     }
+  });
+});
+
+/*
+ * Delhi quotes its own yearly rate card rather than the derived monthly prices. These are the figures the
+ * client published, so a typo here is a wrong price in front of a customer.
+ */
+describe('a centre with its own rate card', () => {
+  const asafAli = LOCATIONS.find((c) => c.id === 'DEL-001');
+  const connaught = LOCATIONS.find((c) => c.id === 'DEL-004');
+
+  it('shows the rate card, per year, not the derived monthly prices', () => {
+    const rows = rowsFor(asafAli);
+
+    expect(rows.map(([, label, price, unit]) => [label, price, unit])).toEqual([
+      ['Business Registration', '₹12,999', '/year'],
+      ['GST Registration', '₹12,999', '/year'],
+      ['Mailing Address', '₹9,999', '/year'],
+      ['Virtual Desk Plan', '₹36,000', '/year'],
+    ]);
+  });
+
+  it('shows N/A for a plan the centre does not sell', () => {
+    expect(rowsFor(connaught).find(([, label]) => label === 'Virtual Desk Plan')[2]).toBeNull();
+  });
+
+  it('badges the zone rather than the city, and uses the centre tagline', () => {
+    const html = render(asafAli);
+
+    expect(html).toContain('Central Delhi');
+    expect(html).toContain('A prestigious business address in the heart of Delhi');
   });
 });

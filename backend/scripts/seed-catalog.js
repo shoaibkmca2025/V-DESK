@@ -459,33 +459,32 @@ const CITY_REF = {
 async function main() {
   await connectDb();
 
-  // Import models after connection (ESM)
-  const { City, Centre, Workspace } = await import('../src/modules/catalog/catalog.model.js');
+  // The Mongoose models this used to call are gone (ADR-010); the repository is the only way in now.
+  const repo = await import('../src/modules/catalog/catalog.repository.js');
 
-  // ── Cities ──
+  /** Update by ref, insert when there is nothing to update — the upsert the old `updateOne` gave us. */
+  async function upsert(kind, ref, data) {
+    const set = { ...data, ref, active: true, deletedAt: null };
+    return (await repo.updateDoc(kind, ref, set)) ?? (await repo.insertDoc(kind, set));
+  }
+
   let citiesUpserted = 0;
   for (const c of CITIES_SEED) {
-    await City.updateOne(
-      { ref: CITY_REF[c.slug] },
-      { $set: { ...c, ref: CITY_REF[c.slug], active: true, deletedAt: null } },
-      { upsert: true },
-    );
+    await upsert('city', CITY_REF[c.slug], c);
     citiesUpserted++;
   }
   console.log(`[seed-catalog] cities upserted: ${citiesUpserted}`);
 
-  // ── Centres ──
   let centresUpserted = 0;
   for (const c of CENTRES_SEED) {
-    await Centre.updateOne({ ref: c.ref }, { $set: { ...c, active: true, deletedAt: null } }, { upsert: true });
+    await upsert('centre', c.ref, c);
     centresUpserted++;
   }
   console.log(`[seed-catalog] centres upserted: ${centresUpserted}`);
 
-  // ── Workspaces ──
   let workspacesUpserted = 0;
   for (const w of WORKSPACES_SEED) {
-    await Workspace.updateOne({ ref: w.ref }, { $set: { ...w, active: true, deletedAt: null } }, { upsert: true });
+    await upsert('workspace', w.ref, w);
     workspacesUpserted++;
   }
   console.log(`[seed-catalog] workspaces upserted: ${workspacesUpserted}`);

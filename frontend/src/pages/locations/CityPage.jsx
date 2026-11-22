@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router';
-import CentreAddressCard from '@/components/cards/CentreAddressCard.jsx';
+import LocationsPlans from '@/components/page/LocationsPlans.jsx';
 import WorkspaceCard from '@/components/cards/WorkspaceCard.jsx';
 import Breadcrumbs from '@/components/page/Breadcrumbs.jsx';
 import CtaStrip from '@/components/page/CtaStrip.jsx';
@@ -67,24 +67,22 @@ export default function CityPage() {
           </div>
         </section>
 
-        <section className="section" style={{ padding: '70px 0', background: '#FBF5EA' }}>
-          <div className="container">
-            <SectionHeader eyebrow="Verified Centres" title={`Business centres in ${city.name}`} description={centres.length ? 'Every centre holds a registered commercial lease, municipal tax receipt and utility bill for statutory use.' : `We are onboarding partner centres in ${city.name}. Request a quote and our team will confirm availability within a working day.`} />
-            {centres.length > 0 ? (
-              <div className="locations__grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '24px', marginTop: '36px' }}>
-                {centres.map((centre) => (
-                  <CentreAddressCard key={centre.id} centre={centre} />
-                ))}
-              </div>
-            ) : (
-              <div style={{ textAlign: 'center', marginTop: '28px' }}>
-                <Link to="/locations" className="btn btn--outline">
-                  Browse All Cities
-                </Link>
-              </div>
-            )}
-          </div>
-        </section>
+        {centres.length > 0 ? (
+          <LocationsPlans city={city.name} centres={centres} />
+        ) : (
+          <section className="section" style={{ padding: '70px 0', background: '#FBF5EA' }}>
+            <div className="container" style={{ textAlign: 'center' }}>
+              <SectionHeader
+                eyebrow="Verified Centres"
+                title={`Business centres in ${city.name}`}
+                description={`We are onboarding partner centres in ${city.name}. Request a quote and our team will confirm availability within a working day.`}
+              />
+              <Link to="/locations" className="btn btn--outline">
+                Browse All Cities
+              </Link>
+            </div>
+          </section>
+        )}
 
         {workspaces.length > 0 && (
           <section className="section" style={{ padding: '70px 0', background: '#FFFFFF' }}>
